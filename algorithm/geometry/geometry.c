@@ -198,8 +198,10 @@ geometry_convex_hull(vec2_t *points, size_t cnt_points)
     if (points && (cnt_points > 3)) {
         convex_hull_t ch_ctx = { cnt_points, &points, dl_list_new(), dl_list_new() };
 
+        #ifdef debug
         __geometry_print_points(points, cnt_points);
-
+        #endif
+        
         __geometry_sort_points(&ch_ctx);
 
         __geometry_upper_cv(&ch_ctx);

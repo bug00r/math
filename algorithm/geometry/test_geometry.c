@@ -1,5 +1,7 @@
 #include "geometry.h"
+
 #include "debug.h"
+
 #include <stdlib.h>
 #include <stdint.h>
 #include <assert.h>

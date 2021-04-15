@@ -1,4 +1,44 @@
-include ../../make_config
+MAKE?=mingw32-make
+AR?=ar
+ARFLAGS?=rcs
+PATHSEP?=/
+CC=gcc
+BUILDROOT?=build
+
+ifeq ($(CLANG),1)
+	export CC=clang
+endif
+
+BUILDDIR?=$(BUILDROOT)$(PATHSEP)$(CC)
+BUILDPATH?=$(BUILDDIR)$(PATHSEP)
+
+INSTALL_ROOT?=$(BUILDPATH)
+
+ifeq ($(DEBUG),1)
+	export debug=-ggdb -Ddebug=1
+	export isdebug=1
+endif
+
+ifeq ($(ANALYSIS),1)
+	export analysis=-Danalysis=1
+	export isanalysis=1
+endif
+
+ifeq ($(DEBUG),2)
+	export debug=-ggdb -Ddebug=2
+	export isdebug=1
+endif
+
+ifeq ($(DEBUG),3)
+	export debug=-ggdb -Ddebug=3
+	export isdebug=1
+endif
+
+ifeq ($(OUTPUT),1)
+	export outimg= -Doutput=1
+endif
+
+CFLAGS=-std=c11 -Wpedantic -pedantic-errors -Wall -Wextra
 #CFLAGS=-std=c11 -Wpedantic -pedantic-errors -Wall -Wextra -O1 
 #-ggdb
 #-pg for profiling 
@@ -8,15 +48,15 @@ SRC=statistics.c average.c
 LIBNAME=libstatistics.a
 OBJS=$(BUILDPATH)statistics.o $(BUILDPATH)average.o
 
-INCLUDEDIR= -I./../vec -I./../mat -I./../utils -I. 
+INCLUDE?=-I/c/dev/include
+INCLUDEDIR=$(INCLUDE) -I. 
+
+LIB?=-L/c/dev/lib
 
 TESTSRC=test_statistics.c
 TESTBIN=test_statistics.exe
 TESTLIB= -lstatistics -lutilsmath -lmat -lvec
-TESTLIBDIR=-L$(BUILDDIR) \
-		   -L./../vec/$(BUILDDIR) \
-		   -L./../mat/$(BUILDDIR) \
-		   -L./../utils/$(BUILDDIR) \
+TESTLIBDIR=-L$(BUILDDIR) $(LIB)
 
 all: mkbuilddir $(BUILDPATH)$(LIBNAME) $(BUILDPATH)$(TESTBIN) test
 
@@ -42,4 +82,10 @@ mkbuilddir:
 
 clean:
 	-rm -dr $(BUILDROOT)
-	
+
+install:
+	mkdir -p $(INSTALL_ROOT)include
+	mkdir -p $(INSTALL_ROOT)lib
+	cp ./statistics.h $(INSTALL_ROOT)include/statistics.h
+	cp ./average.h $(INSTALL_ROOT)include/average.h
+	cp $(BUILDPATH)$(LIBNAME) $(INSTALL_ROOT)lib/$(LIBNAME)

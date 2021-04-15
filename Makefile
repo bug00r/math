@@ -1,22 +1,11 @@
 .PHONY: clean vec mat utils statistics algorithm
 
-all: vec mat utils statistics algorithm
-
-vec:
+all: 
 	$(MAKE) -C vec
-
-mat:
 	$(MAKE) -C mat
-
-utils:
 	$(MAKE) -C utils
-
-statistics:
 	$(MAKE) -C statistics
-
-algorithm:
 	$(MAKE) -C algorithm
-
 
 clean:
 	$(MAKE) -C vec clean
@@ -25,3 +14,9 @@ clean:
 	$(MAKE) -C statistics clean
 	$(MAKE) -C algorithm clean
 	
+install:
+	$(MAKE) -C vec install
+	$(MAKE) -C mat install
+	$(MAKE) -C utils install
+	$(MAKE) -C statistics install
+	$(MAKE) -C algorithm install
