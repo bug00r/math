@@ -182,6 +182,52 @@ print_barycentric(const barycentric_t * bc){
 
 #endif
 
+float line_intersect_denominator(vec2_t* _l1p1, vec2_t* _l1p2, vec2_t* _l2p1, vec2_t* _l2p2) {
+	vec2_t* l1p1 = _l1p1;
+	vec2_t* l1p2 = _l1p2;
+	vec2_t* l2p1 = _l2p1;
+	vec2_t* l2p2 = _l2p2;
+
+	return (l1p1->x - l1p2->x)*(l2p1->y - l2p2->y) - (l1p1->y - l1p2->y)*(l2p1->x - l2p2->x);
+
+}
+
+bool lines_intersect(vec2_t* _l1p1, vec2_t* _l1p2, vec2_t* _l2p1, vec2_t* _l2p2) {
+	vec2_t* l1p1 = _l1p1;
+	vec2_t* l1p2 = _l1p2;
+	vec2_t* l2p1 = _l2p1;
+	vec2_t* l2p2 = _l2p2;
+
+	float denom = line_intersect_denominator(l1p1, l1p2, l2p1, l2p2);
+
+	return (denom != 0.f);
+}
+
+bool lines_intersect_pt(vec2_t *intersec, vec2_t* _l1p1, vec2_t* _l1p2, vec2_t* _l2p1, vec2_t* _l2p2) {
+
+	vec2_t* l1p1 = _l1p1;
+	vec2_t* l1p2 = _l1p2;
+	vec2_t* l2p1 = _l2p1;
+	vec2_t* l2p2 = _l2p2;
+
+	float denom = line_intersect_denominator(l1p1, l1p2, l2p1, l2p2);
+	if (denom != 0.f && intersec) {
+		//x1y2-y1x2
+		float x1y2_y1x2 = (l1p1->x * l1p2->y) - (l1p1->y * l1p2->x);
+		//x3y4-y3x4
+		float x3y4_y3x4 = (l2p1->x * l2p2->y) - (l2p1->y * l2p2->x);
+		//(x1y2-y1x2)(x3-x4)-(x1-x2)(x3y4-y3x4) / denom
+		intersec->x = (x1y2_y1x2 * (l2p1->x - l2p2->x)) - ((l1p1->x - l1p2->x) * x3y4_y3x4);
+		intersec->x /= denom;
+		//(x1y2-y1x2)(y3-y4)-(y1-y2)(x3y4-y3x4) / denom
+		intersec->y = (x1y2_y1x2 * (l2p1->y - l2p2->y)) - ((l1p1->y - l1p2->y) * x3y4_y3x4);
+		intersec->y /= denom;
+	}
+
+
+	return denom != 0.f;
+}
+
 #if defined(USE_VEC_3) && defined(USE_MAT_3)
 
 void 

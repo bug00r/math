@@ -143,6 +143,10 @@ float place_of_vec3(const vec3_t *  s, const vec3_t *  e, const vec3_t *  p);
 void is_inside_triangle(const vec3_t *  v0, const vec3_t *  v1, const vec3_t *  v2, const vec3_t *  p, barycentric_t *  bc);
 void print_barycentric(const barycentric_t *  bc);
 
+float line_intersect_denominator(vec2_t* l1p1, vec2_t* l1p2, vec2_t* l2p1, vec2_t* l2p2);
+bool lines_intersect(vec2_t* l1p1, vec2_t* l1p2, vec2_t* l2p1, vec2_t* l2p2);
+bool lines_intersect_pt(vec2_t *intersec, vec2_t* l1p1, vec2_t* l1p2, vec2_t* l2p1, vec2_t* l2p2);
+
 #endif
 
 #if defined(USE_VEC_3) && defined(USE_MAT_3)

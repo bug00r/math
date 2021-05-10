@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <time.h>
+#include <stdbool.h>
 #include "utils_math.h"
 
 int 
@@ -487,6 +488,101 @@ main() {
 	assert(intres == 0.f);
 	
 	#endif
+
+	#ifdef debug
+		printf("line intersection denominator:\n");
+	#endif
+	vec2_t p1 = {-1.f, 1.f};
+	vec2_t p2 = {-1.f, -1.f};
+	vec2_t p3 = {1.f, 1.f};
+	vec2_t p4 = {1.f, -1.f};
+
+	float denominator = line_intersect_denominator(&p1, &p2, &p3, &p4);
+	#ifdef debug
+		printf("calc denom: %f\n", denominator);
+	#endif
+	assert(denominator == 0.f);
+	assert(lines_intersect(&p1, &p2, &p3, &p4) == false);
+
+	p1 = (vec2_t){-1.f, 1.f};
+	p2 = (vec2_t){-1.f, -1.f};
+	p3 = (vec2_t){-.9f, 1.f};
+	p4 = (vec2_t){-.9f, -1.f};
+
+	denominator = line_intersect_denominator(&p1, &p2, &p3, &p4);
+	#ifdef debug
+		printf("calc denom: %f\n", denominator);
+	#endif
+	assert(denominator == 0.f);
+	assert(lines_intersect(&p1, &p2, &p3, &p4) == false);
+
+	p1 = (vec2_t){-1.f, 1.f};
+	p2 = (vec2_t){1.f, -1.f};
+	p3 = (vec2_t){-1.f, -1.f};
+	p4 = (vec2_t){1.f, 1.f};
+
+	denominator = line_intersect_denominator(&p1, &p2, &p3, &p4);
+	#ifdef debug
+		printf("calc denom: %f\n", denominator);
+	#endif
+	assert(denominator != 0.f);
+	assert(lines_intersect(&p1, &p2, &p3, &p4) == true);
+
+	p3 = (vec2_t){-1.f, 1.f};
+	p4 = (vec2_t){1.f, -1.f};
+	p2 = (vec2_t){-1.f, -1.f};
+	p1 = (vec2_t){1.f, 1.f};
+
+	denominator = line_intersect_denominator(&p1, &p2, &p3, &p4);
+	#ifdef debug
+		printf("calc denom: %f\n", denominator);
+	#endif
+	assert(denominator != 0.f);
+
+	assert(lines_intersect(&p1, &p2, &p3, &p4) == true);
+
+	p1 = (vec2_t){-1.f, 1.f};
+	p2 = (vec2_t){1.f, -1.f};
+	p3 = (vec2_t){-1.f, -1.f};
+	p4 = (vec2_t){1.f, 1.f};
+	vec2_t intersection = {-100.f, -100.f};
+
+	assert(lines_intersect_pt(&intersection, &p1, &p2, &p3, &p4) == true);
+	#ifdef debug
+		printf("intersection at 0 / 0:\n");
+		vec2_print(&intersection);
+	#endif
+	assert(intersection.x == 0.f);
+	assert(intersection.y == 0.f);
+
+
+	p1 = (vec2_t){-1.5f, .5f};
+	p2 = (vec2_t){.5f, -1.5f};
+	p3 = (vec2_t){-1.5f, -1.5f};
+	p4 = (vec2_t){.5f, .5f};
+	intersection = (vec2_t){-100.f, -100.f};
+
+	assert(lines_intersect_pt(&intersection, &p1, &p2, &p3, &p4) == true);
+	#ifdef debug
+		printf("intersection at -0.5 / -0.5:\n");
+		vec2_print(&intersection);
+	#endif
+	assert(intersection.x == -0.5f);
+	assert(intersection.y == -0.5f);
+
+	p1 = (vec2_t){-.5f, 1.5f};
+	p2 = (vec2_t){2.f, .5f};
+	p3 = (vec2_t){1.f, -.5f};
+	p4 = (vec2_t){1.f, 2.f};
+	intersection = (vec2_t){-100.f, -100.f};
+
+	assert(lines_intersect_pt(&intersection, &p1, &p2, &p3, &p4) == true);
+	#ifdef debug
+		printf("intersection at 1 / 0.9:\n");
+		vec2_print(&intersection);
+	#endif
+	assert(intersection.x == 1.f);
+	assert(intersection.y == 0.9f);
 
 	#ifdef debug
 		printf("End testing math utils:\n");
