@@ -10,7 +10,9 @@
 #include <stddef.h>
 
 typedef struct {
-	float x,y,z;
+	float x;
+	float y;
+	float z;
 } vec3_t;	
 
 extern const size_t vec3_size;
