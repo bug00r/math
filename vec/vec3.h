@@ -1,6 +1,6 @@
 #if 0
 /**
-	This ist a vector with two dimensions x, y and z.
+	This ist a vector with three dimensions x, y and z.
 */
 #endif
 

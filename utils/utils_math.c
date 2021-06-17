@@ -412,4 +412,40 @@ float transform_point_dest(vec3_t *  dest, const mat4_t *  m, const vec3_t *  v)
 	//return transform_point(m, dest);
 }
 
+float mu_point_plane_distance(vec3_t *_point, vec3_t *_plane_p1, vec3_t *_plane_p2, vec3_t *_plane_p3) {
+	vec3_t * p = _point;
+	vec3_t * pp1 = _plane_p1;
+	vec3_t * pp2 = _plane_p2;
+	vec3_t * pp3 = _plane_p3;
+
+	vec3_t dvec_p21;
+	vec3_t dvec_p31;
+	vec3_t normal;
+
+	vec3_sub_dest(&dvec_p21, pp2, pp1);
+	vec3_sub_dest(&dvec_p31, pp3, pp1);
+
+	vec3_cross_dest(&normal, &dvec_p21, &dvec_p31);
+
+	/*vec3_t p_pp1_sub;
+	vec3_sub_dest(&p_pp1_sub, p, pp1);
+	vec3_vec3mul(&normal, &p_pp1_sub);
+
+	return vec3_vec3mul(&normal, &p_pp1_sub) / vec3_length(&normal);
+	*/
+	return mu_point_plane_distance_normal(p, pp1, &normal);
+}
+
+float mu_point_plane_distance_normal(vec3_t *_point, vec3_t *_plane_point, vec3_t *_normal) {
+	vec3_t * p = _point;
+	vec3_t * pp = _plane_point;
+	vec3_t * normal = _normal;
+
+	vec3_t p_pp1_sub;
+	vec3_sub_dest(&p_pp1_sub, p, pp);
+	vec3_vec3mul(normal, &p_pp1_sub);
+
+	return vec3_vec3mul(normal, &p_pp1_sub) / vec3_length(normal);
+}
+
 #endif

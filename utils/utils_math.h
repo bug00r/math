@@ -209,5 +209,15 @@ float transform_point(const mat4_t *  m, vec3_t *  v);
 vec3_t * transform_point_new(const mat4_t *  m, const vec3_t *  v);
 float transform_point_dest(vec3_t *  dest, const mat4_t *  m, const vec3_t *  v);
 
+#if 0
+	/*
+		Calculates Distance from point to plane. Calculates normal vector intern.
+		If you want to use a precomputet normal vector please use function:
+			mu_point_plane_distance_normal
+	*/
+#endif
+float mu_point_plane_distance(vec3_t *point, vec3_t *plane_p1, vec3_t *plane_p2, vec3_t *plane_p3);
+float mu_point_plane_distance_normal(vec3_t *point, vec3_t *plane_point, vec3_t *normal);
+
 #endif
 #endif

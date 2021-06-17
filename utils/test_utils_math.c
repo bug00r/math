@@ -584,6 +584,25 @@ main() {
 	assert(intersection.x == 1.f);
 	assert(intersection.y == 0.9f);
 
+	point = (vec3_t){0.5f, 1.f, 0.5f};
+	vec3_t plane_p1 = {0.f, 0.f, 0.f};
+	vec3_t plane_p2 = {0.f, 0.f, 1.f};
+	vec3_t plane_p3 = {1.f, 0.f, 0.f};
+	float distance = mu_point_plane_distance(&point, &plane_p1, &plane_p2, &plane_p3);
+	assert(distance == 1.f);
+
+	point = (vec3_t){0.5f, 0.5f, 0.5f};
+	vec3_t sub1;
+	vec3_t sub2;
+	vec3_t _norm;
+	vec3_sub_dest(&sub1, &plane_p2, &plane_p1);
+	vec3_sub_dest(&sub2, &plane_p3, &plane_p1);
+
+	vec3_cross_dest(&_norm, &sub1, &sub2); 
+
+	distance = mu_point_plane_distance_normal(&point, &plane_p1,&_norm);
+	assert(distance == 0.5f);
+
 	#ifdef debug
 		printf("End testing math utils:\n");
 	#endif
