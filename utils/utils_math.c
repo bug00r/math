@@ -427,12 +427,6 @@ float mu_point_plane_distance(vec3_t *_point, vec3_t *_plane_p1, vec3_t *_plane_
 
 	vec3_cross_dest(&normal, &dvec_p21, &dvec_p31);
 
-	/*vec3_t p_pp1_sub;
-	vec3_sub_dest(&p_pp1_sub, p, pp1);
-	vec3_vec3mul(&normal, &p_pp1_sub);
-
-	return vec3_vec3mul(&normal, &p_pp1_sub) / vec3_length(&normal);
-	*/
 	return mu_point_plane_distance_normal(p, pp1, &normal);
 }
 
@@ -443,9 +437,49 @@ float mu_point_plane_distance_normal(vec3_t *_point, vec3_t *_plane_point, vec3_
 
 	vec3_t p_pp1_sub;
 	vec3_sub_dest(&p_pp1_sub, p, pp);
-	vec3_vec3mul(normal, &p_pp1_sub);
 
 	return vec3_vec3mul(normal, &p_pp1_sub) / vec3_length(normal);
+}
+
+bool mu_line_plane_intersection(vec3_t *_intersect, vec3_t * _line_p1, vec3_t * _line_p2, vec3_t * _plane_p1, vec3_t * _plane_p2, vec3_t * _plane_p3) {
+	vec3_t * pp1 = _plane_p1;
+	vec3_t * pp2 = _plane_p2;
+	vec3_t * pp3 = _plane_p3;
+	vec3_t * lp1 = _line_p1;
+	vec3_t * lp2 = _line_p2;
+	vec3_t * inter = _intersect;
+
+	// redundant normal vector calc => outsourcing
+	vec3_t dvec_p21;
+	vec3_t dvec_p31;
+	vec3_t normal;
+
+	vec3_sub_dest(&dvec_p21, pp2, pp1);
+	vec3_sub_dest(&dvec_p31, pp3, pp1);
+
+	vec3_cross_dest(&normal, &dvec_p21, &dvec_p31);
+
+	vec3_t dvec_lp21;
+	vec3_sub_dest(&dvec_lp21, lp2, lp1);
+	vec3_normalize(&dvec_lp21);
+
+	float n_mul_a = vec3_vec3mul(&normal, &dvec_lp21);
+	bool intersects = (n_mul_a != 0.f);
+
+	if ( intersects ) {
+		vec3_t r0_sub_r1;
+		vec3_sub_dest(&r0_sub_r1, pp1, lp1);
+
+		vec3_mul_dest(inter, &dvec_lp21, vec3_vec3mul(&normal, &r0_sub_r1) / n_mul_a);
+		vec3_add(inter, lp1);
+	}
+
+	return intersects;
+
+}
+
+bool mu_line_plane_intersection_normal(vec3_t *intersect, vec3_t *line_p1, vec3_t *line_p2, vec3_t *plane_point, vec3_t *normal) {
+	return false;
 }
 
 #endif

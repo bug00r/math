@@ -219,5 +219,8 @@ float transform_point_dest(vec3_t *  dest, const mat4_t *  m, const vec3_t *  v)
 float mu_point_plane_distance(vec3_t *point, vec3_t *plane_p1, vec3_t *plane_p2, vec3_t *plane_p3);
 float mu_point_plane_distance_normal(vec3_t *point, vec3_t *plane_point, vec3_t *normal);
 
+bool mu_line_plane_intersection(vec3_t *intersect, vec3_t *line_p1, vec3_t *line_p2, vec3_t *plane_p1, vec3_t *plane_p2, vec3_t *plane_p3);
+bool mu_line_plane_intersection_normal(vec3_t *intersect, vec3_t *line_p1, vec3_t *line_p2, vec3_t *plane_point, vec3_t *normal);
+
 #endif
 #endif
