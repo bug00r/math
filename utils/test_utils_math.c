@@ -628,6 +628,30 @@ main() {
 	expected_intersection = (vec3_t){0.f, 0.f, 0.0f};
 	assert(vec3_equals(&inter_pt, &expected_intersection));
 
+
+	vec3_t p1__ = {-1.f, -1.f, 0.f};
+	vec3_t p2__ = {-1.f, 1.f, 0.f};
+	vec3_t p3__ = {1.f, -1.f, 0.f};
+	vec3_t p21;
+	vec3_t p31;
+	vec3_t n__;
+	vec3_sub_dest(&p21, &p2__, &p1__);
+	vec3_sub_dest(&p31, &p3__, &p1__);
+
+	vec3_cross_dest(&n__, &p21, &p31);
+	printf("p21 X p31:");
+	vec3_print(&n__);
+	printf("p21 X p31 (normalized):");
+	vec3_normalize(&n__);
+	vec3_print(&n__);
+
+	vec3_cross_dest(&n__, &p31, &p21);
+	printf("p31 X p21:");
+	vec3_print(&n__);
+	printf("p31 X p21 (normalized):");
+	vec3_normalize(&n__);
+	vec3_print(&n__);
+
 	#ifdef debug
 		printf("End testing math utils:\n");
 	#endif

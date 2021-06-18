@@ -459,7 +459,9 @@ bool mu_line_plane_intersection(vec3_t *_intersect, vec3_t * _line_p1, vec3_t * 
 
 	vec3_cross_dest(&normal, &dvec_p21, &dvec_p31);
 
-	vec3_t dvec_lp21;
+	
+
+	/*vec3_t dvec_lp21;
 	vec3_sub_dest(&dvec_lp21, lp2, lp1);
 	vec3_normalize(&dvec_lp21);
 
@@ -474,12 +476,34 @@ bool mu_line_plane_intersection(vec3_t *_intersect, vec3_t * _line_p1, vec3_t * 
 		vec3_add(inter, lp1);
 	}
 
-	return intersects;
+	return intersects;*/
+	return mu_line_plane_intersection_normal(inter, lp1, lp2, pp1, &normal);
 
 }
+//vec3_t *_point, vec3_t *_plane_point, vec3_t *_normal
+bool mu_line_plane_intersection_normal(vec3_t *intersect, vec3_t *_line_p1, vec3_t *_line_p2, vec3_t * _point, vec3_t *_normal) {
+	vec3_t * pp1 = _point;
+	vec3_t * lp1 = _line_p1;
+	vec3_t * lp2 = _line_p2;
+	vec3_t * inter = intersect;
+	vec3_t * normal = _normal;
 
-bool mu_line_plane_intersection_normal(vec3_t *intersect, vec3_t *line_p1, vec3_t *line_p2, vec3_t *plane_point, vec3_t *normal) {
-	return false;
+	vec3_t dvec_lp21;
+	vec3_sub_dest(&dvec_lp21, lp2, lp1);
+	vec3_normalize(&dvec_lp21);
+
+	float n_mul_a = vec3_vec3mul(normal, &dvec_lp21);
+	bool intersects = (n_mul_a != 0.f);
+
+	if ( intersects ) {
+		vec3_t r0_sub_r1;
+		vec3_sub_dest(&r0_sub_r1, pp1, lp1);
+
+		vec3_mul_dest(inter, &dvec_lp21, vec3_vec3mul(normal, &r0_sub_r1) / n_mul_a);
+		vec3_add(inter, lp1);
+	}
+
+	return intersects;
 }
 
 #endif
