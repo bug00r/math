@@ -38,7 +38,14 @@ ifeq ($(OUTPUT),1)
 	export outimg= -Doutput=1
 endif
 
-CFLAGS=-std=c11 -Wpedantic -pedantic-errors -Wall -Wextra
+BIT_SUFFIX=
+
+ifeq ($(M32),1)
+	CFLAGS+=-m32
+	BIT_SUFFIX+=32
+endif
+
+CFLAGS+=-std=c11 -Wpedantic -pedantic-errors -Wall -Wextra
 #-ggdb
 #-pg for profiling 
 
@@ -50,7 +57,7 @@ OBJS=noise.o
 INCLUDE?=-I/c/dev/include
 INCLUDEDIR=$(INCLUDE) -I. 
 
-LIB?=-L/c/dev/lib
+LIB?=-L/c/dev/lib$(BIT_SUFFIX)
 
 TESTSRC=test_noise.c
 TESTBIN=test_noise.exe
@@ -81,10 +88,10 @@ clean:
 
 install:
 	mkdir -p $(INSTALL_ROOT)include
-	mkdir -p $(INSTALL_ROOT)lib
+	mkdir -p $(INSTALL_ROOT)lib$(BIT_SUFFIX)
 	cp ./noise.h $(INSTALL_ROOT)include/noise.h
 	cp ./noise_base.h $(INSTALL_ROOT)include/noise_base.h
 	cp ./noise_priv_diamond_square.h $(INSTALL_ROOT)include/noise_priv_diamond_square.h
 	cp ./noise_priv_evolution.h $(INSTALL_ROOT)include/noise_priv_evolution.h
 	cp ./noise_priv_midpoint_displacement.h $(INSTALL_ROOT)include/noise_priv_midpoint_displacement.h
-	cp $(BUILDPATH)$(LIBNAME) $(INSTALL_ROOT)lib/$(LIBNAME)
+	cp $(BUILDPATH)$(LIBNAME) $(INSTALL_ROOT)lib$(BIT_SUFFIX)/$(LIBNAME)

@@ -38,7 +38,14 @@ ifeq ($(OUTPUT),1)
 	export outimg= -Doutput=1
 endif
 
-CFLAGS=-std=c11 -Wpedantic -pedantic-errors -Wall -Wextra
+BIT_SUFFIX=
+
+ifeq ($(M32),1)
+	CFLAGS+=-m32
+	BIT_SUFFIX+=32
+endif
+
+CFLAGS+=-std=c11 -Wpedantic -pedantic-errors -Wall -Wextra
 #-ggdb
 #-pg for profiling 
 
@@ -48,14 +55,14 @@ LIBNAME=libutilsmath.a
 OBJS=utils_math.o
 
 INCLUDEDIR?=-I/c/dev/include
-LIB?=-L/c/dev/lib
+LIB?=-L/c/dev/lib$(BIT_SUFFIX)
 
 TESTSRC=test_utils_math.c
 TESTBIN=test_utils_math.exe
 TESTLIB= -lutilsmath -lmat -lvec  
 TESTLIBDIR=-L$(BUILDDIR) $(LIB)
 
-all: createdir $(BUILDPATH)$(LIBNAME) $(BUILDPATH)$(TESTBIN) test
+all: createdir $(BUILDPATH)$(LIBNAME) $(BUILDPATH)$(TESTBIN)
 
 $(BUILDPATH)$(LIBNAME): $(BUILDPATH)$(OBJS)
 	$(AR) $(ARFLAGS) $(BUILDPATH)$(LIBNAME) $(BUILDPATH)$(OBJS)
@@ -79,6 +86,6 @@ clean:
 
 install:
 	mkdir -p $(INSTALL_ROOT)include
-	mkdir -p $(INSTALL_ROOT)lib
+	mkdir -p $(INSTALL_ROOT)lib$(BIT_SUFFIX)
 	cp ./utils_math.h $(INSTALL_ROOT)include/utils_math.h
-	cp $(BUILDPATH)$(LIBNAME) $(INSTALL_ROOT)lib/$(LIBNAME)
+	cp $(BUILDPATH)$(LIBNAME) $(INSTALL_ROOT)lib$(BIT_SUFFIX)/$(LIBNAME)

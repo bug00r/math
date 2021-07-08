@@ -38,7 +38,14 @@ ifeq ($(OUTPUT),1)
 	export outimg= -Doutput=1
 endif
 
-CFLAGS=-std=c11 -Wpedantic -pedantic-errors -Wall -Wextra
+BIT_SUFFIX=
+
+ifeq ($(M32),1)
+	CFLAGS+=-m32
+	BIT_SUFFIX+=32
+endif
+
+CFLAGS+=-std=c11 -Wpedantic -pedantic-errors -Wall -Wextra
 #-ggdb
 #-pg for profiling 
 SRC=mat.c
@@ -74,10 +81,10 @@ clean:
 
 install:
 	mkdir -p $(INSTALL_ROOT)include
-	mkdir -p $(INSTALL_ROOT)lib
+	mkdir -p $(INSTALL_ROOT)lib$(BIT_SUFFIX)
 	cp ./mat.h $(INSTALL_ROOT)include/mat.h
 	cp ./mat2.h $(INSTALL_ROOT)include/mat2.h
 	cp ./mat3.h $(INSTALL_ROOT)include/mat3.h
 	cp ./mat4.h $(INSTALL_ROOT)include/mat4.h
 	cp ./mat_config.h $(INSTALL_ROOT)include/mat_config.h
-	cp $(BUILDPATH)$(LIBNAME) $(INSTALL_ROOT)lib/$(LIBNAME)
+	cp $(BUILDPATH)$(LIBNAME) $(INSTALL_ROOT)lib$(BIT_SUFFIX)/$(LIBNAME)

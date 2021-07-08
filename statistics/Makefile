@@ -38,7 +38,14 @@ ifeq ($(OUTPUT),1)
 	export outimg= -Doutput=1
 endif
 
-CFLAGS=-std=c11 -Wpedantic -pedantic-errors -Wall -Wextra
+BIT_SUFFIX=
+
+ifeq ($(M32),1)
+	CFLAGS+=-m32
+	BIT_SUFFIX+=32
+endif
+
+CFLAGS+=-std=c11 -Wpedantic -pedantic-errors -Wall -Wextra
 #CFLAGS=-std=c11 -Wpedantic -pedantic-errors -Wall -Wextra -O1 
 #-ggdb
 #-pg for profiling 
@@ -51,14 +58,14 @@ OBJS=$(BUILDPATH)statistics.o $(BUILDPATH)average.o
 INCLUDE?=-I/c/dev/include
 INCLUDEDIR=$(INCLUDE) -I. 
 
-LIB?=-L/c/dev/lib
+LIB?=-L/c/dev/lib$(BIT_SUFFIX)
 
 TESTSRC=test_statistics.c
 TESTBIN=test_statistics.exe
 TESTLIB= -lstatistics -lutilsmath -lmat -lvec
 TESTLIBDIR=-L$(BUILDDIR) $(LIB)
 
-all: mkbuilddir $(BUILDPATH)$(LIBNAME) $(BUILDPATH)$(TESTBIN) test
+all: mkbuilddir $(BUILDPATH)$(LIBNAME) $(BUILDPATH)$(TESTBIN)
 
 $(BUILDPATH)$(LIBNAME):  $(BUILDPATH)statistics.o $(BUILDPATH)average.o
 	$(AR) $(ARFLAGS) $(BUILDPATH)$(LIBNAME) $(OBJS)
@@ -85,7 +92,7 @@ clean:
 
 install:
 	mkdir -p $(INSTALL_ROOT)include
-	mkdir -p $(INSTALL_ROOT)lib
+	mkdir -p $(INSTALL_ROOT)lib$(BIT_SUFFIX)
 	cp ./statistics.h $(INSTALL_ROOT)include/statistics.h
 	cp ./average.h $(INSTALL_ROOT)include/average.h
-	cp $(BUILDPATH)$(LIBNAME) $(INSTALL_ROOT)lib/$(LIBNAME)
+	cp $(BUILDPATH)$(LIBNAME) $(INSTALL_ROOT)lib$(BIT_SUFFIX)/$(LIBNAME)

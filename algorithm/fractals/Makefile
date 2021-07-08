@@ -38,7 +38,14 @@ ifeq ($(OUTPUT),1)
 	export outimg= -Doutput=1
 endif
 
-CFLAGS=-std=c11 -Wpedantic -pedantic-errors -Wall -Wextra
+BIT_SUFFIX=
+
+ifeq ($(M32),1)
+	CFLAGS+=-m32
+	BIT_SUFFIX+=32
+endif
+
+CFLAGS+=-std=c11 -Wpedantic -pedantic-errors -Wall -Wextra
 #-ggdb
 #-pg for profiling 
 
@@ -50,7 +57,7 @@ OBJS=fractals.o
 INCLUDE?=/c/dev/include
 INCLUDEDIR=-I$(INCLUDE) -I.
 
-LIB?=/c/dev/lib
+LIB?=/c/dev/lib$(BIT_SUFFIX)
 
 TESTSRC=test_fractals.c
 TESTBIN=test_fractals.exe
@@ -81,6 +88,6 @@ clean:
 
 install:
 	mkdir -p $(INSTALL_ROOT)include
-	mkdir -p $(INSTALL_ROOT)lib
+	mkdir -p $(INSTALL_ROOT)lib$(BIT_SUFFIX)
 	cp ./fractals.h $(INSTALL_ROOT)include/fractals.h
-	cp $(BUILDPATH)$(LIBNAME) $(INSTALL_ROOT)lib/$(LIBNAME)
+	cp $(BUILDPATH)$(LIBNAME) $(INSTALL_ROOT)lib$(BIT_SUFFIX)/$(LIBNAME)
