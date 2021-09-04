@@ -40,6 +40,53 @@ static void test_geometry_convex_hull() {
 	DEBUG_LOG("<<<\n");
 }
 
+void print_raster(int32_t const * const x, int32_t const * const y, void *data) {
+	printf("x/y = %i/%i\n", *x, *y);
+}
+
+static void test_geometry_line() {
+	DEBUG_LOG_ARGS(">>> %s => %s\n", __FILE__, __func__);
+
+	vec2_t start = { 1,3 };
+	vec2_t end = { 12, 9 };
+ 
+	void * data = NULL;
+
+	geometry_line(&start, &end, print_raster, data);
+
+
+	DEBUG_LOG("<<<\n");
+}
+
+static void test_geometry_circle() {
+	DEBUG_LOG_ARGS(">>> %s => %s\n", __FILE__, __func__);
+
+	vec2_t center = { 7,7 };
+	int32_t radius = 5;
+ 
+	void * data = NULL;
+
+	geometry_circle(&center, &radius, print_raster, data);
+
+
+	DEBUG_LOG("<<<\n");
+}
+
+static void test_geometry_ellipse() {
+	DEBUG_LOG_ARGS(">>> %s => %s\n", __FILE__, __func__);
+
+	vec2_t center = { 25,25 };
+	int32_t a = 5;  //halfaxis
+	int32_t b = 10;
+ 
+	void * data = NULL;
+
+	geometry_ellipse(&center, &a, &b, print_raster, data);
+
+
+	DEBUG_LOG("<<<\n");
+}
+
 int main(int argc, char **argv) {
 	(void)argc; (void)argv;
 
@@ -48,6 +95,12 @@ int main(int argc, char **argv) {
     test_geometry_convex_hull_null();
 
 	test_geometry_convex_hull();
+
+	test_geometry_line();
+
+	test_geometry_circle();
+
+	test_geometry_ellipse();
 
 	DEBUG_LOG("<< end geometry tests:\n");
 

@@ -214,3 +214,124 @@ geometry_convex_hull(vec2_t *points, size_t cnt_points)
 
     return result;
 }
+
+//algorithm: https://de.wikipedia.org/wiki/Bresenham-Algorithmus :D
+void 
+geometry_line(vec2_t *start, vec2_t *end, RASTER_FUNC_2D rFunc, void *data)
+{   
+    vec2_t  *s = start,
+            *e = end;
+    RASTER_FUNC_2D func = rFunc;
+    void * dat = data;
+    int32_t x0 = (int32_t)s->x,
+             x1 = (int32_t)e->x,
+             y0 = (int32_t)s->y,
+             y1 = (int32_t)e->y;
+    int32_t dx =  abs(x1-x0), sx = x0<x1 ? 1 : -1;
+    int32_t dy = -abs(y1-y0), sy = y0<y1 ? 1 : -1;
+    int32_t err = dx+dy, e2; /* error value e_xy */
+
+    while (true) {
+        func((int32_t const * const)&x0, (int32_t const * const)&y0, dat);//setPixel(x0,y0);
+        if (x0==x1 && y0==y1) break;
+        e2 = 2*err;
+        if (e2 > dy) { err += dy; x0 += sx; } /* e_xy+e_x > 0 */
+        if (e2 < dx) { err += dx; y0 += sy; } /* e_xy+e_y < 0 */
+    }
+}
+
+void 
+geometry_circle(vec2_t *center, int32_t *_radius, RASTER_FUNC_2D rFunc, void *data)
+{
+    int32_t radius = *_radius;
+    vec2_t  *c = center;
+    int32_t x0 = (int32_t)c->x,
+            y0 = (int32_t)c->y;
+    RASTER_FUNC_2D func = rFunc;
+    void * dat = data;
+    
+    int32_t f = 1 - radius;
+    int32_t ddF_x = 0;
+    int32_t ddF_y = -2 * radius;
+    int32_t x = 0;
+    int32_t y = radius;
+
+    int32_t tmp = y0 + radius;
+    func((int32_t const * const)&x0, (int32_t const * const)&tmp, dat);
+    tmp = y0 - radius;
+    func((int32_t const * const)&x0, (int32_t const * const)&tmp, dat);
+    tmp = x0 + radius;
+    func((int32_t const * const)&tmp, (int32_t const * const)&y0, dat);
+    tmp = x0 - radius;
+    func((int32_t const * const)&tmp, (int32_t const * const)&y0, dat);
+
+    while(x < y)
+    {
+        if(f >= 0)
+        {
+            y--;
+            ddF_y += 2;
+            f += ddF_y;
+        }
+        x++;
+        ddF_x += 2;
+        f += ddF_x + 1;
+
+        int32_t tmps[8] = {
+            /*0 x0px */ x0 + x,
+            /*1 x0mx */ x0 - x,
+            /*2 x0py */ x0 + y,
+            /*3 x0my */ x0 - y,
+            /*4 y0py */ y0 + y,
+            /*5 y0my */ y0 - y,
+            /*6 y0px */ y0 + x,
+            /*7 y0mx */ y0 - x
+        };
+
+        func((int32_t const * const)&tmps[0], (int32_t const * const)&tmps[4], dat);
+        func((int32_t const * const)&tmps[1], (int32_t const * const)&tmps[4], dat);
+        func((int32_t const * const)&tmps[0], (int32_t const * const)&tmps[5], dat);
+        func((int32_t const * const)&tmps[1], (int32_t const * const)&tmps[5], dat);
+        func((int32_t const * const)&tmps[2], (int32_t const * const)&tmps[6], dat);
+        func((int32_t const * const)&tmps[3], (int32_t const * const)&tmps[6], dat);
+        func((int32_t const * const)&tmps[2], (int32_t const * const)&tmps[7], dat);
+        func((int32_t const * const)&tmps[3], (int32_t const * const)&tmps[7], dat);
+    }
+}
+
+void 
+geometry_ellipse(vec2_t *center, int32_t *_a, int32_t *_b, RASTER_FUNC_2D rFunc, void *data)
+{
+
+    RASTER_FUNC_2D func = rFunc;
+    void * dat = data;
+
+    int32_t xm = (int32_t)center->x, 
+            ym = (int32_t)center->y, 
+            a = *_a, 
+            b = *_b;
+
+    int32_t dx = 0, dy = b; /* im I. Quadranten von links oben nach rechts unten */
+    long a2 = a*a, b2 = b*b;
+    long err = b2-(2*b-1)*a2, e2; /* Fehler im 1. Schritt */
+
+    do {
+        int32_t tmps[4] = { xm+dx, ym+dy, xm-dx, ym-dy };
+        func((int32_t const * const)&tmps[0], (int32_t const * const)&tmps[1], dat); /* I. Quadrant */
+        func((int32_t const * const)&tmps[2], (int32_t const * const)&tmps[1], dat); /* II. Quadrant */
+        func((int32_t const * const)&tmps[2], (int32_t const * const)&tmps[3], dat); /* III. Quadrant */
+        func((int32_t const * const)&tmps[0], (int32_t const * const)&tmps[3], dat); /* IV. Quadrant */
+
+        e2 = 2*err;
+        if (e2 <  (2*dx+1)*b2) { dx++; err += (2*dx+1)*b2; }
+        if (e2 > -(2*dy-1)*a2) { dy--; err -= (2*dy-1)*a2; }
+    } while (dy >= 0);
+
+    int32_t tmp;
+    while (dx++ < a) { /* fehlerhafter Abbruch bei flachen Ellipsen (b=1) */
+        tmp = xm+dx;
+        func((int32_t const * const)&tmp, (int32_t const * const)&ym, dat); /* -> Spitze der Ellipse vollenden */
+        tmp = xm-dx;
+        func((int32_t const * const)&tmp, (int32_t const * const)&ym, dat);
+    }
+}
