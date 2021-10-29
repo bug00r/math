@@ -1,5 +1,4 @@
 #include "geometry.h"
-#include "dl_list.h"
 
 #include <stdint.h>
 
@@ -335,3 +334,136 @@ geometry_ellipse(vec2_t *center, int32_t *_a, int32_t *_b, RASTER_FUNC_2D rFunc,
         func((int32_t const * const)&tmp, (int32_t const * const)&ym, dat);
     }
 }
+
+/* TRIANGULATION */
+
+/* creats a list from pointer to vec, there is no need to allocate extra memory. */
+static dl_list_t * __geometry_create_list_from_vecs(const vec3_t *vecs, size_t cnt_vecs) 
+{
+    dl_list_t * vec_list = dl_list_new();
+
+    for ( size_t curVec = 0; curVec < cnt_vecs; ++curVec ) {
+        dl_list_append(vec_list, (void*)&vecs[curVec]);
+    }
+
+    return vec_list;
+}
+
+//bool lines_intersect(vec2_t* _l1p1, vec2_t* _l1p2, vec2_t* _l2p1, vec2_t* _l2p2)
+static bool __geometry_any_intersection(dl_list_t * vec_list, vec3_t *firstPt, vec3_t *middlePt,  vec3_t *lastPt,
+                                                              int32_t *firstPtIdx, int32_t *middlePtIdx,  int32_t *lastPtIdx) {
+    bool intersection = false;
+
+    int32_t firstIdx = 0, lastIdx = 1;
+    int32_t maxIdx = vec_list->cnt - 1;
+
+    while ( (firstIdx < maxIdx) ) {
+        lastIdx = firstIdx + 1;
+
+
+        ++firstIdx;
+    }
+
+
+    return intersection;
+}
+
+dl_list_t * 
+geometry_triangulate(const vec3_t *vecs, size_t cnt_vecs) 
+{
+    dl_list_t * triangulated = NULL;
+
+    if ( cnt_vecs > 3 ) {
+
+        dl_list_t * vec_list = __geometry_create_list_from_vecs(vecs, cnt_vecs);
+        
+        triangulated = dl_list_new();
+
+        int32_t maxIdx = cnt_vecs - 1;
+        int32_t firstIdx = 0;
+        int32_t lastIdx = 2;
+
+        while ( maxIdx > 2) {
+            
+            int32_t middleIdx = lastIdx - 1;
+
+            middleIdx = ( middleIdx < 0 ? maxIdx : middleIdx );
+
+            //printf("f: %i m: %i l: %i max: %i\n", firstIdx, middleIdx, lastIdx, maxIdx);
+
+            vec3_t *f,*m,*l;
+
+            f = (vec3_t*)dl_list_get(vec_list, firstIdx);
+            m = (vec3_t*)dl_list_get(vec_list, middleIdx);
+            l = (vec3_t*)dl_list_get(vec_list, lastIdx);
+
+            float place = place_of_vec3(f, l, m);
+
+            /*printf("%p = ", &*f);vec3_print(f);
+            printf("%p = ", &*m);vec3_print(m);
+            printf("%p = ", &*l);vec3_print(l);
+            */ 
+            /* we found convex point */
+            if ( place < 0.f ) {
+
+                /* but there is a chance for intersection. then we have to increase first and last index */
+                if (__geometry_any_intersection(vec_list, f, m, l, &firstIdx, &middleIdx, &lastIdx)) {
+                    ++firstIdx; 
+                    ++lastIdx; 
+                } else {
+                    //printf("found triangle!!\n");
+                    /* saving first triangle and removing middleIdx from pool, continue with lastIdx, and maxIdx - 1 */
+                    dl_list_append(triangulated, &*f);
+                    dl_list_append(triangulated, &*m);
+                    dl_list_append(triangulated, &*l);
+
+                    dl_list_remove(vec_list, middleIdx);
+
+                    --maxIdx;
+                }
+                
+            } else if ( place == 0.f ) {
+                /* middleIdx is linear to others, we can remove it and retry with lastIdx, and maxIdx - 1 */
+                //printf("linear, removing\n");
+                dl_list_remove(vec_list, middleIdx);
+                
+                --maxIdx;
+            } else {
+                //printf("not convex triangle!!\n");
+                /* there is no convex structure, we have to increase firstIdx and lastIdx and then continue*/
+                ++firstIdx; 
+                ++lastIdx; 
+            }
+
+            if ( maxIdx == 2 ) {
+                //printf("f: %i m: %i l: %i max: %i\n", firstIdx, middleIdx, lastIdx, maxIdx);
+                //printf("last triangle!!\n");
+                /* here we are saving the last triangle */
+                f = (vec3_t*)dl_list_get(vec_list, 0);
+                m = (vec3_t*)dl_list_get(vec_list, 1);
+                l = (vec3_t*)dl_list_get(vec_list, 2);
+                
+                dl_list_append(triangulated, &*f);
+                dl_list_append(triangulated, &*m);
+                dl_list_append(triangulated, &*l);
+
+                //vec3_print(dl_list_get(vec_list, 0));
+                //vec3_print(dl_list_get(vec_list, 2));
+                //vec3_print(dl_list_get(vec_list, 1));
+
+                break;
+            }
+
+            if ( lastIdx > maxIdx ) lastIdx = 0;
+            if ( firstIdx > maxIdx ) firstIdx = 0;
+        }
+
+        dl_list_clear(vec_list);
+        dl_list_free(&vec_list);
+
+    }
+
+    return triangulated;
+}
+
+/* EOF TRIANGULATION */

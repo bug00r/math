@@ -87,6 +87,39 @@ static void test_geometry_ellipse() {
 	DEBUG_LOG("<<<\n");
 }
 
+#ifdef debug
+static void
+__geometry_vec3_print_wrapper(vec3_t **vec) 
+{
+    printf("%p = ",*vec);vec3_print(*vec);
+}
+#endif
+
+static void test_geometry_triangulation() {
+	DEBUG_LOG_ARGS(">>> %s => %s\n", __FILE__, __func__);
+
+	vec3_t points[8] = { {5.f, .0f, .0f} , { 5.f, 10.f, .0f}, { .0f, 10.f, .0f}  , { .0f, 14.f, .0f}, 
+						  {14.f, 14.f, .0f}, { 14.f, 10.f, .0f}, { 9.f, 10.f, .0f}, { 9.f, .0f, .0f}};
+
+	#ifdef debug
+    	for (size_t curSrcPt = 0; curSrcPt < 8 ; ++curSrcPt) {
+			printf("[%u]: %p = ", curSrcPt, &points[curSrcPt]);vec3_print(&points[curSrcPt]);
+		}
+    #endif
+
+
+	dl_list_t * triangles = geometry_triangulate(points, 8);
+
+	#ifdef debug
+    	dl_list_each(triangles, (EACH_FUNC)__geometry_vec3_print_wrapper);
+    #endif
+
+	dl_list_clear(triangles);
+	dl_list_free(&triangles);
+
+	DEBUG_LOG("<<<\n");
+}
+
 int main(int argc, char **argv) {
 	(void)argc; (void)argv;
 
@@ -101,6 +134,8 @@ int main(int argc, char **argv) {
 	test_geometry_circle();
 
 	test_geometry_ellipse();
+
+	test_geometry_triangulation();
 
 	DEBUG_LOG("<< end geometry tests:\n");
 

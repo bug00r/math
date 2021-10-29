@@ -61,7 +61,7 @@ INCLUDEDIR=$(INCLUDE) -I.
 
 TESTSRC=test_geometry.c
 TESTBIN=test_geometry.exe
-TESTLIB= -lgeometry -ldl_list -lutilsmath -lvec 
+TESTLIB= -lgeometry -lutilsmath -lmat -lvec -ldl_list
 TESTLIBDIR=-L$(BUILDDIR) $(LIB)
 
 all: createdir $(BUILDPATH)$(LIBNAME) $(BUILDPATH)$(TESTBIN)

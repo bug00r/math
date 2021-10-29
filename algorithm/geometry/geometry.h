@@ -1,7 +1,8 @@
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 
-#include "vec.h"
+#include "dl_list.h"
+#include "utils_math.h"
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
@@ -19,5 +20,15 @@ void geometry_line(vec2_t *start, vec2_t *end, RASTER_FUNC_2D rFunc, void *data)
 void geometry_circle(vec2_t *center, int32_t *radius, RASTER_FUNC_2D rFunc, void *data);
 
 void geometry_ellipse(vec2_t *center, int32_t *_a, int32_t *_b, RASTER_FUNC_2D rFunc, void *data);
+
+/**
+ * functions goes throught vec3 array and will calculate triangles in an simple way.
+ * the list are containing vec3 instances for triangles. Every 3 vecs a trinagle ends
+ * as sequence of t1p1,t1p2,t1p3,t2p1,t2p2,t2p3,...  
+ *      t1 = triangle 1
+ *      t2 = triangle 2
+ *      t1p1 = triangle 1 point 1 ....
+ */
+dl_list_t *  geometry_triangulate(const vec3_t *vecs, size_t cnt_vecs);
 
 #endif
