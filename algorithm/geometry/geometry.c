@@ -354,18 +354,70 @@ static bool __geometry_any_intersection(dl_list_t * vec_list, vec3_t *firstPt, v
                                                               int32_t *firstPtIdx, int32_t *middlePtIdx,  int32_t *lastPtIdx) {
     bool intersection = false;
 
-    int32_t firstIdx = 0, lastIdx = 1;
+    int32_t firstIdx = 0, lastIdx = 1, _firstPtIdx = *firstPtIdx, _lastPtIdx = *lastPtIdx;
     int32_t maxIdx = vec_list->cnt - 1;
 
-    while ( (firstIdx < maxIdx) ) {
-        lastIdx = firstIdx + 1;
+    #ifdef debug
+    printf("checking triangle index: %i - %i\n", _firstPtIdx, _lastPtIdx);
+    #endif
 
+    while ( firstIdx <= maxIdx ) {
 
+        lastIdx = ( firstIdx == maxIdx ? 0 : firstIdx + 1 );
+
+        #ifdef debug
+        printf("checking intersection index: %i - %i\n", firstIdx, lastIdx);
+        #endif
+
+        if ( firstIdx < _firstPtIdx || firstIdx >= _lastPtIdx ) {
+
+            vec3_t *f = (vec3_t*)dl_list_get(vec_list, firstIdx);
+            vec3_t *l = (vec3_t*)dl_list_get(vec_list, lastIdx);
+
+            vec2_t l1p1, l1p2, l2p1, l2p2, intersection_pt;
+            l1p1.x = f->x;
+            l1p1.y = f->y; 
+            l1p2.x = l->x;
+            l1p2.y = l->y; 
+
+            l2p1.x = firstPt->x;
+            l2p1.y = firstPt->y; 
+            l2p2.x = lastPt->x;
+            l2p2.y = lastPt->y;
+
+            #ifdef debug
+            printf("x: %.24f, y: %.24f\n",l1p1.x, l1p1.y);
+            printf("x: %.24f, y: %.24f\n",l1p2.x, l1p2.y);
+            printf("x: %.24f, y: %.24f\n",l2p1.x, l2p1.y);
+            printf("x: %.24f, y: %.24f\n",l2p2.x, l2p2.y);
+            #endif
+
+            intersection = lineseg_intersect_pt(&intersection_pt, &l1p1, &l1p2, &l2p1, &l2p2);
+
+            if ( intersection ) {
+                
+                bool isStartPart =      vec2_equals( &l1p1, &intersection_pt)
+                                    ||  vec2_equals( &l1p2, &intersection_pt)
+                                    ||  vec2_equals( &l2p1, &intersection_pt)
+                                    ||  vec2_equals( &l2p2, &intersection_pt);
+
+                #ifdef debug
+                printf("intersection pt: including=%i\n", isStartPart);
+                printf("x: %.24f, y: %.24f\n",intersection_pt.x, intersection_pt.y);
+                #endif
+
+                intersection = !isStartPart;
+
+                if ( intersection ) return true;
+
+            }; 
+        }
+        
         ++firstIdx;
     }
 
 
-    return intersection;
+    return false;
 }
 
 dl_list_t * 
@@ -387,9 +439,11 @@ geometry_triangulate(const vec3_t *vecs, size_t cnt_vecs)
             
             int32_t middleIdx = lastIdx - 1;
 
-            middleIdx = ( middleIdx < 0 ? maxIdx : middleIdx );
+            middleIdx = ( middleIdx < 0 ? vec_list->cnt - 1 : middleIdx );
 
-            //printf("f: %i m: %i l: %i max: %i\n", firstIdx, middleIdx, lastIdx, maxIdx);
+            #ifdef debug
+            printf("f: %i m: %i l: %i max: %i\n", firstIdx, middleIdx, lastIdx, maxIdx);
+            #endif
 
             vec3_t *f,*m,*l;
 
@@ -398,20 +452,24 @@ geometry_triangulate(const vec3_t *vecs, size_t cnt_vecs)
             l = (vec3_t*)dl_list_get(vec_list, lastIdx);
 
             float place = place_of_vec3(f, l, m);
-
-            /*printf("%p = ", &*f);vec3_print(f);
+            
+            #ifdef debu
+            printf("\n ---- STEP ----\n\n");
+            printf("%p = ", &*f);vec3_print(f);
             printf("%p = ", &*m);vec3_print(m);
             printf("%p = ", &*l);vec3_print(l);
-            */ 
+            #endif
+
             /* we found convex point */
             if ( place < 0.f ) {
 
                 /* but there is a chance for intersection. then we have to increase first and last index */
                 if (__geometry_any_intersection(vec_list, f, m, l, &firstIdx, &middleIdx, &lastIdx)) {
+                    //printf("Intersection!!!\n");
                     ++firstIdx; 
                     ++lastIdx; 
                 } else {
-                    //printf("found triangle!!\n");
+                    printf("found triangle!!\n");
                     /* saving first triangle and removing middleIdx from pool, continue with lastIdx, and maxIdx - 1 */
                     dl_list_append(triangulated, &*f);
                     dl_list_append(triangulated, &*m);
@@ -429,15 +487,18 @@ geometry_triangulate(const vec3_t *vecs, size_t cnt_vecs)
                 
                 --maxIdx;
             } else {
-                //printf("not convex triangle!!\n");
+                #ifdef debug
+                printf("not convex triangle!!\n");
+                #endif
                 /* there is no convex structure, we have to increase firstIdx and lastIdx and then continue*/
                 ++firstIdx; 
                 ++lastIdx; 
             }
 
             if ( maxIdx == 2 ) {
-                //printf("f: %i m: %i l: %i max: %i\n", firstIdx, middleIdx, lastIdx, maxIdx);
-                //printf("last triangle!!\n");
+                #ifdef debug
+                printf("last triangle!!\n");
+                #endif
                 /* here we are saving the last triangle */
                 f = (vec3_t*)dl_list_get(vec_list, 0);
                 m = (vec3_t*)dl_list_get(vec_list, 1);
@@ -447,15 +508,12 @@ geometry_triangulate(const vec3_t *vecs, size_t cnt_vecs)
                 dl_list_append(triangulated, &*m);
                 dl_list_append(triangulated, &*l);
 
-                //vec3_print(dl_list_get(vec_list, 0));
-                //vec3_print(dl_list_get(vec_list, 2));
-                //vec3_print(dl_list_get(vec_list, 1));
-
                 break;
             }
 
             if ( lastIdx > maxIdx ) lastIdx = 0;
             if ( firstIdx > maxIdx ) firstIdx = 0;
+            if ( firstIdx == maxIdx ) lastIdx = 1;
         }
 
         dl_list_clear(vec_list);
