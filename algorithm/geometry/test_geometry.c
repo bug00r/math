@@ -163,6 +163,56 @@ static void test_geometry_triangulation_vc() {
 	DEBUG_LOG("<<<\n");
 }
 
+static void test_geometry_triangulation_vc2() {
+	DEBUG_LOG_ARGS(">>> %s => %s\n", __FILE__, __func__);
+
+	vec3_t points3[22] = {	{1.f, .0f, .0f}, { .0f, .0f, .0f }, { .0f, 1.f, .0f}  , { 1.f, 1.f, .0f}, 
+						 	{1.f, .2f, .0f}, { .2f, 0.2f, .0f}, { .2f, .8f, .0f}, { .8f, .8f, .0f}, { .8f, .4f, .0f},
+						 	{ 0.4f, 0.4f, .0f}, { .4f, 0.6f, .0f} ,{.5f, .6f, .0f} , { .5f, .5f, .0f}, { .7f, .5f, .0f}, 
+						 	{.7f, .7f, .0f}, { .3f, .7f, .0f}, { .3f, .3f, .0f}, { .9f, .3f, .0f},
+						 	{ 0.9f, 0.9f, .0f}, { .1f, 0.9f, .0f}, { 0.1f, 0.1f, .0f}, { 1.f, 0.1f, .0f}
+						};
+
+	dl_list_t * triangles = geometry_triangulate(points3, 22);
+
+	#ifdef debug
+		printf("THIRD VERY COMPLEX\n");
+    	dl_list_each(triangles, (EACH_FUNC)__geometry_vec3_print_wrapper);
+    #endif
+
+	dl_list_clear(triangles);
+	dl_list_free(&triangles);
+
+	DEBUG_LOG("<<<\n");
+}
+
+static void test_geometry_triangulation_skull() {
+	DEBUG_LOG_ARGS(">>> %s => %s\n", __FILE__, __func__);
+
+	vec3_t points3[46] = {  {.0f, 1.1f, .0f}, { .1f, 1.4f, .0f }, { .4f, 1.6f, .0f}  , { .9f, 1.7f, .0f}, 
+						 	{1.4f, 1.6f, .0f}, { 1.7f, 1.4f, .0f}, { 1.8f, 1.1f, .0f},   { 1.7f, .8f, .0f}, { 1.6f, .5f, .0f},
+						 	{1.7f, .4f, .0f}, { 1.5f, .3f, .0f}, { 1.4f, .4f, .0f} ,   { 1.2f, .4f, .0f}, { 1.3f, .2f, .0f}, 
+						 	{1.2f, .0f, .0f}, { 1.1f, .2f, .0f},  { 1.f, .0f, .0f},   { .92f, .2f, .0f},
+						 	{.92f, .3f, .0f}, { 1.02f, 0.5f, .0f}, { 1.12f, 0.6f, .0f}, { 1.5f, 0.7f, .0f},
+							{1.3f, 0.9f, .0f}, { 1.f, .7f, .0f }, { 1.1f, .6f, .0f}  , { 1.f, .5f, .0f}, { .9f, .6f, .0f}, 
+						 	{0.8f, .52f, .0f}, { .7f, 0.62f, .0f}, { .8f, .7f, .0f},   { .5f, .9f, .0f}, { .3f, .7f, .0f},
+						 	{.7f, .6f, .0f}, { .8f, 0.5f, .0f}, {.9f, .3f, .0f} ,   { .9f, .2f, .0f}, { .8f, .0f, .0f}, 
+						 	{.7f, .2f, .0f}, { .6f, .0f, .0f},  { .5f, .2f, .0f},   { .6f, .4f, .0f}, { .4f, .4f, .0f}, 
+						 	{.3f, .3f, .0f}, { .1f, 0.4f, .0f}, { 0.2f, 0.5f, .0f}, { .1f, 0.8f, .0f}};
+
+	dl_list_t * triangles = geometry_triangulate(points3, 46);
+
+	#ifdef debug
+		printf("THIRD VERY COMPLEX\n");
+    	dl_list_each(triangles, (EACH_FUNC)__geometry_vec3_print_wrapper);
+    #endif
+
+	dl_list_clear(triangles);
+	dl_list_free(&triangles);
+
+	DEBUG_LOG("<<<\n");
+}
+
 int main(int argc, char **argv) {
 	(void)argc; (void)argv;
 
@@ -182,7 +232,11 @@ int main(int argc, char **argv) {
 
 	//test_geometry_triangulation_mc();
 
-	test_geometry_triangulation_vc();
+	//test_geometry_triangulation_vc();
+
+	//test_geometry_triangulation_vc2();
+
+	test_geometry_triangulation_skull();
 
 	DEBUG_LOG("<< end geometry tests:\n");
 

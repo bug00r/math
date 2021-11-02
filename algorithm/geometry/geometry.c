@@ -396,17 +396,14 @@ static bool __geometry_any_intersection(dl_list_t * vec_list, vec3_t *firstPt, v
 
             if ( intersection ) {
                 
-                bool isStartPart =      vec2_equals( &l1p1, &intersection_pt)
-                                    ||  vec2_equals( &l1p2, &intersection_pt)
-                                    ||  vec2_equals( &l2p1, &intersection_pt)
-                                    ||  vec2_equals( &l2p2, &intersection_pt);
+                bool neighbourCollision = (lastIdx == _firstPtIdx) || (firstIdx == _lastPtIdx);
 
                 #ifdef debug
-                printf("intersection pt: including=%i\n", isStartPart);
+                //printf("intersection pt: including=%i\n", isStartPart);
                 printf("x: %.24f, y: %.24f\n",intersection_pt.x, intersection_pt.y);
                 #endif
 
-                intersection = !isStartPart;
+                intersection &= !neighbourCollision;
 
                 if ( intersection ) return true;
 
@@ -436,7 +433,7 @@ geometry_triangulate(const vec3_t *vecs, size_t cnt_vecs)
         int32_t lastIdx = 2;
 
         while ( maxIdx > 2) {
-            
+
             int32_t middleIdx = lastIdx - 1;
 
             middleIdx = ( middleIdx < 0 ? vec_list->cnt - 1 : middleIdx );
@@ -453,7 +450,7 @@ geometry_triangulate(const vec3_t *vecs, size_t cnt_vecs)
 
             float place = place_of_vec3(f, l, m);
             
-            #ifdef debu
+            #ifdef debug
             printf("\n ---- STEP ----\n\n");
             printf("%p = ", &*f);vec3_print(f);
             printf("%p = ", &*m);vec3_print(m);
@@ -465,7 +462,7 @@ geometry_triangulate(const vec3_t *vecs, size_t cnt_vecs)
 
                 /* but there is a chance for intersection. then we have to increase first and last index */
                 if (__geometry_any_intersection(vec_list, f, m, l, &firstIdx, &middleIdx, &lastIdx)) {
-                    //printf("Intersection!!!\n");
+                    printf("Intersection!!!\n");
                     ++firstIdx; 
                     ++lastIdx; 
                 } else {
@@ -482,7 +479,7 @@ geometry_triangulate(const vec3_t *vecs, size_t cnt_vecs)
                 
             } else if ( place == 0.f ) {
                 /* middleIdx is linear to others, we can remove it and retry with lastIdx, and maxIdx - 1 */
-                //printf("linear, removing\n");
+                printf("linear, removing\n");
                 dl_list_remove(vec_list, middleIdx);
                 
                 --maxIdx;
