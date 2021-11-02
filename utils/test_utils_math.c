@@ -541,11 +541,24 @@ main() {
 
 	assert(lines_intersect(&p1, &p2, &p3, &p4) == true);
 
+
+	p1 = (vec2_t){.6f, 1.1f};
+	p2 = (vec2_t){.4f, .6f};
+	p3 = (vec2_t){0.f, .0f};
+	p4 = (vec2_t){.3f, .8f};
+	vec2_t intersection = {-100.f, -100.f};
+
+	assert(lineseg_intersect_pt(&intersection, &p1, &p2, &p3, &p4) == false);
+	#ifdef debug
+		printf("NO INTERSECTION\n");
+		vec2_print(&intersection);
+	#endif
+	
 	p1 = (vec2_t){-1.f, 1.f};
 	p2 = (vec2_t){1.f, -1.f};
 	p3 = (vec2_t){-1.f, -1.f};
 	p4 = (vec2_t){1.f, 1.f};
-	vec2_t intersection = {-100.f, -100.f};
+	intersection = (vec2_t){-100.f, -100.f};
 
 	assert(lines_intersect_pt(&intersection, &p1, &p2, &p3, &p4) == true);
 	#ifdef debug
@@ -555,6 +568,13 @@ main() {
 	assert(intersection.x == 0.f);
 	assert(intersection.y == 0.f);
 
+	assert(lineseg_intersect_pt(&intersection, &p1, &p2, &p3, &p4) == true);
+	#ifdef debug
+		printf("line seg intersection at 0 / 0:\n");
+		vec2_print(&intersection);
+	#endif
+	assert(intersection.x == 0.f);
+	assert(intersection.y == 0.f);
 
 	p1 = (vec2_t){-1.5f, .5f};
 	p2 = (vec2_t){.5f, -1.5f};
@@ -570,6 +590,14 @@ main() {
 	assert(intersection.x == -0.5f);
 	assert(intersection.y == -0.5f);
 
+	assert(lineseg_intersect_pt(&intersection, &p1, &p2, &p3, &p4) == true);
+	#ifdef debug
+		printf("line seg intersection at -0.5 / -0.5:\n");
+		vec2_print(&intersection);
+	#endif
+	assert(intersection.x == -0.5f);
+	assert(intersection.y == -0.5f);
+
 	p1 = (vec2_t){-.5f, 1.5f};
 	p2 = (vec2_t){2.f, .5f};
 	p3 = (vec2_t){1.f, -.5f};
@@ -579,6 +607,14 @@ main() {
 	assert(lines_intersect_pt(&intersection, &p1, &p2, &p3, &p4) == true);
 	#ifdef debug
 		printf("intersection at 1 / 0.9:\n");
+		vec2_print(&intersection);
+	#endif
+	assert(intersection.x == 1.f);
+	assert(intersection.y == 0.9f);
+
+	assert(lineseg_intersect_pt(&intersection, &p1, &p2, &p3, &p4) == true);
+	#ifdef debug
+		printf("line seg intersection at 1 / 0.9:\n");
 		vec2_print(&intersection);
 	#endif
 	assert(intersection.x == 1.f);

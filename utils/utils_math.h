@@ -147,6 +147,9 @@ float line_intersect_denominator(vec2_t* l1p1, vec2_t* l1p2, vec2_t* l2p1, vec2_
 bool lines_intersect(vec2_t* l1p1, vec2_t* l1p2, vec2_t* l2p1, vec2_t* l2p2);
 bool lines_intersect_pt(vec2_t *intersec, vec2_t* l1p1, vec2_t* l1p2, vec2_t* l2p1, vec2_t* l2p2);
 
+bool lineseg_intersect(vec2_t* l1p1, vec2_t* l1p2, vec2_t* l2p1, vec2_t* l2p2);
+bool lineseg_intersect_pt(vec2_t *intersec, vec2_t* l1p1, vec2_t* l1p2, vec2_t* l2p1, vec2_t* l2p2);
+
 #endif
 
 #if defined(USE_VEC_3) && defined(USE_MAT_3)

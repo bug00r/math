@@ -228,6 +228,60 @@ bool lines_intersect_pt(vec2_t *intersec, vec2_t* _l1p1, vec2_t* _l1p2, vec2_t* 
 	return denom != 0.f;
 }
 
+static void __mu_lineseg_intersec_raw(vec2_t* l1p1, vec2_t* l1p2, vec2_t* l2p1, vec2_t* l2p2, bool *intersect, vec2_t *intersect_pt) {
+
+	*intersect = line_intersect_denominator(l1p1, l1p2, l2p1, l2p2);
+
+	if ( *intersect ) {
+		
+		float 	x1 = l1p1->x,
+				x2 = l1p2->x,
+				x3 = l2p1->x,
+				x4 = l2p2->x,
+				y1 = l1p1->y,
+				y2 = l1p2->y,
+				y3 = l2p1->y,
+				y4 = l2p2->y;
+
+		float x1mx3 = x1 - x3,
+			  x1mx2 = x1 - x2,
+			  x3mx4 = x3 - x4,
+			  y1my2 = y1 - y2,
+			  y1my3 = y1 - y3,
+			  y3my4 = y3 - y4;
+
+		float t = ((x1mx3*y3my4) - (y1my3*x3mx4)) / ((x1mx2*y3my4) - (y1my2*x3mx4));
+
+		float u = ((x1mx3*y1my2) - (y1my3*x1mx2)) / ((x1mx2*y3my4) - (y1my2*x3mx4));
+
+		*intersect = (t >= 0.f && t <= 1.f && u >= 0.f && u <= 1.f);
+
+		intersect_pt->x = x1 + (t*(x2-x1));
+		intersect_pt->y = y1 + (t*(y2-y1));
+	}
+
+}
+
+bool lineseg_intersect(vec2_t* l1p1, vec2_t* l1p2, vec2_t* l2p1, vec2_t* l2p2) {
+
+	bool intersect;
+	vec2_t intersect_pt;
+
+	 __mu_lineseg_intersec_raw(l1p1, l1p2, l2p1, l2p2, &intersect, &intersect_pt);
+
+	return intersect;
+}
+
+bool lineseg_intersect_pt(vec2_t *intersec, vec2_t* l1p1, vec2_t* l1p2, vec2_t* l2p1, vec2_t* l2p2) {
+	
+	bool intersect;
+	
+	__mu_lineseg_intersec_raw(l1p1, l1p2, l2p1, l2p2, &intersect,intersec);
+
+	return intersect;
+}
+
+
 #if defined(USE_VEC_3) && defined(USE_MAT_3)
 
 void 
