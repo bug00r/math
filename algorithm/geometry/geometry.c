@@ -522,3 +522,179 @@ geometry_triangulate(const vec3_t *vecs, size_t cnt_vecs)
 }
 
 /* EOF TRIANGULATION */
+
+/* START BEZIER */
+
+void geometry_bezier1(vec2_t *start, vec2_t *cp, vec2_t *end, uint32_t *steps, RASTER_BEZIER_FUNC_2D rFunc, void *data) 
+{
+    
+    vec2_t middle;
+    vec2_t middle_before;
+    vec2_t middle_unit;
+    vec2_t s_cp_unit;
+    vec2_t s_cp;
+    vec2_t cp_e_unit;
+    vec2_t cp_e;
+    vec2_t temp;
+
+    float s_cp_len;
+    float s_cp_step;
+    float cp_e_len;
+    float cp_e_step;
+    float middle_len;
+    float middle_step;
+    float maxSteps = (float)*steps; 
+
+    /* copy start values */
+    vec2_copy_dest(&middle_before, start);
+    vec2_copy_dest(&middle, start);
+
+    /* compute needed values from start to ctrl point */
+    vec2_copy_dest(&s_cp, start); // this seems to be unneeded
+    vec2_sub_dest(&s_cp_unit, cp, start);
+    s_cp_len = vec2_length(&s_cp_unit);
+    s_cp_step = s_cp_len / maxSteps;
+
+    vec2_normalize(&s_cp_unit);
+
+    /* compute needed values from ctrl to start point */
+    vec2_copy_dest(&cp_e, cp);  // this seems to be unneeded
+    vec2_sub_dest(&cp_e_unit, end, cp);
+    cp_e_len = vec2_length(&cp_e_unit);
+    cp_e_step = cp_e_len / maxSteps;
+
+    vec2_normalize(&cp_e_unit);
+
+    for( float curStep = 1.0f; curStep <= maxSteps; ++curStep ) 
+    {
+        vec2_mul_dest(&temp, &s_cp_unit, curStep * s_cp_step);
+        vec2_add_dest(&s_cp, start, &temp);
+
+        vec2_mul_dest(&temp, &cp_e_unit, curStep * cp_e_step);
+        vec2_add_dest(&cp_e, cp, &temp);
+
+        vec2_sub_dest(&middle_unit, &cp_e, &s_cp);
+        middle_len = vec2_length(&middle_unit);
+        middle_step = middle_len / maxSteps;
+
+        vec2_normalize(&middle_unit);
+
+        vec2_mul_dest(&temp, &middle_unit, curStep * middle_step);
+        vec2_add_dest(&middle, &s_cp, &temp);
+
+        rFunc((vec2_t const * const)&middle_before, (vec2_t const * const)&middle, data);
+
+        vec2_copy_dest(&middle_before, &middle);
+    }
+
+
+}
+
+void geometry_bezier2(vec2_t *start, vec2_t *cp1, vec2_t *cp2, vec2_t *end, uint32_t *steps, RASTER_BEZIER_FUNC_2D rFunc, void *data)
+{
+    vec2_t middle;
+    vec2_t middle_before;
+    vec2_t middle_unit;
+    vec2_t s_cp1_unit;
+    vec2_t s_cp1;
+    vec2_t cp1_cp2_unit;
+    vec2_t cp1_cp2;
+    vec2_t cp2_e_unit;
+    vec2_t cp2_e;
+    vec2_t temp;
+
+    float s_cp1_len;
+    float s_cp1_step;
+    float cp1_cp2_len;
+    float cp1_cp2_step;
+    float cp2_e_len;
+    float cp2_e_step;
+    float middle_len;
+    float middle_step;
+    float maxSteps = (float)*steps; 
+
+    /* copy start values */
+    vec2_copy_dest(&middle_before, start);
+    vec2_copy_dest(&middle, start);
+
+    /* compute needed values from start to ctrl point 1 */
+    vec2_sub_dest(&s_cp1_unit, cp1, start);
+    s_cp1_len = vec2_length(&s_cp1_unit);
+    s_cp1_step = s_cp1_len / maxSteps;
+
+    vec2_normalize(&s_cp1_unit);
+
+    /* compute needed values from ctrl point 1 to ctrl point 2 */
+    vec2_sub_dest(&cp1_cp2_unit, cp2, cp1);
+    cp1_cp2_len = vec2_length(&cp1_cp2_unit);
+    cp1_cp2_step = cp1_cp2_len / maxSteps;
+
+    vec2_normalize(&cp1_cp2_unit);
+
+    /* compute needed values from ctrl point 2 to end */
+    vec2_sub_dest(&cp2_e_unit, end, cp2);
+    cp2_e_len = vec2_length(&cp2_e_unit);
+    cp2_e_step = cp2_e_len / maxSteps;
+
+    vec2_normalize(&cp2_e_unit);
+
+    for( float curStep = 1.0f; curStep <= maxSteps; ++curStep ) 
+    {
+        vec2_mul_dest(&temp, &s_cp1_unit, curStep * s_cp1_step);
+        vec2_add_dest(&s_cp1, start, &temp);
+
+        vec2_mul_dest(&temp, &cp1_cp2_unit, curStep * cp1_cp2_step);
+        vec2_add_dest(&cp1_cp2, cp1, &temp);
+
+        vec2_mul_dest(&temp, &cp2_e_unit, curStep * cp2_e_step);
+        vec2_add_dest(&cp2_e, cp2, &temp);
+
+
+        /* compute needed values from ctrl point 1 to ctrl point 2 */
+        vec2_t side1;
+        vec2_t side1_unit;
+        float side1_len;
+        float side1_step;
+
+        vec2_sub_dest(&side1_unit, &cp1_cp2, &s_cp1);
+        side1_len = vec2_length(&side1_unit);
+        side1_step = side1_len / maxSteps;
+
+        vec2_normalize(&side1_unit);
+
+        vec2_mul_dest(&temp, &side1_unit, curStep * side1_step);
+        vec2_add_dest(&side1, &s_cp1, &temp);
+
+        /* compute needed values from ctrl point 1 to ctrl point 2 */
+        vec2_t side2;
+        vec2_t side2_unit;
+        float side2_len;
+        float side2_step;
+
+        vec2_sub_dest(&side2_unit, &cp2_e, &cp1_cp2);
+        side2_len = vec2_length(&side2_unit);
+        side2_step = side2_len / maxSteps;
+
+        vec2_normalize(&side2_unit);
+
+        vec2_mul_dest(&temp, &side2_unit, curStep * side2_step);
+        vec2_add_dest(&side2, &cp1_cp2, &temp);
+        
+        //---
+        vec2_sub_dest(&middle_unit, &side2, &side1);
+        middle_len = vec2_length(&middle_unit);
+        middle_step = middle_len / maxSteps;
+
+        vec2_normalize(&middle_unit);
+
+        vec2_mul_dest(&temp, &middle_unit, curStep * middle_step);
+        vec2_add_dest(&middle, &side1, &temp);
+
+        rFunc((vec2_t const * const)&middle_before, (vec2_t const * const)&middle, data);
+
+        vec2_copy_dest(&middle_before, &middle);
+    }
+}
+
+/* EOF BEZIER */
+

@@ -40,7 +40,7 @@ static void test_geometry_convex_hull() {
 	DEBUG_LOG("<<<\n");
 }
 
-void print_raster(int32_t const * const x, int32_t const * const y, void *data) {
+static void print_raster(int32_t const * const x, int32_t const * const y, void *data) {
 	printf("x/y = %i/%i\n", *x, *y);
 }
 
@@ -213,20 +213,55 @@ static void test_geometry_triangulation_skull() {
 	DEBUG_LOG("<<<\n");
 }
 
+static void print_bezier(vec2_t const * const p, vec2_t const * const p2, void *data) {
+	printf("bezier1: ");
+	vec2_print(p);
+	vec2_print(p2);
+}
+
+static void test_geometry_bezier1() {
+	DEBUG_LOG_ARGS(">>> %s => %s\n", __FILE__, __func__);
+	
+	vec2_t start = { 0.f, 0.f };
+	vec2_t cp = { 0.5f, 0.5f };
+	vec2_t end = { 1.f, 0.f };
+	uint32_t steps = 10;
+	void *data = NULL;
+	
+	geometry_bezier1(&start, &cp, &end, &steps, print_bezier, data);
+
+	DEBUG_LOG("<<<\n");
+}
+
+static void test_geometry_bezier2() {
+	DEBUG_LOG_ARGS(">>> %s => %s\n", __FILE__, __func__);
+	
+	vec2_t start = { 0.f, 0.f };
+	vec2_t cp1 = { 0.1f, 0.5f };
+	vec2_t cp2 = { 0.9f, 0.5f };
+	vec2_t end = { 1.f, 0.f };
+	uint32_t steps = 10;
+	void *data = NULL;
+	
+	geometry_bezier2(&start, &cp1, &cp2, &end, &steps, print_bezier, data);
+
+	DEBUG_LOG("<<<\n");
+}
+
 int main(int argc, char **argv) {
 	(void)argc; (void)argv;
 
 	DEBUG_LOG(">> Start geometry tests:\n");
 
-    test_geometry_convex_hull_null();
+    //test_geometry_convex_hull_null();
 
-	test_geometry_convex_hull();
+	//test_geometry_convex_hull();
 
-	test_geometry_line();
+	//test_geometry_line();
 
-	test_geometry_circle();
+	//test_geometry_circle();
 
-	test_geometry_ellipse();
+	//test_geometry_ellipse();
 
 	//test_geometry_triangulation();
 
@@ -236,7 +271,11 @@ int main(int argc, char **argv) {
 
 	//test_geometry_triangulation_vc2();
 
-	test_geometry_triangulation_skull();
+	//test_geometry_triangulation_skull();
+
+	test_geometry_bezier1();
+
+	test_geometry_bezier2();
 
 	DEBUG_LOG("<< end geometry tests:\n");
 
