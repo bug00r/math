@@ -47,6 +47,8 @@ typedef struct {
 	bool inside;
 } barycentric_t;
 
+int round_f(float num);
+
 #if 0
 	//lineare interpolation
 #endif

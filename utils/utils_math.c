@@ -3,6 +3,11 @@
 
 static const float onedegrad = M_PI / 180.f;
 
+int round_f(float num)
+{
+	return (int)(num < 0 ? (num - .5f) : (num + .5f));
+}
+
 float interpolate_lin(const float x, const float x0, const float f0, const float x1, const float f1){
 	float result = 0.f;
 	
