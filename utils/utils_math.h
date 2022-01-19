@@ -158,7 +158,7 @@ bool lineseg_intersect_pt(vec2_t *intersec, vec2_t* l1p1, vec2_t* l1p2, vec2_t* 
 
 #if 0
 /**
-	Matrix 2x2 multiplies with vec 3. Result stored in vector v
+	Matrix 3x3 multiplies with vec 3. Result stored in vector v
 */
 #endif
 void mat_vec_mul_3(const mat3_t *  m, vec3_t *  v);
@@ -172,7 +172,7 @@ vec3_t * mat_vec_mul_3_new(const mat3_t *  m, const vec3_t *  v);
 vec3_t * mat_vec_mul_3_dest(vec3_t * dest, const mat3_t *  m, const vec3_t *  v);
 #if 0
 /**
-	create roattion matrix for x axis.
+	create rotation matrix for x axis.
 */
 #endif
 mat3_t * create_rot_x_mat(const float degree);
@@ -226,6 +226,9 @@ float mu_point_plane_distance_normal(vec3_t *point, vec3_t *plane_point, vec3_t 
 
 bool mu_line_plane_intersection(vec3_t *intersect, vec3_t *line_p1, vec3_t *line_p2, vec3_t *plane_p1, vec3_t *plane_p2, vec3_t *plane_p3);
 bool mu_line_plane_intersection_normal(vec3_t *intersect, vec3_t *line_p1, vec3_t *line_p2, vec3_t *plane_point, vec3_t *normal);
+
+float polygon_area_2D(vec2_t *points, size_t cntPoints);
+bool polygon_2D_is_clockwise(vec2_t *points, size_t cntPoints);
 
 #endif
 #endif

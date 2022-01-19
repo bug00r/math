@@ -675,18 +675,37 @@ main() {
 	vec3_sub_dest(&p31, &p3__, &p1__);
 
 	vec3_cross_dest(&n__, &p21, &p31);
-	printf("p21 X p31:");
-	vec3_print(&n__);
-	printf("p21 X p31 (normalized):");
+	#ifdef debug 
+		printf("p21 X p31:"); 
+		vec3_print(&n__); 
+		printf("p21 X p31 (normalized):");
+	#endif
 	vec3_normalize(&n__);
+	#ifdef debug 
 	vec3_print(&n__);
-
+	#endif
 	vec3_cross_dest(&n__, &p31, &p21);
+	#ifdef debug 
 	printf("p31 X p21:");
 	vec3_print(&n__);
 	printf("p31 X p21 (normalized):");
+	#endif
 	vec3_normalize(&n__);
+	#ifdef debug
 	vec3_print(&n__);
+	#endif
+
+	vec2_t points[5] = {{7.f, 1.f}, {8.f, 5.f}, {5.f, 4.f}, {2.f, 5.f}, {1.f, 1.f}};
+
+	float polyarea = polygon_area_2D(&points[0], 5);
+	assert(polyarea == 21.f);
+	assert(polygon_2D_is_clockwise(&points[0], 5) == false);
+
+	vec2_t points2[5] = { {1.f, 1.f}, {2.f, 5.f}, {5.f, 4.f}, {8.f, 5.f}, {7.f, 1.f}};
+
+	polyarea = polygon_area_2D(&points2[0], 5);
+	assert(polyarea == -21.f);
+	assert(polygon_2D_is_clockwise(&points2[0], 5) == true);
 
 	#ifdef debug
 		printf("End testing math utils:\n");

@@ -565,4 +565,36 @@ bool mu_line_plane_intersection_normal(vec3_t *intersect, vec3_t *_line_p1, vec3
 	return intersects;
 }
 
+float polygon_area_2D(vec2_t *_points, size_t _cntPoints)
+{
+	vec2_t *points = _points;
+	size_t cntPoints =_cntPoints;
+
+	float polyarea = 0.f;
+	mat2_t matrix;
+	vec2_t *p1, *p2;
+	for ( size_t curPt = 1; curPt <= cntPoints; curPt++)
+	{
+		if ( curPt == cntPoints )
+		{
+			p1 = &points[curPt-1];
+			p2 = &points[0];
+		} else 
+		{
+			p1 = &points[curPt-1];
+			p2 = &points[curPt];
+		}
+
+		matrix = (mat2_t){ p1->x, p2->x, p1->y, p2->y};
+		polyarea += mat2_determinant(&matrix);
+	}
+
+	return polyarea * 0.5f;
+}
+
+bool polygon_2D_is_clockwise(vec2_t *points, size_t cntPoints)
+{
+	return polygon_area_2D(points, cntPoints) < 0.f;
+}
+
 #endif
