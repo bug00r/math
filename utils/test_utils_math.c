@@ -636,9 +636,15 @@ main() {
 
 	vec3_cross_dest(&_norm, &sub1, &sub2); 
 
+	printf("NORMAL: ");vec3_print(&_norm);
+
 	distance = mu_point_plane_distance_normal(&point, &plane_p1,&_norm);
 	assert(distance == 0.5f);
 
+	point = (vec3_t){0.5f, -0.5f, 0.5f};
+
+	distance = mu_point_plane_distance_normal(&point, &plane_p1,&_norm);
+	assert(distance == -0.5f);
 
 	//bool mu_line_plane_intersection(vec3_t *_intersect, vec3_t * _line_p1, vec3_t * _line_p2, vec3_t * _plane_p1, vec3_t * _plane_p2, vec3_t * _plane_p3)
 	vec3_t inter_pt;
