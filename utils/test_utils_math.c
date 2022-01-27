@@ -636,8 +636,6 @@ main() {
 
 	vec3_cross_dest(&_norm, &sub1, &sub2); 
 
-	printf("NORMAL: ");vec3_print(&_norm);
-
 	distance = mu_point_plane_distance_normal(&point, &plane_p1,&_norm);
 	assert(distance == 0.5f);
 
