@@ -54,7 +54,11 @@ void create_evolution(evolution_t * param) {
 	for (unsigned int cur_item = param->cnt_items; cur_item--;) {
 		int new_w = (int)fabsf(seedrndlh(-_w, _w));
 		int new_h = (int)fabsf(seedrndlh(-_h, _h));
+		
+		#ifdef debug
 		printf("new point %i: %i %i", cur_item, new_w, new_h);
+		#endif
+
 		evolution_item_t * cur_ev_item = &ev_items[cur_item];
 		cur_ev_item->width = new_w;
 		cur_ev_item->height = new_h;

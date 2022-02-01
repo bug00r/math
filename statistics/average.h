@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include "utils_math.h"
+#include "utilsmath.h" 
 
 float middle_arithmetic(const float x1, const float x2, const float x3, const float x4);
 float middle_arithmetic2(const float x1, const float x2);

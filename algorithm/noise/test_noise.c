@@ -109,7 +109,7 @@ main()
 	
 	it = array_iterator_new(noise->map);
 	
-	//#ifdef debug
+	#ifdef debug
 		printf("evolution array contains[\n");
 		while(array_iterator_has_next(it))
 		{
@@ -118,7 +118,7 @@ main()
 			if (it->index % w == 0) printf("\n");
 		}
 		printf("]\n");
-	//#endif
+	#endif
 	array_iterator_free(it);
 	
 	noise_free(noise);

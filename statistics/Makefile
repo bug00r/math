@@ -49,40 +49,36 @@ CFLAGS+=-std=c11 -Wpedantic -pedantic-errors -Wall -Wextra
 #CFLAGS=-std=c11 -Wpedantic -pedantic-errors -Wall -Wextra -O1 
 #-ggdb
 #-pg for profiling 
+NAME=statistics
 
-SRC=statistics.c average.c
+LIBNAME=lib$(NAME).a
+LIB=$(BUILDPATH)$(LIBNAME)
+OBJS=$(BUILDPATH)$(NAME).o $(BUILDPATH)average.o
 
-LIBNAME=libstatistics.a
-OBJS=$(BUILDPATH)statistics.o $(BUILDPATH)average.o
+INCLUDE?=-I. -I/c/dev/include
+INCLUDEDIR=$(INCLUDE) 
 
-INCLUDE?=-I/c/dev/include
-INCLUDEDIR=$(INCLUDE) -I. 
+LIBSDIR?=-L/c/dev/lib$(BIT_SUFFIX)
 
-LIB?=-L/c/dev/lib$(BIT_SUFFIX)
+TESTBIN=$(BUILDPATH)test_$(NAME).exe
+TESTLIB= -l$(NAME) -lutilsmath -lmat -lvec
+TESTLIBDIR=-L$(BUILDDIR) $(LIBSDIR)
 
-TESTSRC=test_statistics.c
-TESTBIN=test_statistics.exe
-TESTLIB= -lstatistics -lutilsmath -lmat -lvec
-TESTLIBDIR=-L$(BUILDDIR) $(LIB)
+all: mkbuilddir $(LIB) $(TESTBIN)
 
-all: mkbuilddir $(BUILDPATH)$(LIBNAME) $(BUILDPATH)$(TESTBIN)
+$(LIB): $(OBJS)
+	$(AR) $(ARFLAGS) $@ $^
 
-$(BUILDPATH)$(LIBNAME):  $(BUILDPATH)statistics.o $(BUILDPATH)average.o
-	$(AR) $(ARFLAGS) $(BUILDPATH)$(LIBNAME) $(OBJS)
-
-$(BUILDPATH)statistics.o: statistics.c statistics.h
-	$(CC) $(CFLAGS) -c statistics.c -o $(BUILDPATH)statistics.o  $(INCLUDEDIR) $(debug)
+$(OBJS): $(NAME).h average.h
+	$(CC) $(CFLAGS) -c $(@F:.o=.c) -o $@ $(INCLUDEDIR) $(debug)
 	
-$(BUILDPATH)average.o: average.c average.h
-	$(CC) $(CFLAGS) -c average.c -o $(BUILDPATH)average.o  $(INCLUDEDIR) $(debug)
-	
-$(BUILDPATH)$(TESTBIN):
-	$(CC) $(CFLAGS) $(TESTSRC) -o $(BUILDPATH)$(TESTBIN) $(INCLUDEDIR) $(TESTLIBDIR) $(TESTLIB) $(debug)
+$(TESTBIN): $(LIB)
+	$(CC) $(CFLAGS) $(@F:.exe=.c) -o $@ $(INCLUDEDIR) $(TESTLIBDIR) $(TESTLIB) $(debug)
 	
 .PHONY: clean mkbuilddir test
 
 test:
-	./$(BUILDPATH)$(TESTBIN)
+	./$(TESTBIN)
 
 mkbuilddir:
 	mkdir -p $(BUILDDIR)
@@ -93,6 +89,6 @@ clean:
 install:
 	mkdir -p $(INSTALL_ROOT)include
 	mkdir -p $(INSTALL_ROOT)lib$(BIT_SUFFIX)
-	cp ./statistics.h $(INSTALL_ROOT)include/statistics.h
-	cp ./average.h $(INSTALL_ROOT)include/average.h
-	cp $(BUILDPATH)$(LIBNAME) $(INSTALL_ROOT)lib$(BIT_SUFFIX)/$(LIBNAME)
+	cp ./$(NAME).h $(INSTALL_ROOT)include$(PATHSEP)$(NAME).h
+	cp ./average.h $(INSTALL_ROOT)include$(PATHSEP)average.h
+	cp $(LIB) $(INSTALL_ROOT)lib$(BIT_SUFFIX)$(PATHSEP)$(LIBNAME)

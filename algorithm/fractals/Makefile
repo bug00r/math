@@ -49,31 +49,31 @@ CFLAGS+=-std=c11 -Wpedantic -pedantic-errors -Wall -Wextra
 #-ggdb
 #-pg for profiling 
 
-SRC=fractals.c
+NAME=fractals
 
-LIBNAME=libfractals.a
-OBJS=fractals.o
+LIBNAME=lib$(NAME).a
+LIB=$(BUILDPATH)$(LIBNAME)
+OBJS=$(BUILDPATH)$(NAME).o
 
 INCLUDE?=/c/dev/include
 INCLUDEDIR=-I$(INCLUDE) -I.
 
-LIB?=/c/dev/lib$(BIT_SUFFIX)
+LIBSDIR?=/c/dev/lib$(BIT_SUFFIX)
 
-TESTSRC=test_fractals.c
-TESTBIN=test_fractals.exe
-TESTLIB= -lfractals -larray -lutilsmath -lmat -lvec 
-TESTLIBDIR=-L$(BUILDDIR) -L$(LIB)
+TESTBIN=$(BUILDPATH)test_$(NAME).exe
+TESTLIB= -l$(NAME) -larray -lutilsmath -lmat -lvec 
+TESTLIBDIR=-L$(BUILDDIR) -L$(LIBSDIR)
 
-all: createdir $(BUILDPATH)$(LIBNAME) $(BUILDPATH)$(TESTBIN) test
+all: createdir $(LIB) $(TESTBIN)
 
-$(BUILDPATH)$(LIBNAME): $(BUILDPATH)$(OBJS)
-	$(AR) $(ARFLAGS) $(BUILDPATH)$(LIBNAME) $(BUILDPATH)$(OBJS)
+$(LIB): $(OBJS)
+	$(AR) $(ARFLAGS) $@ $^
 
-$(BUILDPATH)$(OBJS): fractals.h
-	$(CC) $(CFLAGS) -c $(SRC) -o $(BUILDPATH)$(OBJS) $(INCLUDEDIR) 
+$(OBJS): $(NAME).h
+	$(CC) $(CFLAGS) -c $(@F:.o=.c) -o $@ $(INCLUDEDIR) 
 	
-$(BUILDPATH)$(TESTBIN):
-	$(CC) $(CFLAGS) $(TESTSRC) -o $(BUILDPATH)$(TESTBIN) $(INCLUDEDIR) $(TESTLIBDIR) $(TESTLIB)
+$(TESTBIN): $(LIB)
+	$(CC) $(CFLAGS) $(@F:.exe=.c) -o $@ $(INCLUDEDIR) $(TESTLIBDIR) $(TESTLIB)
 	
 .PHONY: createdir clean test
 
@@ -81,7 +81,7 @@ createdir:
 	mkdir -p $(BUILDDIR)
 
 test:
-	./$(BUILDPATH)$(TESTBIN)
+	./$(TESTBIN)
 
 clean:
 	-rm -dr $(BUILDROOT)
@@ -89,5 +89,5 @@ clean:
 install:
 	mkdir -p $(INSTALL_ROOT)include
 	mkdir -p $(INSTALL_ROOT)lib$(BIT_SUFFIX)
-	cp ./fractals.h $(INSTALL_ROOT)include/fractals.h
-	cp $(BUILDPATH)$(LIBNAME) $(INSTALL_ROOT)lib$(BIT_SUFFIX)/$(LIBNAME)
+	cp ./$(NAME).h $(INSTALL_ROOT)include$(PATHSEP)$(NAME).h
+	cp $(LIB) $(INSTALL_ROOT)lib$(BIT_SUFFIX)$(PATHSEP)$(LIBNAME)

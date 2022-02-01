@@ -1,7 +1,7 @@
 #ifndef FRACTALS_H
 #define FRACTALS_H
 
-#include "utils_math.h"
+#include "utilsmath.h"
 #include "array.h"
 
 typedef struct {

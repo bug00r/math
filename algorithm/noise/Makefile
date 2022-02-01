@@ -49,31 +49,31 @@ CFLAGS+=-std=c11 -Wpedantic -pedantic-errors -Wall -Wextra
 #-ggdb
 #-pg for profiling 
 
-SRC=noise.c
+NAME=noise
 
-LIBNAME=libnoise.a
-OBJS=noise.o
+LIBNAME=lib$(NAME).a
+LIB=$(BUILDPATH)$(LIBNAME)
+OBJS=$(BUILDPATH)$(NAME).o
 
 INCLUDE?=-I/c/dev/include
 INCLUDEDIR=$(INCLUDE) -I. 
 
-LIB?=-L/c/dev/lib$(BIT_SUFFIX)
+LIBSDIR?=-L/c/dev/lib$(BIT_SUFFIX)
 
-TESTSRC=test_noise.c
-TESTBIN=test_noise.exe
-TESTLIB= -lnoise -lfarray -larray -lstatistics -lutilsmath -lmat -lvec
-TESTLIBDIR=-L$(BUILDDIR) $(LIB)
+TESTBIN=$(BUILDPATH)test_$(NAME).exe
+TESTLIB= -l$(NAME) -lfarray -larray -lstatistics -lutilsmath -lmat -lvec
+TESTLIBDIR=-L$(BUILDDIR) $(LIBSDIR)
 
-all: createdir $(BUILDPATH)$(LIBNAME) $(BUILDPATH)$(TESTBIN) test
+all: createdir $(LIB) $(TESTBIN)
 
-$(BUILDPATH)$(LIBNAME): $(BUILDPATH)$(OBJS) 
-	$(AR) $(ARFLAGS) $(BUILDPATH)$(LIBNAME) $(BUILDPATH)$(OBJS)
+$(LIB): $(OBJS) 
+	$(AR) $(ARFLAGS) $@ $^
 
-$(BUILDPATH)$(OBJS):
-	$(CC) $(CFLAGS) -c $(SRC) -o $(BUILDPATH)$(OBJS) $(INCLUDEDIR)
+$(OBJS):
+	$(CC) $(CFLAGS) -c $(@F:.o=.c) -o $@ $(INCLUDEDIR)
 
-$(BUILDPATH)$(TESTBIN):
-	$(CC) $(CFLAGS) $(TESTSRC) -o $(BUILDPATH)$(TESTBIN) $(INCLUDEDIR) $(TESTLIBDIR) $(TESTLIB)
+$(TESTBIN): $(LIB)
+	$(CC) $(CFLAGS) $(@F:.exe=.c) -o $@ $(INCLUDEDIR) $(TESTLIBDIR) $(TESTLIB)
 
 .PHONY: clean createdir test
 
@@ -81,7 +81,7 @@ createdir:
 	mkdir -p $(BUILDDIR)
 
 test:
-	./$(BUILDPATH)$(TESTBIN)
+	./$(TESTBIN)
 
 clean:
 	-rm -dr $(BUILDROOT)
@@ -89,9 +89,9 @@ clean:
 install:
 	mkdir -p $(INSTALL_ROOT)include
 	mkdir -p $(INSTALL_ROOT)lib$(BIT_SUFFIX)
-	cp ./noise.h $(INSTALL_ROOT)include/noise.h
-	cp ./noise_base.h $(INSTALL_ROOT)include/noise_base.h
-	cp ./noise_priv_diamond_square.h $(INSTALL_ROOT)include/noise_priv_diamond_square.h
-	cp ./noise_priv_evolution.h $(INSTALL_ROOT)include/noise_priv_evolution.h
-	cp ./noise_priv_midpoint_displacement.h $(INSTALL_ROOT)include/noise_priv_midpoint_displacement.h
-	cp $(BUILDPATH)$(LIBNAME) $(INSTALL_ROOT)lib$(BIT_SUFFIX)/$(LIBNAME)
+	cp ./$(NAME).h $(INSTALL_ROOT)include$(PATHSEP)$(NAME).h
+	cp ./$(NAME)_base.h $(INSTALL_ROOT)include$(PATHSEP)$(NAME)_base.h
+	cp ./$(NAME)_priv_diamond_square.h $(INSTALL_ROOT)include$(PATHSEP)$(NAME)_priv_diamond_square.h
+	cp ./$(NAME)_priv_evolution.h $(INSTALL_ROOT)include$(PATHSEP)$(NAME)_priv_evolution.h
+	cp ./$(NAME)_priv_midpoint_displacement.h $(INSTALL_ROOT)include$(PATHSEP)$(NAME)_priv_midpoint_displacement.h
+	cp $(LIB) $(INSTALL_ROOT)lib$(BIT_SUFFIX)$(PATHSEP)$(LIBNAME)

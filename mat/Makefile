@@ -48,33 +48,33 @@ endif
 CFLAGS+=-std=c11 -Wpedantic -pedantic-errors -Wall -Wextra
 #-ggdb
 #-pg for profiling 
-SRC=mat.c
 
-LIBNAME=libmat.a
-OBJS=mat.o
+NAME=mat
+LIBNAME=lib$(NAME).a
+LIB=$(BUILDPATH)$(LIBNAME)
+OBJS=$(BUILDPATH)$(NAME).o
 
-TESTSRC=test_mat.c
-TESTBIN=test_mat.exe
-TESTLIB=-lmat
+TESTBIN=$(BUILDPATH)test_$(NAME).exe
+TESTLIB=-l$(NAME)
 TESTLIBDIR=-L$(BUILDDIR)
 
-all: createdir $(BUILDPATH)$(LIBNAME) $(BUILDPATH)$(TESTBIN) test
+all: createdir $(LIB) $(TESTBIN) test
 
-$(BUILDPATH)$(LIBNAME): $(BUILDPATH)$(OBJS)
-	$(AR) $(ARFLAGS) $(BUILDPATH)$(LIBNAME) $(BUILDPATH)$(OBJS)
+$(LIB): $(OBJS)
+	$(AR) $(ARFLAGS) $@ $^
 
-$(BUILDPATH)$(OBJS): mat.h
-	$(CC) $(CFLAGS) -c $(SRC) -o $(BUILDPATH)$(OBJS)
+$(OBJS): $(NAME).h
+	$(CC) $(CFLAGS) -c $(@F:.o=.c) -o $@
 
-$(BUILDPATH)$(TESTBIN): 
-	$(CC) $(CFLAGS) $(TESTSRC) -o $(BUILDPATH)$(TESTBIN) $(TESTLIBDIR) $(TESTLIB) 
+$(TESTBIN): $(LIB)
+	$(CC) $(CFLAGS) $(@F:.exe=.c) -o $@ $(TESTLIBDIR) $(TESTLIB) 
 	
 .PHONY: clean test createdir
 
 createdir:
 	mkdir -p $(BUILDDIR)
 test:
-	./$(BUILDPATH)$(TESTBIN)
+	./$(TESTBIN)
 	
 clean:
 	-rm -dr $(BUILDROOT)
@@ -82,9 +82,9 @@ clean:
 install:
 	mkdir -p $(INSTALL_ROOT)include
 	mkdir -p $(INSTALL_ROOT)lib$(BIT_SUFFIX)
-	cp ./mat.h $(INSTALL_ROOT)include/mat.h
-	cp ./mat2.h $(INSTALL_ROOT)include/mat2.h
-	cp ./mat3.h $(INSTALL_ROOT)include/mat3.h
-	cp ./mat4.h $(INSTALL_ROOT)include/mat4.h
-	cp ./mat_config.h $(INSTALL_ROOT)include/mat_config.h
-	cp $(BUILDPATH)$(LIBNAME) $(INSTALL_ROOT)lib$(BIT_SUFFIX)/$(LIBNAME)
+	cp ./$(NAME).h $(INSTALL_ROOT)include$(PATHSEP)$(NAME).h
+	cp ./$(NAME)2.h $(INSTALL_ROOT)include$(PATHSEP)$(NAME)2.h
+	cp ./$(NAME)3.h $(INSTALL_ROOT)include$(PATHSEP)$(NAME)3.h
+	cp ./$(NAME)4.h $(INSTALL_ROOT)include$(PATHSEP)$(NAME)4.h
+	cp ./$(NAME)_config.h $(INSTALL_ROOT)include$(PATHSEP)$(NAME)_config.h
+	cp $(LIB) $(INSTALL_ROOT)lib$(BIT_SUFFIX)$(PATHSEP)$(LIBNAME)

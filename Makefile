@@ -1,4 +1,4 @@
-.PHONY: clean vec mat utils statistics algorithm
+.PHONY: clean install test
 
 all: 
 	$(MAKE) -C vec
@@ -20,3 +20,10 @@ install:
 	$(MAKE) -C utils install
 	$(MAKE) -C statistics install
 	$(MAKE) -C algorithm install
+
+test:
+	$(MAKE) -C vec test
+	$(MAKE) -C mat test
+	$(MAKE) -C utils test
+	$(MAKE) -C statistics test
+	$(MAKE) -C algorithm test

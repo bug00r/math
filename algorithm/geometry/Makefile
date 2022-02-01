@@ -49,31 +49,31 @@ CFLAGS+=-std=c11 -Wpedantic -pedantic-errors -Wall -Wextra
 #-ggdb
 #-pg for profiling 
 
-SRC=geometry.c
+NAME=geometry
 
-LIBNAME=libgeometry.a
-OBJS=geometry.o
+LIBNAME=lib$(NAME).a
+LIB=$(BUILDPATH)$(LIBNAME)
+OBJS=$(BUILDPATH)$(NAME).o
 
 INCLUDE?=-I/c/dev/include
-LIB?=-L/c/dev/lib$(BIT_SUFFIX)
+LIBSDIR?=-L/c/dev/lib$(BIT_SUFFIX)
 
 INCLUDEDIR=$(INCLUDE) -I.
 
-TESTSRC=test_geometry.c
-TESTBIN=test_geometry.exe
-TESTLIB= -lgeometry -lutilsmath -lmat -lvec -ldl_list
-TESTLIBDIR=-L$(BUILDDIR) $(LIB)
+TESTBIN=$(BUILDPATH)test_$(NAME).exe
+TESTLIB= -l$(NAME) -lutilsmath -lmat -lvec -ldl_list
+TESTLIBDIR=-L$(BUILDDIR) $(LIBSDIR)
 
-all: createdir $(BUILDPATH)$(LIBNAME) $(BUILDPATH)$(TESTBIN)
+all: createdir $(LIB) $(TESTBIN)
 
-$(BUILDPATH)$(LIBNAME): $(BUILDPATH)$(OBJS)
-	$(AR) $(ARFLAGS) $(BUILDPATH)$(LIBNAME) $(BUILDPATH)$(OBJS)
+$(LIB): $(OBJS)
+	$(AR) $(ARFLAGS) $@ $^
 
-$(BUILDPATH)$(OBJS):
-	$(CC) $(CFLAGS) -c $(SRC) -o $(BUILDPATH)$(OBJS) $(INCLUDEDIR) $(debug)
+$(OBJS): $(NAME).h
+	$(CC) $(CFLAGS) -c $(@F:.o=.c) -o $@ $(INCLUDEDIR) $(debug)
 	
-$(BUILDPATH)$(TESTBIN):
-	$(CC) $(CFLAGS) $(TESTSRC) -o $(BUILDPATH)$(TESTBIN) $(INCLUDEDIR) $(TESTLIBDIR) $(TESTLIB) $(debug)
+$(TESTBIN): $(LIB)
+	$(CC) $(CFLAGS) $(@F:.exe=.c) -o $@ $(INCLUDEDIR) $(TESTLIBDIR) $(TESTLIB) $(debug)
 	
 .PHONY: createdir clean test install
 
@@ -81,7 +81,7 @@ createdir:
 	mkdir -p $(BUILDDIR)
 
 test:
-	./$(BUILDPATH)$(TESTBIN)
+	./$(TESTBIN)
 
 clean:
 	-rm -dr $(BUILDROOT)
@@ -89,5 +89,5 @@ clean:
 install:
 	mkdir -p $(INSTALL_ROOT)include
 	mkdir -p $(INSTALL_ROOT)lib$(BIT_SUFFIX)
-	cp ./geometry.h $(INSTALL_ROOT)include/geometry.h
-	cp $(BUILDPATH)$(LIBNAME) $(INSTALL_ROOT)lib$(BIT_SUFFIX)/$(LIBNAME)
+	cp ./$(NAME).h $(INSTALL_ROOT)include$(PATHSEP)$(NAME).h
+	cp $(LIB) $(INSTALL_ROOT)lib$(BIT_SUFFIX)$(PATHSEP)$(LIBNAME)

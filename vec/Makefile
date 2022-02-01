@@ -50,31 +50,30 @@ CFLAGS+=-std=c11 -Wpedantic -pedantic-errors -Wall -Wextra
 #-ggdb
 #-pg for profiling 
 
-SRC=vec.c
+NAME=vec
+LIBNAME=lib$(NAME).a
+LIB=$(BUILDPATH)$(LIBNAME)
+OBJS=$(BUILDPATH)$(NAME).o
 
-LIBNAME=libvec.a
-OBJS=vec.o
-
-TESTSRC=test_vec.c
-TESTBIN=test_vec.exe
-TESTLIB=-lvec
+TESTBIN=$(BUILDPATH)test_$(NAME).exe
+TESTLIB=-l$(NAME)
 TESTLIBDIR=-L$(BUILDDIR)
 
-all: createdir $(BUILDPATH)$(LIBNAME) $(BUILDPATH)$(TESTBIN)
+all: createdir $(LIB) $(TESTBIN)
 
-$(BUILDPATH)$(LIBNAME):$(BUILDPATH)$(OBJS)
-	$(AR) $(ARFLAGS) $(BUILDPATH)$(LIBNAME) $(BUILDPATH)$(OBJS)
+$(LIB): $(OBJS)
+	$(AR) $(ARFLAGS) $@ $^
 	
-$(BUILDPATH)$(OBJS): vec.h
-	$(CC) $(CFLAGS) -c $(SRC) -o $(BUILDPATH)$(OBJS)
+$(OBJS): $(NAME).h
+	$(CC) $(CFLAGS) -c $(@F:.o=.c) -o $@
 	
-$(BUILDPATH)$(TESTBIN):
-	$(CC) $(CFLAGS) $(TESTSRC) -o $(BUILDPATH)$(TESTBIN) $(TESTLIBDIR) $(TESTLIB)
+$(TESTBIN):
+	$(CC) $(CFLAGS) $(@F:.exe=.c) -o $@ $(TESTLIBDIR) $(TESTLIB)
 	
 .PHONY: clean createdir test
 
 test:
-	./$(BUILDPATH)$(TESTBIN)
+	./$(TESTBIN)
 
 createdir:
 	mkdir -p $(BUILDDIR)
@@ -85,8 +84,8 @@ clean:
 install:
 	mkdir -p $(INSTALL_ROOT)include
 	mkdir -p $(INSTALL_ROOT)lib$(BIT_SUFFIX)
-	cp ./vec.h $(INSTALL_ROOT)include/vec.h
-	cp ./vec2.h $(INSTALL_ROOT)include/vec2.h
-	cp ./vec3.h $(INSTALL_ROOT)include/vec3.h
-	cp ./vec_config.h $(INSTALL_ROOT)include/vec_config.h
-	cp $(BUILDPATH)$(LIBNAME) $(INSTALL_ROOT)lib$(BIT_SUFFIX)/$(LIBNAME)
+	cp ./$(NAME).h $(INSTALL_ROOT)include$(PATHSEP)$(NAME).h
+	cp ./$(NAME)2.h $(INSTALL_ROOT)include$(PATHSEP)$(NAME)2.h
+	cp ./$(NAME)3.h $(INSTALL_ROOT)include$(PATHSEP)$(NAME)3.h
+	cp ./$(NAME)_config.h $(INSTALL_ROOT)include$(PATHSEP)$(NAME)_config.h
+	cp $(LIB) $(INSTALL_ROOT)lib$(BIT_SUFFIX)$(PATHSEP)$(LIBNAME)

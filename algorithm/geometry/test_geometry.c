@@ -41,7 +41,11 @@ static void test_geometry_convex_hull() {
 }
 
 static void print_raster(int32_t const * const x, int32_t const * const y, void *data) {
+	#ifdef debug
 	printf("x/y = %i/%i\n", *x, *y);
+	#else
+	(void)(x); (void)(y); (void)(data);
+	#endif
 }
 
 static void test_geometry_line() {
@@ -214,9 +218,13 @@ static void test_geometry_triangulation_skull() {
 }
 
 static void print_bezier(vec2_t const * const p, vec2_t const * const p2, void *data) {
+	#ifdef debug
 	printf("bezier1: ");
 	vec2_print(p);
 	vec2_print(p2);
+	#else
+	(void)(p); (void)(p2); (void)(data);
+	#endif
 }
 
 static void test_geometry_bezier1() {
@@ -253,25 +261,25 @@ int main(int argc, char **argv) {
 
 	DEBUG_LOG(">> Start geometry tests:\n");
 
-    //test_geometry_convex_hull_null();
+    test_geometry_convex_hull_null();
 
-	//test_geometry_convex_hull();
+	test_geometry_convex_hull();
 
-	//test_geometry_line();
+	test_geometry_line();
 
-	//test_geometry_circle();
+	test_geometry_circle();
 
-	//test_geometry_ellipse();
+	test_geometry_ellipse();
 
-	//test_geometry_triangulation();
+	test_geometry_triangulation();
 
-	//test_geometry_triangulation_mc();
+	test_geometry_triangulation_mc();
 
-	//test_geometry_triangulation_vc();
+	test_geometry_triangulation_vc();
 
-	//test_geometry_triangulation_vc2();
+	test_geometry_triangulation_vc2();
 
-	//test_geometry_triangulation_skull();
+	test_geometry_triangulation_skull();
 
 	test_geometry_bezier1();
 

@@ -1,4 +1,4 @@
-.PHONY: clean noise fractals geometry
+.PHONY: clean install test
 
 all:
 	$(MAKE) -C noise
@@ -14,4 +14,9 @@ install:
 	$(MAKE) -C noise install
 	$(MAKE) -C fractals install
 	$(MAKE) -C geometry install
+
+test:
+	$(MAKE) -C noise test
+	$(MAKE) -C fractals test
+	$(MAKE) -C geometry test
 	

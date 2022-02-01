@@ -350,8 +350,9 @@ static dl_list_t * __geometry_create_list_from_vecs(const vec3_t *vecs, size_t c
 }
 
 //bool lines_intersect(vec2_t* _l1p1, vec2_t* _l1p2, vec2_t* _l2p1, vec2_t* _l2p2)
-static bool __geometry_any_intersection(dl_list_t * vec_list, vec3_t *firstPt, vec3_t *middlePt,  vec3_t *lastPt,
-                                                              int32_t *firstPtIdx, int32_t *middlePtIdx,  int32_t *lastPtIdx) {
+static bool __geometry_any_intersection(dl_list_t * vec_list, vec3_t *firstPt, vec3_t *lastPt,
+                                                              int32_t *firstPtIdx, int32_t *lastPtIdx) {
+
     bool intersection = false;
 
     int32_t firstIdx = 0, lastIdx = 1, _firstPtIdx = *firstPtIdx, _lastPtIdx = *lastPtIdx;
@@ -436,7 +437,7 @@ geometry_triangulate(const vec3_t *vecs, size_t cnt_vecs)
 
             int32_t middleIdx = lastIdx - 1;
 
-            middleIdx = ( middleIdx < 0 ? vec_list->cnt - 1 : middleIdx );
+            middleIdx = ( middleIdx < 0 ? (int32_t)vec_list->cnt - 1 : middleIdx );
 
             #ifdef debug
             printf("f: %i m: %i l: %i max: %i\n", firstIdx, middleIdx, lastIdx, maxIdx);
@@ -461,12 +462,16 @@ geometry_triangulate(const vec3_t *vecs, size_t cnt_vecs)
             if ( place < 0.f ) {
 
                 /* but there is a chance for intersection. then we have to increase first and last index */
-                if (__geometry_any_intersection(vec_list, f, m, l, &firstIdx, &middleIdx, &lastIdx)) {
+                if (__geometry_any_intersection(vec_list, f, l, &firstIdx, &lastIdx)) {
+                    #ifdef debug
                     printf("Intersection!!!\n");
+                    #endif
                     ++firstIdx; 
                     ++lastIdx; 
                 } else {
+                    #ifdef debug
                     printf("found triangle!!\n");
+                    #endif
                     /* saving first triangle and removing middleIdx from pool, continue with lastIdx, and maxIdx - 1 */
                     dl_list_append(triangulated, &*f);
                     dl_list_append(triangulated, &*m);
@@ -479,7 +484,9 @@ geometry_triangulate(const vec3_t *vecs, size_t cnt_vecs)
                 
             } else if ( place == 0.f ) {
                 /* middleIdx is linear to others, we can remove it and retry with lastIdx, and maxIdx - 1 */
+                #ifdef debug
                 printf("linear, removing\n");
+                #endif
                 dl_list_remove(vec_list, middleIdx);
                 
                 --maxIdx;

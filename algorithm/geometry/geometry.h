@@ -2,7 +2,7 @@
 #define GEOMETRY_H
 
 #include "dl_list.h"
-#include "utils_math.h"
+#include "utilsmath.h"
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>

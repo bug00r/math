@@ -8,7 +8,7 @@
 
 #include "farray.h"
 #include "statistics.h"
-#include "utils_math.h"
+#include "utilsmath.h"
 
 #include "noise_base.h"
 #include "noise_priv_diamond_square.h"
