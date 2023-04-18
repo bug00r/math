@@ -37,12 +37,15 @@ LIBNAME=lib$(NAME).a
 LIB=$(BUILDPATH)$(LIBNAME)
 OBJS=$(BUILDPATH)$(NAME).o
 
-INCLUDEDIR?=-I/c/dev/include -I.
+CFLAGS+=-I/c/dev/include -I.
+
 LIBSDIR?=-L/c/dev/lib$(BIT_SUFFIX)
 
 TESTBIN=$(BUILDPATH)test_$(NAME).exe
 TESTLIB= -l$(NAME) -lmat -lvec  
 TESTLIBDIR=-L$(BUILDDIR) $(LIBSDIR)
+
+LDFLAGS+=$(TESTLIBDIR) $(TESTLIB)
 
 all: createdir $(LIB)
 
@@ -50,10 +53,10 @@ $(LIB): $(OBJS)
 	$(AR) $(ARFLAGS) $@ $^
 
 $(OBJS): $(NAME).h
-	$(CC) $(CFLAGS) -c $(@F:.o=.c) -o $@ $(INCLUDEDIR) 
+	$(CC) $(CFLAGS) -c $(@F:.o=.c) -o $@
 	
 $(TESTBIN): $(LIB)
-	$(CC) $(CFLAGS) $(@F:.exe=.c) -o $@ $(INCLUDEDIR) $(TESTLIBDIR) $(TESTLIB)
+	$(CC) $(CFLAGS) $(@F:.exe=.c) -o $@ $(LDFLAGS)
 
 .PHONY: clean createdir test
 

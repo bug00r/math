@@ -41,6 +41,8 @@ TESTBIN=$(BUILDPATH)test_$(NAME).exe
 TESTLIB=-l$(NAME)
 TESTLIBDIR=-L$(BUILDDIR)
 
+LDFLAGS+=$(TESTLIBDIR) $(TESTLIB)
+
 all: createdir $(LIB)
 
 $(LIB): $(OBJS)
@@ -50,7 +52,7 @@ $(OBJS): $(NAME).h
 	$(CC) $(CFLAGS) -c $(@F:.o=.c) -o $@
 	
 $(TESTBIN): $(LIB)
-	$(CC) $(CFLAGS) $(@F:.exe=.c) -o $@ $(TESTLIBDIR) $(TESTLIB)
+	$(CC) $(CFLAGS) $(@F:.exe=.c) -o $@ $(LDFLAGS)
 	
 .PHONY: clean createdir test
 
