@@ -33,7 +33,7 @@ ifeq ($(M32),1)
 	BIT_SUFFIX+=32
 endif
 
-CFLAGS+=-std=c11 -Wpedantic -pedantic-errors -Wall -Wextra
+override CFLAGS+=-std=c11 -Wpedantic -pedantic-errors -Wall -Wextra
 #-ggdb
 #-pg for profiling 
 
@@ -43,16 +43,16 @@ LIBNAME=lib$(NAME).a
 LIB=$(BUILDPATH)$(LIBNAME)
 OBJS=$(BUILDPATH)$(NAME).o
 
-CFLAGS+=-I/c/dev/include
+override CFLAGS+=-I/c/dev/include
 LIBSDIR?=-L/c/dev/lib$(BIT_SUFFIX)
 
-CFLAGS+=-I.
+override CFLAGS+=-I.
 
 TESTBIN=$(BUILDPATH)test_$(NAME).exe
 TESTLIB= -l$(NAME) -lutilsmath -lmat -lvec -ldl_list
 TESTLIBDIR=-L$(BUILDDIR) $(LIBSDIR)
 
-LDFLAGS+=$(TESTLIBDIR) $(TESTLIB)
+override LDFLAGS+=$(TESTLIBDIR) $(TESTLIB)
 
 all: createdir $(LIB)
 
