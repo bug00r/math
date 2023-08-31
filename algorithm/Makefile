@@ -36,7 +36,7 @@ endif
 MATH_ALGO_PROJ_ROOT:=$(shell pwd)
 MATH_ALGO_PROJ_BUILD:=$(MATH_ALGO_PROJ_ROOT)$(PATHSEP)$(BUILDPATH)
 
-MATH_ALGO_MODULES:=noise fractals geometry
+MATH_ALGO_MODULES:=noise fractals geometry compression
 
 all: $(patsubst %, build_%, $(MATH_ALGO_MODULES)) 
 
@@ -52,12 +52,17 @@ build_geometry:
 	$(MAKE) -C geometry CFLAGS="$(CFLAGS) -I$(MATH_ALGO_PROJ_BUILD)include"
 	$(MAKE) -C geometry install PREFIX=$(MATH_ALGO_PROJ_BUILD)
 
+build_compression:
+	$(MAKE) -C compression CFLAGS="$(CFLAGS) -I$(MATH_ALGO_PROJ_BUILD)include"
+	$(MAKE) -C compression install PREFIX=$(MATH_ALGO_PROJ_BUILD)
+
 .PHONY: clean createdir	test
 
 test: createdir
 	$(MAKE) -C noise test CFLAGS="$(CFLAGS) -I$(MATH_ALGO_PROJ_BUILD)include" LDFLAGS="$(LDFLAGS) -L$(MATH_ALGO_PROJ_BUILD)lib$(BIT_SUFFIX)$(PATHSEP)"
 	$(MAKE) -C fractals test CFLAGS="$(CFLAGS) -I$(MATH_ALGO_PROJ_BUILD)include" LDFLAGS="$(LDFLAGS) -L$(MATH_ALGO_PROJ_BUILD)lib$(BIT_SUFFIX)$(PATHSEP)"
 	$(MAKE) -C geometry test CFLAGS="$(CFLAGS) -I$(MATH_ALGO_PROJ_BUILD)include" LDFLAGS="$(LDFLAGS) -L$(MATH_ALGO_PROJ_BUILD)lib$(BIT_SUFFIX)$(PATHSEP)"
+	$(MAKE) -C compression test CFLAGS="$(CFLAGS) -I$(MATH_ALGO_PROJ_BUILD)include" LDFLAGS="$(LDFLAGS) -L$(MATH_ALGO_PROJ_BUILD)lib$(BIT_SUFFIX)$(PATHSEP)"
 
 createdir:
 	mkdir -p $(BUILDDIR)
@@ -67,10 +72,11 @@ clean:
 	$(MAKE) -C noise clean
 	$(MAKE) -C fractals clean
 	$(MAKE) -C geometry clean
+	$(MAKE) -C compression clean
 
 install:
 	$(info install at: $(INSTALL_ROOT))
 	mkdir -p $(INSTALL_ROOT)include
 	mkdir -p $(INSTALL_ROOT)lib$(BIT_SUFFIX)
-	cp $(BUILDPATH)include/*.h $(INSTALL_ROOT)include
-	cp $(BUILDPATH)lib$(BIT_SUFFIX)/*.a $(INSTALL_ROOT)lib$(BIT_SUFFIX)
+	-cp -f $(BUILDPATH)include/*.h $(INSTALL_ROOT)include
+	-cp -f $(BUILDPATH)lib$(BIT_SUFFIX)/*.a $(INSTALL_ROOT)lib$(BIT_SUFFIX)
