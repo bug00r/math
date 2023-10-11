@@ -42,7 +42,7 @@ NAME=compression
 LIBNAME=lib$(NAME).a
 LIB=$(BUILDPATH)$(LIBNAME)
 
-COMPRESSION_MODULES=deflate checksum
+COMPRESSION_MODULES=deflate checksum lz77
 OBJS=$(patsubst %, $(BUILDPATH)%.o, $(COMPRESSION_MODULES))
 #OBJS=$(BUILDPATH)$(NAME).o
 
