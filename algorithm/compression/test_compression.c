@@ -24,6 +24,13 @@ static void test_compression_crc32()
 	DEBUG_LOG("<< end crc32 tests:\n");
 }
 
+static void test_compression_lz77()
+{
+	DEBUG_LOG(">> Start lz77 tests:\n");
+
+	DEBUG_LOG("<< end lz77 tests:\n");
+}
+
 static void test_compression_deflate()
 {
 	DEBUG_LOG(">> Start deflate tests:\n");
@@ -37,6 +44,8 @@ int main(int argc, char **argv) {
 	DEBUG_LOG(">> Start compression tests:\n");
 
 	test_compression_crc32();
+
+	test_compression_lz77();
 
 	test_compression_deflate();
 

@@ -84,4 +84,5 @@ install:
 	mkdir -p $(INSTALL_ROOT)lib$(BIT_SUFFIX)
 	cp ./$(NAME).h $(INSTALL_ROOT)include$(PATHSEP)$(NAME).h
 	cp ./deflate.h $(INSTALL_ROOT)include$(PATHSEP)deflate.h
+	cp ./lz77.h $(INSTALL_ROOT)include$(PATHSEP)lz77.h
 	cp $(LIB) $(INSTALL_ROOT)lib$(BIT_SUFFIX)$(PATHSEP)$(LIBNAME)
