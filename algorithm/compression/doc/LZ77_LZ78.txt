@@ -187,3 +187,23 @@ zusammengefasst werden, das entspricht 2 Bytes. Das Folgezeichen wurde stets sep
 ausgegeben und bildete so das dritte Byte. Pro Treffer oder Nicht-Treffer werden exakt 3 
 Bytes Daten ausgeben. Da der Offset 12 Bit lang ist, kann maximal ein 4 Kilobyte (minus ein Byte) 
 langer Puffer adressiert werden. 
+
+Folgende Dinge betrachten/erarbeiten:
+
+    1.Der Ausgabestrom nutzt lediglich 4 Bit für die Länge eines gefundenen Triplets. Wenn Längere
+      Werte gefunden werden, werden einfach mehrere Treffer nebeneinander gesetzt.
+      (Habe eine Vermutung, KA ob sie stimmt. GGFS. am Algorithmus testen)
+    2. Während der Berechnung der Triplets können bei der Suche nach Zeichenketten neben decompress
+       regulären Verhalten und der unter Punkt 1 noch zwei weitere Sonderfälle Auftreten:
+            1. RLE-Modus Runtime Length encoding
+            2. Wiederhol Modus.
+
+            Bei diesen Beiden ist mir noch nicht 100%ig klar wie diese unterschieden werden und die 
+            anderen dabei nicht übergangen sondern im Sinne der Erfinder implementiert werden.
+
+            Getestet werden kann dies ggfs. unter der Verwendung anderer Implementierungen zur De- 
+            bzw. Kodierung und der entgegengesetzten Operation durch meine Implementierung. 
+
+            Andernfalls ist lediglich eine Verwendung meiner Bibliothek in beiden Richtungen denkbar.
+
+
