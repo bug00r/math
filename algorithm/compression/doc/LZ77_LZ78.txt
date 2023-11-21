@@ -1,15 +1,17 @@
 Source: https://hackernoon.com/how-lz77-data-compression-works-yk113te0
 (Hidden Thanks to Dhanesh Budhrani for this very good explanation!!)
 
-In this post we are going to explore LZ77, a lossless data-compression algorithm created by Lempel and Ziv in 1977. 
-This algorithm is widely spread in our current systems since, for instance, ZIP and GZIP are based on LZ77.
+In this post we are going to explore LZ77, a lossless data-compression algorithm 
+created by Lempel and Ziv in 1977. This algorithm is widely spread in our current 
+systems since, for instance, ZIP and GZIP are based on LZ77.
 
 Compression
 
-LZ77 iterates sequentially through the input string and stores any new match into a search buffer. 
-The process of compression can be divided in 3 steps:
+LZ77 iterates sequentially through the input string and stores any new match into a 
+search buffer. The process of compression can be divided in 3 steps:
 
-    1. Find the longest match of a string that starts at the current position with a pattern available in the search buffer.
+    1. Find the longest match of a string that starts at the current position with a 
+       pattern available in the search buffer.
     2. Output a triple (o, l, c) where,
         - o: offset, represents the number of positions that we would need to move 
              backwards in order to find the start of the matching string.
@@ -165,4 +167,43 @@ Fully decompressed string: a b a b c b a b a b a a
 
 If you check the original to-be-compressed string in the previous section, you will see 
 that they are the same!
+
+Anhang: https://de.wikibooks.org/wiki/Datenkompression:_Verlustfreie_Verfahren:_W%C3%B6rterbuchbasierte_Verfahren:_LZ77
+Codierung des Ausgabestroms
+
+Codierung eines Treffers/Nicht-Treffers 
+Länge 	Offset 	                    Folgezeichen
+4 3	2 1 12 11 10 9  8 7 6 5 4 3 2 1 8 7 6 5 4 3 2 1
+Byte 1 (8 Bit) 	   | Byte 2 (8 Bit)|Byte 3 (8 Bit)
+
+Für die Codierung der Trefferlänge wurde ein 4 Bit langer Wert reserviert. Damit sind alle
+Längenangaben zwischen 0 und 15 exakt codierbar. Längere Treffer wurden durch Aneinanderreihung 
+mehrerer Treffer erreicht. Wie Sie sehen, werden Treffer und Nicht-Treffer gleichartig codiert. 
+Sie sind nach der Codierung immer 24 Bits lang. Bei dieser Darstellung jedoch ergibt sich ein 
+riesiges Sparpotential, welches in vielen später entwickelten Varianten ausgenutzt wurde. 
+Für die Offsets wurden 12 Bits zur Verfügung gestellt, womit alle Werte zwischen 0 und 4095 
+darstellbar sind. Die beiden Werte für Länge und Offset können in einem Block aus 16 Bits 
+zusammengefasst werden, das entspricht 2 Bytes. Das Folgezeichen wurde stets separat dazu 
+ausgegeben und bildete so das dritte Byte. Pro Treffer oder Nicht-Treffer werden exakt 3 
+Bytes Daten ausgeben. Da der Offset 12 Bit lang ist, kann maximal ein 4 Kilobyte (minus ein Byte) 
+langer Puffer adressiert werden. 
+
+Folgende Dinge betrachten/erarbeiten:
+
+    1.Der Ausgabestrom nutzt lediglich 4 Bit für die Länge eines gefundenen Triplets. Wenn Längere
+      Werte gefunden werden, werden einfach mehrere Treffer nebeneinander gesetzt.
+      (Habe eine Vermutung, KA ob sie stimmt. GGFS. am Algorithmus testen)
+    2. Während der Berechnung der Triplets können bei der Suche nach Zeichenketten neben decompress
+       regulären Verhalten und der unter Punkt 1 noch zwei weitere Sonderfälle Auftreten:
+            1. RLE-Modus Runtime Length encoding
+            2. Wiederhol Modus.
+
+            Bei diesen Beiden ist mir noch nicht 100%ig klar wie diese unterschieden werden und die 
+            anderen dabei nicht übergangen sondern im Sinne der Erfinder implementiert werden.
+
+            Getestet werden kann dies ggfs. unter der Verwendung anderer Implementierungen zur De- 
+            bzw. Kodierung und der entgegengesetzten Operation durch meine Implementierung. 
+
+            Andernfalls ist lediglich eine Verwendung meiner Bibliothek in beiden Richtungen denkbar.
+
 
