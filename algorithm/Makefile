@@ -36,7 +36,7 @@ endif
 MATH_ALGO_PROJ_ROOT:=$(shell pwd)
 MATH_ALGO_PROJ_BUILD:=$(MATH_ALGO_PROJ_ROOT)$(PATHSEP)$(BUILDPATH)
 
-MATH_ALGO_MODULES:=noise fractals geometry compression
+MATH_ALGO_MODULES:=noise fractals geometry compression crypt
 
 all: $(patsubst %, build_%, $(MATH_ALGO_MODULES)) 
 
@@ -56,6 +56,10 @@ build_compression:
 	$(MAKE) -C compression CFLAGS="$(CFLAGS) -I$(MATH_ALGO_PROJ_BUILD)include"
 	$(MAKE) -C compression install PREFIX=$(MATH_ALGO_PROJ_BUILD)
 
+build_crypt:
+	$(MAKE) -C crypt CFLAGS="$(CFLAGS) -I$(MATH_ALGO_PROJ_BUILD)include"
+	$(MAKE) -C crypt install PREFIX=$(MATH_ALGO_PROJ_BUILD)
+
 .PHONY: clean createdir	test
 
 test: createdir
@@ -63,7 +67,7 @@ test: createdir
 	$(MAKE) -C fractals test CFLAGS="$(CFLAGS) -I$(MATH_ALGO_PROJ_BUILD)include" LDFLAGS="$(LDFLAGS) -L$(MATH_ALGO_PROJ_BUILD)lib$(BIT_SUFFIX)$(PATHSEP)"
 	$(MAKE) -C geometry test CFLAGS="$(CFLAGS) -I$(MATH_ALGO_PROJ_BUILD)include" LDFLAGS="$(LDFLAGS) -L$(MATH_ALGO_PROJ_BUILD)lib$(BIT_SUFFIX)$(PATHSEP)"
 	$(MAKE) -C compression test CFLAGS="$(CFLAGS) -I$(MATH_ALGO_PROJ_BUILD)include" LDFLAGS="$(LDFLAGS) -L$(MATH_ALGO_PROJ_BUILD)lib$(BIT_SUFFIX)$(PATHSEP)"
-
+	$(MAKE) -C crypt test CFLAGS="$(CFLAGS) -I$(MATH_ALGO_PROJ_BUILD)include" LDFLAGS="$(LDFLAGS) -L$(MATH_ALGO_PROJ_BUILD)lib$(BIT_SUFFIX)$(PATHSEP)"
 createdir:
 	mkdir -p $(BUILDDIR)
 
@@ -73,6 +77,7 @@ clean:
 	$(MAKE) -C fractals clean
 	$(MAKE) -C geometry clean
 	$(MAKE) -C compression clean
+	$(MAKE) -C crypt clean
 
 install:
 	$(info install at: $(INSTALL_ROOT))
