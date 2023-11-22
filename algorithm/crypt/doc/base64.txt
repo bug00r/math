@@ -53,4 +53,3 @@ len of encoded = ceil( numbytes / 3 ) * 4
 max len of decoded = encoded * 3 / 4
     could include a real amount of maxLen down to maxLen - 2, should be saved separat
 
-lenEnc = ceil(numBytes * 1.33333333)
