@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <stddef.h>
 #include <stdbool.h>
 #include <string.h>
@@ -45,12 +46,12 @@ uint8_t* b64decode(uint8_t* bytes, size_t numBytes, bool padding);
     Computes Base 64 encoding for a byte String and stores the Result into targebuffer.
     TargetBuffer must be large enough (see: b64maxLenEnc, b64maxLenEncStr).
 */
-void b64encodeBuf(uint8_t* bytes, size_t numBytes, uint8_t* targetBuffer, bool padding);
+void b64encodeBuf(uint8_t* bytes, size_t numBytes, uint8_t* targetBuffer, uint32_t targetBufLen, bool padding);
 
 /*
     Computes Base 64 decoding for a byte String and stores the Result into targebuffer.
     TargetBuffer must be large enough (see: b64maxLenDec, b64maxLenDecStr).
 */
-void b64decodeBuf(uint8_t* bytes, size_t numBytes, uint8_t* targetBuffer, bool padding);
+void b64decodeBuf(uint8_t* bytes, size_t numBytes, uint8_t* targetBuffer, uint32_t targetBufLen, bool padding);
 
 #endif

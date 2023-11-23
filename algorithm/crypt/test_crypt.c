@@ -38,12 +38,43 @@ static void test_b64_len_fn()
 	DEBUG_LOG("<< end b64 len tests:\n");	
 }
 
+static void test_b64_encrypt()
+{
+	DEBUG_LOG(">> Start b64 encrypt tests:\n");
+
+	const unsigned char *test = (const unsigned char *)"Ma";
+
+	uint8_t *result = b64encode((uint8_t*)test, strlen((const char*)test), true);
+	DEBUG_LOG_ARGS("test: %s => encode: %s\n", (char*)test, (char*)result);
+	free(result);
+
+	test = (const unsigned char *)"M";
+	result = b64encode((uint8_t*)test, strlen((const char*)test), true);
+	DEBUG_LOG_ARGS("test: %s => encode: %s\n", (char*)test, (char*)result);
+	free(result);
+	
+	test = (const unsigned char *)"light work";
+	result = b64encode((uint8_t*)test, strlen((const char*)test), true);
+	DEBUG_LOG_ARGS("test: %s => encode: %s\n", (char*)test, (char*)result);
+	free(result);
+
+	test = (const unsigned char *)"Dies ist ein langer Text!!";
+	result = b64encode((uint8_t*)test, strlen((const char*)test), true);
+	DEBUG_LOG_ARGS("test: %s => encode: %s\n", (char*)test, (char*)result);
+	assert(strcmp("RGllcyBpc3QgZWluIGxhbmdlciBUZXh0ISE=", (const char*)result) == 0);
+	free(result);
+
+	DEBUG_LOG("<< end b64 encrypt tests:\n");	
+}
+
 int main(int argc, char **argv) {
 	(void)argc; (void)argv;
 
 	DEBUG_LOG(">> Start crypt tests:\n");
 
 	test_b64_len_fn();
+
+	test_b64_encrypt();
 
 	DEBUG_LOG("<< end crypt tests:\n");
 
