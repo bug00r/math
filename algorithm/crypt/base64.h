@@ -33,24 +33,28 @@ uint32_t b64maxLenDecStr(const unsigned char* b64Bytes);
 
 /*
     Computes Base 64 encoding for a byte String and returns result.
-    Result must be free'd by Caller.
+    Result must be free'd by Caller. In case of padding is false,
+    the Rest of the Buffer will be filled with Zeros('\0')
 */
 uint8_t* b64encode(uint8_t* bytes, size_t numBytes, bool padding);
 /*
     Computes Base 64 decoding for a Base64 String and returns result.
-    Result must be free'd by Caller.
+    Result must be free'd by Caller. In case of padding is true,
+    the Rest of the Buffer will be filled with Zeros('\0')
 */
 uint8_t* b64decode(uint8_t* bytes, size_t numBytes, bool padding);
 
 /*
     Computes Base 64 encoding for a byte String and stores the Result into targebuffer.
-    TargetBuffer must be large enough (see: b64maxLenEnc, b64maxLenEncStr).
+    TargetBuffer must be large enough (see: b64maxLenEnc, b64maxLenEncStr). In case of 
+    padding is false, the Rest of the Buffer will be filled with Zeros('\0')
 */
 void b64encodeBuf(uint8_t* bytes, size_t numBytes, uint8_t* targetBuffer, uint32_t targetBufLen, bool padding);
 
 /*
     Computes Base 64 decoding for a byte String and stores the Result into targebuffer.
-    TargetBuffer must be large enough (see: b64maxLenDec, b64maxLenDecStr).
+    TargetBuffer must be large enough (see: b64maxLenDec, b64maxLenDecStr). In case of 
+    padding is true, the Rest of the Buffer will be filled with Zeros('\0')
 */
 void b64decodeBuf(uint8_t* bytes, size_t numBytes, uint8_t* targetBuffer, uint32_t targetBufLen, bool padding);
 

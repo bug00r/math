@@ -38,31 +38,42 @@ static void test_b64_len_fn()
 	DEBUG_LOG("<< end b64 len tests:\n");	
 }
 
+typedef struct __b64_enc_test_data
+{
+	const unsigned char *text;
+	const char *b64Text;
+	bool padding;
+} b64encdata_t;
+
+static const b64encdata_t b64enctestdata[] = { 
+	{(const unsigned char *)"Ma", "TWE=", true} ,
+	{(const unsigned char *)"M", "TQ==", true} ,
+	{(const unsigned char *)"light work", "bGlnaHQgd29yaw==", true} ,
+	{(const unsigned char *)"Dies ist ein langer Text!!", "RGllcyBpc3QgZWluIGxhbmdlciBUZXh0ISE=", true} ,
+	{(const unsigned char *)"Ma", "TWE", false} ,
+	{(const unsigned char *)"M", "TQ", false} ,
+	{(const unsigned char *)"light work", "bGlnaHQgd29yaw", false} ,
+	{(const unsigned char *)"Dies ist ein langer Text!!", "RGllcyBpc3QgZWluIGxhbmdlciBUZXh0ISE", false},
+	{ NULL, NULL, false},
+};
+
+static void __test_b64_enc_(const unsigned char *text, const char *expectedResult, bool padding)
+{
+	uint8_t *result = b64encode((uint8_t*)text, strlen((const char*)text), padding);
+	DEBUG_LOG_ARGS("test: %s => encode: %s\n", (char*)text, (char*)result);
+	assert(strcmp((const char*)result, (const char*)expectedResult) == 0);
+	free(result);
+}
+
 static void test_b64_encrypt()
 {
 	DEBUG_LOG(">> Start b64 encrypt tests:\n");
 
-	const unsigned char *test = (const unsigned char *)"Ma";
-
-	uint8_t *result = b64encode((uint8_t*)test, strlen((const char*)test), true);
-	DEBUG_LOG_ARGS("test: %s => encode: %s\n", (char*)test, (char*)result);
-	free(result);
-
-	test = (const unsigned char *)"M";
-	result = b64encode((uint8_t*)test, strlen((const char*)test), true);
-	DEBUG_LOG_ARGS("test: %s => encode: %s\n", (char*)test, (char*)result);
-	free(result);
-	
-	test = (const unsigned char *)"light work";
-	result = b64encode((uint8_t*)test, strlen((const char*)test), true);
-	DEBUG_LOG_ARGS("test: %s => encode: %s\n", (char*)test, (char*)result);
-	free(result);
-
-	test = (const unsigned char *)"Dies ist ein langer Text!!";
-	result = b64encode((uint8_t*)test, strlen((const char*)test), true);
-	DEBUG_LOG_ARGS("test: %s => encode: %s\n", (char*)test, (char*)result);
-	assert(strcmp("RGllcyBpc3QgZWluIGxhbmdlciBUZXh0ISE=", (const char*)result) == 0);
-	free(result);
+	for ( size_t testDataIdx = 0; b64enctestdata[testDataIdx].text != NULL; testDataIdx++)
+	{
+		const b64encdata_t* testData = &b64enctestdata[testDataIdx];
+		__test_b64_enc_(testData->text, testData->b64Text, testData->padding);
+	}
 
 	DEBUG_LOG("<< end b64 encrypt tests:\n");	
 }

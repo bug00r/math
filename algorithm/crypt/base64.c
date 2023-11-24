@@ -99,13 +99,15 @@ void b64encodeBuf(uint8_t* _bytes, size_t numBytes, uint8_t* targetBuffer, uint3
         
         targetBuffer[targetBufferIdx++] = b64Dict[b64Idx % 64]; /* 64 secure overflow */
 
+        char paddingChar = ( padding ? '=' : '\0');
+
         switch(cntPadding)
         {
-            case 1: targetBuffer[targetBufferIdx++] = '='; break;
-            case 2: targetBuffer[targetBufferIdx++] = '='; 
-                    targetBuffer[targetBufferIdx++] = '='; break;
+            case 1: targetBuffer[targetBufferIdx++] = paddingChar; break;
+            case 2: targetBuffer[targetBufferIdx++] = paddingChar; 
+                    targetBuffer[targetBufferIdx++] = paddingChar; break;
         }
-
+        
     } 
 
 }
