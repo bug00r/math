@@ -56,48 +56,43 @@ typedef struct __b64_extract
 
 static const b64ext_t extracts[] = { {0,0,6,252}, {2,3,4,240}, {4,15,2,192}, {6,0,6,63} };
 
-void b64encodeBuf(uint8_t* _bytes, size_t numBytes, uint8_t* targetBuffer, uint32_t targetBufLen, bool padding)
+void b64encodeBuf(uint8_t* _bytes, size_t _numBytes, uint8_t* _targetBuffer, uint32_t targetBufLen, bool padding)
 {
 
-    uint8_t* bytes = _bytes;
+    size_t numBytes = _numBytes, targetBufferIdx = 0; 
+    uint8_t *targetBuffer = _targetBuffer, *bytes = _bytes, 
+            lastByte = 0, curByte = 0, octetCnt = 0, b64Idx = 0;
 
-    uint8_t lastByte = 0;
-    uint8_t curByte = 0;
     const b64ext_t *curExtract = NULL, *nextExtract = NULL;
-    uint32_t targetBufferIdx = 0;
-    uint8_t octetCnt = 0;
-    for(size_t curByteIdx = 0; curByteIdx < numBytes; ++curByteIdx)
+
+    for(size_t curByteIdx = 0; curByteIdx < numBytes; ++curByteIdx, lastByte = curByte)
     {
         curByte = bytes[curByteIdx];
 
         curExtract = &extracts[targetBufferIdx % 4];
-        nextExtract = &extracts[(targetBufferIdx + 1) % 4];
+        nextExtract = curExtract + 1;
 
-        uint8_t b64Idx = ((lastByte & curExtract->restMask) << curExtract->cur) |
-                         ( curByte & curExtract->curMask) >> nextExtract->rest;
+        b64Idx = (((lastByte & curExtract->restMask) << curExtract->cur) |
+                 ( curByte & curExtract->curMask) >> nextExtract->rest );
 
-        targetBuffer[targetBufferIdx++] = b64Dict[b64Idx % 64]; /* 64 secure overflow */
+        targetBuffer[targetBufferIdx++] = b64Dict[b64Idx]; 
 
-        octetCnt++;
-
-        if (octetCnt == 3) /* if 3 Byte full */
+        if (++octetCnt == 3) /* if 3 Byte full */
         {
-            b64Idx = ( curByte & nextExtract->curMask);
-            targetBuffer[targetBufferIdx++] = b64Dict[b64Idx % 64]; /* 64 secure overflow */
+            targetBuffer[targetBufferIdx++] = b64Dict[ curByte & nextExtract->curMask ];
             octetCnt = 0;
         }
-
-        lastByte = curByte;
+        
     }
 
     uint8_t cntPadding = targetBufLen - targetBufferIdx - 1; 
     
-    if ( cntPadding != 0 )
+    if ( cntPadding )
     {
-        uint8_t mask = ( cntPadding == 1 ? 15 : 3 ); /* 1 pad = 00001111 and 2 pad = 00000011 MASK */
-        uint8_t b64Idx = ( curByte & mask ) << (cntPadding * 2); /* moving */
+        uint8_t mask = ( cntPadding == 1 ? 0xF : 0x3 ); /* 1 pad = 00001111 and 2 pad = 00000011 MASK */
+        b64Idx = ( curByte & mask ) << (cntPadding + cntPadding); /* moving */
         
-        targetBuffer[targetBufferIdx++] = b64Dict[b64Idx % 64]; /* 64 secure overflow */
+        targetBuffer[targetBufferIdx++] = b64Dict[b64Idx];
 
         char paddingChar = ( padding ? '=' : '\0');
 
