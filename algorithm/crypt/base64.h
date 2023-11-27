@@ -49,13 +49,13 @@ uint8_t* b64decode(uint8_t* bytes, size_t numBytes, bool padding);
     TargetBuffer must be large enough (see: b64maxLenEnc, b64maxLenEncStr). In case of 
     padding is false, the Rest of the Buffer will be filled with Zeros('\0')
 */
-void b64encodeBuf(uint8_t* bytes, size_t numBytes, uint8_t* targetBuffer, uint32_t targetBufLen, bool padding);
+void b64encodeBuf(uint8_t* bytes, size_t numBytes, uint8_t* targetBuffer, size_t targetBufLen, bool padding);
 
 /*
     Computes Base 64 decoding for a byte String and stores the Result into targebuffer.
     TargetBuffer must be large enough (see: b64maxLenDec, b64maxLenDecStr). In case of 
     padding is true, the Rest of the Buffer will be filled with Zeros('\0')
 */
-void b64decodeBuf(uint8_t* bytes, size_t numBytes, uint8_t* targetBuffer, uint32_t targetBufLen, bool padding);
+void b64decodeBuf(uint8_t* bytes, size_t numBytes, uint8_t* targetBuffer, size_t targetBufLen, bool padding);
 
 #endif
