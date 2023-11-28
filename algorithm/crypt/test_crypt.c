@@ -78,6 +78,27 @@ static void test_b64_encrypt()
 	DEBUG_LOG("<< end b64 encrypt tests:\n");	
 }
 
+static void __test_b64_dec_(const char *text, const unsigned char *expectedResult, bool padding)
+{
+	uint8_t *result = b64decode((uint8_t*)text, strlen(text), padding);
+	DEBUG_LOG_ARGS("test: %s => decode: %s\n", (char*)text, (char*)result);
+	assert(strcmp((const char*)result, (const char*)expectedResult) == 0);
+	free(result);
+}
+
+static void test_b64_decrypt()
+{
+	DEBUG_LOG(">> Start b64 encrypt tests:\n");
+
+	for ( size_t testDataIdx = 0; b64enctestdata[testDataIdx].text != NULL; testDataIdx++)
+	{
+		const b64encdata_t* testData = &b64enctestdata[testDataIdx];
+		__test_b64_dec_(testData->b64Text, testData->text, testData->padding);
+	}
+
+	DEBUG_LOG("<< end b64 encrypt tests:\n");	
+}
+
 int main(int argc, char **argv) {
 	(void)argc; (void)argv;
 
@@ -86,6 +107,8 @@ int main(int argc, char **argv) {
 	test_b64_len_fn();
 
 	test_b64_encrypt();
+
+	test_b64_decrypt();
 
 	DEBUG_LOG("<< end crypt tests:\n");
 

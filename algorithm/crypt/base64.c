@@ -112,7 +112,109 @@ void b64encodeBuf(uint8_t* _bytes, size_t _numBytes, uint8_t* _targetBuffer, siz
 
 }
 
+/*typedef struct __b64_extract 
+{
+    uint8_t rest;
+    uint8_t restMask;
+    uint8_t cur;
+    uint8_t curMask;
+} b64ext_t;
+
+static const b64ext_t extracts[] = { {0,0,6,252}, {2,192,4,60}, {4,15,2,192}, {6,0,6,63} };
+
+printf("My Flag "
+           PRINTF_BINARY_PATTERN_INT64 "\n",
+           PRINTF_BYTE_TO_BINARY_INT64(flag));
+
++ = 43
+/ = 47
+0 = 48
+9 = 57
+A = 65
+Z = 90
+a = 97
+z = 122
+
+
+*/
+static const b64ext_t extractsDecode[] = { {0,0,6,252}, {2,192,4,60}, {4,240,2,252}, {0,0,6,63} };
+
+#define _ 255
+
+static const uint8_t b64revIdx[] = 
+    {_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,
+     _,_,62,_,_,_,63,52,53,54,55,56,57,58,59,60,61,_,_,_,_,_,_,_,0,1,2,3,4,5,6,7,8,9,
+     10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,_,_,_,_,_,_,26,27,28,29,30,31,32,
+     33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51};
+
+#undef _
+
+#include "defs.h"
+
 void b64decodeBuf(uint8_t* _bytes, size_t _numBytes, uint8_t* _targetBuffer, size_t _targetBufLen, bool padding)
 {
+
+    size_t numBytes = _numBytes, targetBufferIdx = 0, targetBufLen = _targetBufLen; 
+    uint8_t *targetBuffer = _targetBuffer, *bytes = _bytes, 
+            lastB64Byte = 0, curB64Byte = 0, sextetCnt = 0, b64Idx = 0;
+
+    const b64ext_t *curExtract = NULL, *nextExtract = NULL;
+
+    /* targetbuffer not large enough. */
+    if ( b64maxLenDec(numBytes) > targetBufLen ) return;
+
+    for(size_t curByteIdx = 0; curByteIdx < numBytes; ++curByteIdx, lastB64Byte = curB64Byte)
+    {
+        curB64Byte = bytes[curByteIdx];
+
+        curExtract = &extractsDecode[curByteIdx % 4];
+        nextExtract = curExtract + 1;
+
+        printf("B64Byte: %c(%i)\n", curB64Byte, curB64Byte);
+        printf("My Flag "
+           PRINTF_BINARY_PATTERN_INT8 "\n",
+           PRINTF_BYTE_TO_BINARY_INT8(curB64Byte));
+        if ( curExtract->rest > 0 )
+        {
+            targetBuffer[targetBufferIdx++] |= (curB64Byte & curExtract->curMask) >> (6 - curExtract->rest);
+        } 
+        else 
+        {   
+            targetBuffer[targetBufferIdx] = curB64Byte;
+        }
+
+        /*
+        b64Idx = (((lastByte & curExtract->restMask) << curExtract->cur) |
+                 ( curByte & curExtract->curMask) >> nextExtract->rest );
+
+        targetBuffer[targetBufferIdx++] = b64Dict[b64Idx]; 
+        
+        if (++octetCnt == OCTECT_CNT_COMPLETE)
+        {
+            targetBuffer[targetBufferIdx++] = b64Dict[ curByte & nextExtract->curMask ];
+            octetCnt = 0;
+        }
+        */
+    }
+
+    /*if ( octetCnt != 0 )
+    {
+        uint8_t cntPadding = OCTECT_CNT_COMPLETE - octetCnt; 
+
+        uint8_t mask = ( cntPadding == 1 ? 0xF : 0x3 ); // 1 pad = 00001111 and 2 pad = 00000011 MASK 
+        b64Idx = ( curByte & mask ) << (cntPadding << 1); 
+        
+        targetBuffer[targetBufferIdx++] = b64Dict[b64Idx];
+
+        char paddingChar = ( padding ? '=' : '\0');
+
+        switch(cntPadding)
+        {
+            case 1: targetBuffer[targetBufferIdx++] = paddingChar; break;
+            case 2: targetBuffer[targetBufferIdx++] = paddingChar; 
+                    targetBuffer[targetBufferIdx++] = paddingChar; break;
+        }
+        
+    } */
 
 }
