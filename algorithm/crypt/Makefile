@@ -55,7 +55,7 @@ TESTBIN=$(BUILDPATH)test_$(NAME).exe
 TESTLIB= -l$(NAME)
 TESTLIBDIR=-L$(BUILDDIR) $(LIBSDIR)
 
-override LDFLAGS+=$(TESTLIBDIR) $(TESTLIB)
+override LDFLAGS+=$(TESTLIBDIR) $(TESTLIB) -lm
 
 all: createdir $(LIB)
 

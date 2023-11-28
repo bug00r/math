@@ -137,19 +137,42 @@ z = 122
 
 
 */
-static const b64ext_t extractsDecode[] = { {0,0,6,252}, {2,192,4,60}, {4,240,2,252}, {0,0,6,63} };
 
 #define _ 255
 
 static const uint8_t b64revIdx[] = 
-    {_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,
-     _,_,62,_,_,_,63,52,53,54,55,56,57,58,59,60,61,_,_,_,_,_,_,_,0,1,2,3,4,5,6,7,8,9,
-     10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,_,_,_,_,_,_,26,27,28,29,30,31,32,
-     33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51};
+//    0  1  2  3  4  5  6  7  8  9
+    { _, _, _, _, _, _, _, _, _, _,
+//   10 11 12 13 14 15 16 17 18 19
+      _, _, _, _, _, _, _, _, _, _,
+//   20 21 22 23 24 25 26 27 28 29
+      _, _, _, _, _, _, _, _, _, _,
+//   30 31 32 33 34 35 36 37 38 39
+      _, _, _, _, _, _, _, _, _, _,
+//   40 41 42 43 44 45 46 47 48 49
+      _, _, _,62, _, _, _,63,52,53,
+//   50 51 52 53 54 55 56 57 58 59
+     54,55,56,57,58,59,60,61, _, _,
+//   60 61 62 63 64 65 66 67 68 69
+      _, _, _, _, _, 0, 1, 2, 3, 4,
+//   70 71 72 73 74 75 76 77 78 79
+      5, 6, 7, 8, 9,10,11,12,13,14,
+//   80 81 82 83 84 85 86 87 88 89
+     15,16,17,18,19,20,21,22,23,24,
+//   90 91 92 93 94 95 96 97 98 99
+     25, _, _, _, _, _, _,26,27,28,
+//  100 101 102 103 104 105 106 107 108 109
+     29, 30, 31, 32, 33, 34, 35, 36, 37, 38,
+//  110 111 112 113 114 115 116 117 118 119
+     39, 40, 41, 42, 43, 44, 45, 46, 47, 48,
+//  120 121 122 
+     49, 50, 51};
 
 #undef _
 
 #include "defs.h"
+
+static const b64ext_t extractsDecode[] = { {0,0,6,252}, {2,192,4,60}, {4,240,2,252}, {0,0,6,63} };
 
 void b64decodeBuf(uint8_t* _bytes, size_t _numBytes, uint8_t* _targetBuffer, size_t _targetBufLen, bool padding)
 {
@@ -165,23 +188,37 @@ void b64decodeBuf(uint8_t* _bytes, size_t _numBytes, uint8_t* _targetBuffer, siz
 
     for(size_t curByteIdx = 0; curByteIdx < numBytes; ++curByteIdx, lastB64Byte = curB64Byte)
     {
-        curB64Byte = bytes[curByteIdx];
 
         curExtract = &extractsDecode[curByteIdx % 4];
         nextExtract = curExtract + 1;
 
-        printf("B64Byte: %c(%i)\n", curB64Byte, curB64Byte);
-        printf("My Flag "
+        curB64Byte = bytes[curByteIdx];
+        uint8_t revIdx = b64revIdx[curB64Byte];
+
+        printf("B64Byte: %c(%i) idx: %i\n", curB64Byte, curB64Byte, revIdx);
+        printf("revidx"
            PRINTF_BINARY_PATTERN_INT8 "\n",
-           PRINTF_BYTE_TO_BINARY_INT8(curB64Byte));
+           PRINTF_BYTE_TO_BINARY_INT8(revIdx));
+
         if ( curExtract->rest > 0 )
         {
-            targetBuffer[targetBufferIdx++] |= (curB64Byte & curExtract->curMask) >> (6 - curExtract->rest);
+            targetBuffer[targetBufferIdx++] |= (revIdx & curExtract->curMask) >> (6 - curExtract->rest);
         } 
         else 
-        {   
-            targetBuffer[targetBufferIdx] = curB64Byte;
+        {
+            targetBuffer[targetBufferIdx] = revIdx << nextExtract->rest;
         }
+           
+        if ( ++sextetCnt == 4 )
+        {
+            targetBuffer[targetBufferIdx++] |= revIdx;
+            sextetCnt = 0;
+        }
+
+
+
+
+
 
         /*
         b64Idx = (((lastByte & curExtract->restMask) << curExtract->cur) |

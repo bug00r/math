@@ -46,10 +46,12 @@ typedef struct __b64_enc_test_data
 } b64encdata_t;
 
 static const b64encdata_t b64enctestdata[] = { 
+	{(const unsigned char *)"Man", "TWFu", true} ,
 	{(const unsigned char *)"Ma", "TWE=", true} ,
 	{(const unsigned char *)"M", "TQ==", true} ,
 	{(const unsigned char *)"light work", "bGlnaHQgd29yaw==", true} ,
 	{(const unsigned char *)"Dies ist ein langer Text!!", "RGllcyBpc3QgZWluIGxhbmdlciBUZXh0ISE=", true} ,
+	{(const unsigned char *)"Man", "TWFu", false} ,
 	{(const unsigned char *)"Ma", "TWE", false} ,
 	{(const unsigned char *)"M", "TQ", false} ,
 	{(const unsigned char *)"light work", "bGlnaHQgd29yaw", false} ,
