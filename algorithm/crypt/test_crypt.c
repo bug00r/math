@@ -51,11 +51,15 @@ static const b64encdata_t b64enctestdata[] = {
 	{(const unsigned char *)"M", "TQ==", true} ,
 	{(const unsigned char *)"light work", "bGlnaHQgd29yaw==", true} ,
 	{(const unsigned char *)"Dies ist ein langer Text!!", "RGllcyBpc3QgZWluIGxhbmdlciBUZXh0ISE=", true} ,
+	{(const unsigned char *)"Dies ist ein langer Text!! So lang, dass ich ihn nicht in eine Zeile stecken kann. Es ist wirklich ein zyclopenhafter langer Text in Ypsilon Schleife!!§$&/())'", 
+							"RGllcyBpc3QgZWluIGxhbmdlciBUZXh0ISEgU28gbGFuZywgZGFzcyBpY2ggaWhuIG5pY2h0IGluIGVpbmUgWmVpbGUgc3RlY2tlbiBrYW5uLiBFcyBpc3Qgd2lya2xpY2ggZWluIHp5Y2xvcGVuaGFmdGVyIGxhbmdlciBUZXh0IGluIFlwc2lsb24gU2NobGVpZmUhIcKnJCYvKCkpJw==", true} ,
 	{(const unsigned char *)"Man", "TWFu", false} ,
 	{(const unsigned char *)"Ma", "TWE", false} ,
 	{(const unsigned char *)"M", "TQ", false} ,
 	{(const unsigned char *)"light work", "bGlnaHQgd29yaw", false} ,
 	{(const unsigned char *)"Dies ist ein langer Text!!", "RGllcyBpc3QgZWluIGxhbmdlciBUZXh0ISE", false},
+	{(const unsigned char *)"Dies ist ein langer Text!! So lang, dass ich ihn nicht in eine Zeile stecken kann. Es ist wirklich ein zyclopenhafter langer Text in Ypsilon Schleife!!§$&/())'", 
+							"RGllcyBpc3QgZWluIGxhbmdlciBUZXh0ISEgU28gbGFuZywgZGFzcyBpY2ggaWhuIG5pY2h0IGluIGVpbmUgWmVpbGUgc3RlY2tlbiBrYW5uLiBFcyBpc3Qgd2lya2xpY2ggZWluIHp5Y2xvcGVuaGFmdGVyIGxhbmdlciBUZXh0IGluIFlwc2lsb24gU2NobGVpZmUhIcKnJCYvKCkpJw", false} ,
 	{ NULL, NULL, false},
 };
 
@@ -80,9 +84,9 @@ static void test_b64_encrypt()
 	DEBUG_LOG("<< end b64 encrypt tests:\n");	
 }
 
-static void __test_b64_dec_(const char *text, const unsigned char *expectedResult, bool padding)
+static void __test_b64_dec_(const char *text, const unsigned char *expectedResult)
 {
-	uint8_t *result = b64decode((uint8_t*)text, strlen(text), padding);
+	uint8_t *result = b64decode((uint8_t*)text, strlen(text));
 	DEBUG_LOG_ARGS("test: %s => decode: %s\n", (char*)text, (char*)result);
 	assert(strcmp((const char*)result, (const char*)expectedResult) == 0);
 	free(result);
@@ -95,7 +99,7 @@ static void test_b64_decrypt()
 	for ( size_t testDataIdx = 0; b64enctestdata[testDataIdx].text != NULL; testDataIdx++)
 	{
 		const b64encdata_t* testData = &b64enctestdata[testDataIdx];
-		__test_b64_dec_(testData->b64Text, testData->text, testData->padding);
+		__test_b64_dec_(testData->b64Text, testData->text);
 	}
 
 	DEBUG_LOG("<< end b64 encrypt tests:\n");	

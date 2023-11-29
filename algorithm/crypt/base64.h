@@ -11,11 +11,10 @@
 
 /* B64 Interface for zero terminated Byte Strings. */
 #define B64ENC(str) do { b64encode(str, strlen(str), true) } while(0)
-#define B64DEC(str) do { b64decode(str, strlen(str), true) } while(0)
+#define B64DEC(str) do { b64decode(str, strlen(str)) } while(0)
 
 /* B64 Interface for zero terminated Byte Strings without padding(WOP). */
 #define B64ENC_WOP(str) do { b64encode(str, strlen(str), false) } while(0)
-#define B64DEC_WOP(str) do { b64decode(str, strlen(str), false) } while(0)
 
 /*  
     Compute the max. Amount of needed Bytes for b64 Encoding. 
@@ -42,7 +41,7 @@ uint8_t* b64encode(uint8_t* bytes, size_t numBytes, bool padding);
     Result must be free'd by Caller. In case of padding is true,
     the Rest of the Buffer will be filled with Zeros('\0')
 */
-uint8_t* b64decode(uint8_t* bytes, size_t numBytes, bool padding);
+uint8_t* b64decode(uint8_t* bytes, size_t numBytes);
 
 /*
     Computes Base 64 encoding for a byte String and stores the Result into targebuffer.
@@ -56,6 +55,6 @@ void b64encodeBuf(uint8_t* bytes, size_t numBytes, uint8_t* targetBuffer, size_t
     TargetBuffer must be large enough (see: b64maxLenDec, b64maxLenDecStr). In case of 
     padding is true, the Rest of the Buffer will be filled with Zeros('\0')
 */
-void b64decodeBuf(uint8_t* bytes, size_t numBytes, uint8_t* targetBuffer, size_t targetBufLen, bool padding);
+void b64decodeBuf(uint8_t* bytes, size_t numBytes, uint8_t* targetBuffer, size_t targetBufLen);
 
 #endif
