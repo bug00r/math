@@ -2,37 +2,16 @@
 
 #define OCTECT_CNT_COMPLETE 3
 
-static const char* b64Dict = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+static const char* lookupTable = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 #define _ 255
 
-static const uint8_t b64revIdx[] = 
-//    0  1  2  3  4  5  6  7  8  9
-    { _, _, _, _, _, _, _, _, _, _,
-//   10 11 12 13 14 15 16 17 18 19
-      _, _, _, _, _, _, _, _, _, _,
-//   20 21 22 23 24 25 26 27 28 29
-      _, _, _, _, _, _, _, _, _, _,
-//   30 31 32 33 34 35 36 37 38 39
-      _, _, _, _, _, _, _, _, _, _,
-//   40 41 42 43 44 45 46 47 48 49
-      _, _, _,62, _, _, _,63,52,53,
-//   50 51 52 53 54 55 56 57 58 59
-     54,55,56,57,58,59,60,61, _, _,
-//   60 61 62 63 64 65 66 67 68 69
-      _, _, _, _, _, 0, 1, 2, 3, 4,
-//   70 71 72 73 74 75 76 77 78 79
-      5, 6, 7, 8, 9,10,11,12,13,14,
-//   80 81 82 83 84 85 86 87 88 89
-     15,16,17,18,19,20,21,22,23,24,
-//   90 91 92 93 94 95 96 97 98 99
-     25, _, _, _, _, _, _,26,27,28,
-//  100 101 102 103 104 105 106 107 108 109
-     29, 30, 31, 32, 33, 34, 35, 36, 37, 38,
-//  110 111 112 113 114 115 116 117 118 119
-     39, 40, 41, 42, 43, 44, 45, 46, 47, 48,
-//  120 121 122 
-     49, 50, 51};
+static const uint8_t reverseLookupTable[] = 
+{ _,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,
+  _,_,_,62,_,_,_,63,52,53,54,55,56,57,58,59,60,61,_,_,_,_,_,_,_,0,1,2,3,4,5,6,7,8,
+  9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,_,_,_,_,_,_,26,27,28,29,30,31,
+  32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51
+};
 
 #undef _
 
@@ -113,11 +92,11 @@ void b64encodeBuf(uint8_t* _bytes, size_t _numBytes, uint8_t* _targetBuffer, siz
         b64Idx = (((lastByte & curExtract->restMask) << curExtract->cur) |
                  ( curByte & curExtract->curMask) >> nextExtract->rest );
 
-        targetBuffer[targetBufferIdx++] = b64Dict[b64Idx]; 
+        targetBuffer[targetBufferIdx++] = lookupTable[b64Idx]; 
 
         if (++octetCnt == OCTECT_CNT_COMPLETE) /* if 3 Byte full */
         {
-            targetBuffer[targetBufferIdx++] = b64Dict[ curByte & nextExtract->curMask ];
+            targetBuffer[targetBufferIdx++] = lookupTable[ curByte & nextExtract->curMask ];
             octetCnt = 0;
         }
         
@@ -130,7 +109,7 @@ void b64encodeBuf(uint8_t* _bytes, size_t _numBytes, uint8_t* _targetBuffer, siz
         uint8_t mask = ( cntPadding == 1 ? 0xF : 0x3 ); /* 1 pad = 00001111 and 2 pad = 00000011 MASK */
         b64Idx = ( curByte & mask ) << (cntPadding << 1); /* moving */
         
-        targetBuffer[targetBufferIdx++] = b64Dict[b64Idx];
+        targetBuffer[targetBufferIdx++] = lookupTable[b64Idx];
 
         char paddingChar = ( padding ? '=' : '\0');
 
@@ -163,7 +142,7 @@ void b64decodeBuf(uint8_t* _bytes, size_t _numBytes, uint8_t* _targetBuffer, siz
         curExtract = &extractsDecode[curByteIdx % 4];
 
         curB64Byte = bytes[curByteIdx];
-        revIdx = b64revIdx[curB64Byte];
+        revIdx = reverseLookupTable[curB64Byte];
 
         bool paddingReached = (curB64Byte == '=');
 
