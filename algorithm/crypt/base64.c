@@ -80,7 +80,7 @@ void b64encodeBuf(uint8_t* _bytes, size_t _numBytes, uint8_t* _targetBuffer, siz
     const b64ext_t *curExtract = NULL, *nextExtract = NULL;
 
     /* targetbuffer not large enough. */
-    if ( b64maxLenEnc(numBytes) > targetBufLen ) return;
+    if ( !bytes || b64maxLenEnc(numBytes) > targetBufLen ) return;
 
     for(size_t curByteIdx = 0; curByteIdx < numBytes; ++curByteIdx, lastByte = curByte)
     {
@@ -134,7 +134,7 @@ void b64decodeBuf(uint8_t* _bytes, size_t _numBytes, uint8_t* _targetBuffer, siz
     const b64ext_t *curExtract = NULL, *lastExtract = &extractsDecode[3];
 
     /* targetbuffer not large enough. */
-    if ( b64maxLenDec(numBytes) > targetBufLen ) return;
+    if ( !bytes || b64maxLenDec(numBytes) > targetBufLen ) return;
 
     for(size_t curByteIdx = 0; curByteIdx < numBytes; ++curByteIdx, lastRevIdx = revIdx, lastExtract = curExtract)
     {
