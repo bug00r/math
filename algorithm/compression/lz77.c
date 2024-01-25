@@ -50,16 +50,16 @@ static void __lz77_set_search_buffer(lz77CtxPtr _ctx)
     {
         searchBufPos->start = NULL;
         searchBufPos->end = NULL;
-    }
-
-    searchBufPos->start = startSrcBuf - ctx->param->searchBufSize;
-
-    if ( searchBufPos->start < startSrcBuf ) 
+    } else
     {
-        searchBufPos->start = startSrcBuf;
-        searchBufPos->end = ctx->pos - 1;
-    }
-        
+        searchBufPos->start = startSrcBuf - ctx->param->searchBufSize;
+
+        if ( searchBufPos->start < startSrcBuf ) 
+        {
+            searchBufPos->start = startSrcBuf;
+            searchBufPos->end = ctx->pos - 1;
+        }
+    }        
 }
 
 static void __lz77_set_lookahed_buffer(lz77CtxPtr _ctx)
