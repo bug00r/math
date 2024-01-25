@@ -1,6 +1,7 @@
 #include "deflate.h"
 
 #include "checksum.h"
+#include "lz77.h"
 
 #include <stdint.h>
 #include <assert.h>
@@ -27,6 +28,32 @@ static void test_compression_crc32()
 static void test_compression_lz77()
 {
 	DEBUG_LOG(">> Start lz77 tests:\n");
+
+	lz77_buf_t bufText;
+	lz77BufPtr bufTextPtr = &bufText;
+
+	//lz77_buf_t bufEncoded;
+	//lz77BufPtr bufEncodedPtr = &bufEncoded;
+	lz77BufPtr bufEncodedPtr;
+	lz77_result_t result = LZ77_ERR;
+
+	lz77_param_t paramEncoding;
+	paramEncoding.searchBufSize = 8;
+    paramEncoding.lookaheadBufSize = 8;
+	lz77ParamPtr paramEncodingPtr = &paramEncoding;
+
+	result = en_lz77_u8(bufTextPtr, &bufEncodedPtr, paramEncodingPtr);
+	
+	assert(result == LZ77_OK);
+
+	//lz77_buf_t bufDecoded;
+	//lz77BufPtr bufDecodedPtr = &bufDecoded;
+	lz77BufPtr bufDecodedPtr;
+
+	result = LZ77_ERR;
+	result = de_lz77_u8(bufEncodedPtr, &bufDecodedPtr);
+
+	assert(result == LZ77_OK);
 
 	DEBUG_LOG("<< end lz77 tests:\n");
 }
