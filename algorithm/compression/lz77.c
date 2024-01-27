@@ -130,6 +130,8 @@ static void __lz77_search_next_triplet(lz77CtxPtr _ctx, lz77TripletPtr _curTripl
     lz77TripletPtr curTriplet = _curTriplet;
 
     //todo searching with every special situation
+    //At first we will implement a very simple Version, this will be optimzed later
+    
 
 }
 
