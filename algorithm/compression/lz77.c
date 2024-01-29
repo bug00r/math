@@ -162,8 +162,8 @@ static void __lz77_search_triplet(lz77CtxPtr _ctx,
     uint8_t chr = *_chr;
 
     lz77SlidingWindowPtr slWinPtr = &ctx->slWin;
-    lz77BufPosPtr sbBufPtr
-    lz77BufPosPtr laBufPtr
+    lz77BufPosPtr sbBufPtr = &slWinPtr->sbBuf;
+    lz77BufPosPtr laBufPtr = &slWinPtr->laBuf;
     //TODO implement seach details
 
 }
