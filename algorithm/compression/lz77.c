@@ -140,6 +140,20 @@ static void __lz77_pack_triplet(lz77TripletPtr _curTriplet,
     #endif
 } 
 
+/*
+typedef struct __lz77_buf_pos
+{
+    uint8_t *start;
+    uint8_t *end;
+} lz77_buf_pos_t, *lz77BufPosPtr;
+
+typedef struct __lz77_sliding_window 
+{
+    lz77_buf_pos_t sbBuf; 
+    lz77_buf_pos_t laBuf;
+} lz77_sliding_window_t, *lz77SlidingWindowPtr;
+*/
+
 static void __lz77_search_triplet(lz77CtxPtr _ctx, 
                                   uint32_t *_offset, uint32_t *_len, uint8_t *_chr)
 {
@@ -147,6 +161,9 @@ static void __lz77_search_triplet(lz77CtxPtr _ctx,
     uint32_t offset = *_offset, len = *_len;
     uint8_t chr = *_chr;
 
+    lz77SlidingWindowPtr slWinPtr = &ctx->slWin;
+    lz77BufPosPtr sbBufPtr
+    lz77BufPosPtr laBufPtr
     //TODO implement seach details
 
 }
