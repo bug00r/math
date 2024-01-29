@@ -32,6 +32,10 @@ static void test_compression_lz77()
 	lz77_buf_t bufText;
 	lz77BufPtr bufTextPtr = &bufText;
 
+	unsigned char txt[] = "ababcbababaa";
+	bufTextPtr->bytes = (uint8_t*)&txt[0];
+	bufTextPtr->numBytes = sizeof(txt);
+
 	//lz77_buf_t bufEncoded;
 	//lz77BufPtr bufEncodedPtr = &bufEncoded;
 	lz77BufPtr bufEncodedPtr;

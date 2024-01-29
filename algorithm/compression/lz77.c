@@ -34,7 +34,7 @@ static bool __lz77_search_buffer_available(lz77CtxPtr _ctx)
     lz77CtxPtr ctx = _ctx;
     lz77BufPosPtr searchBufPos = &ctx->slWin.sbBuf;
 
-    return ( searchBufPos->start != searchBufPos->end );
+    return ( searchBufPos->start != NULL && searchBufPos->end != NULL );
 }
 
 static void __lz77_set_search_buffer(lz77CtxPtr _ctx)
@@ -58,8 +58,8 @@ static void __lz77_set_search_buffer(lz77CtxPtr _ctx)
     } 
     else
     {
-        searchBufPos->start = ctx->pos;
-        searchBufPos->end = ctx->pos;
+        searchBufPos->start = NULL;
+        searchBufPos->end = NULL;
     }        
 }
 
@@ -124,15 +124,55 @@ typedef struct __lz77_triplet
     uint8_t bytes[3];
 } lz77_priplet_t,*lz77TripletPtr;
 
+static void __lz77_pack_triplet(lz77TripletPtr _curTriplet, 
+                                uint32_t *_offset, uint32_t *_len, uint8_t *_chr)
+{
+    lz77TripletPtr curTriplet = _curTriplet;
+    uint32_t offset = *_offset, len = *_len;
+    uint8_t chr = *_chr;
+
+    //TODO packing into Byte Array from Triplet Pointer
+
+    #if defined(debug) && debug != 0
+    printf("packed(o,l,c) => bytes: (%i,%i,%c) => (%c,%c,%c)\n",
+            offset, len, chr, 
+            curTriplet->bytes[0],curTriplet->bytes[1],curTriplet->bytes[2]);
+    #endif
+} 
+
+static void __lz77_search_triplet(lz77CtxPtr _ctx, 
+                                  uint32_t *_offset, uint32_t *_len, uint8_t *_chr)
+{
+    lz77CtxPtr ctx = _ctx;
+    uint32_t offset = *_offset, len = *_len;
+    uint8_t chr = *_chr;
+
+    //TODO implement seach details
+
+}
+
 static void __lz77_search_next_triplet(lz77CtxPtr _ctx, lz77TripletPtr _curTriplet)
 {
     lz77CtxPtr ctx = _ctx;
     lz77TripletPtr curTriplet = _curTriplet;
-
-    //todo searching with every special situation
-    //At first we will implement a very simple Version, this will be optimzed later
+    uint32_t offset = 0, len = 0;
+    uint8_t chr = 0; 
     
+    //TODO searching with every special situation
+    //At first we will implement a very simple Version, this will be optimzed later
+    if ( __lz77_search_buffer_available(ctx) )
+    {
+        __lz77_search_triplet(ctx, &offset, &len, &chr);
+    }
+    else
+    {
+        chr = *ctx->pos;
+    }
 
+    __lz77_pack_triplet(curTriplet, &offset, &len, &chr);
+
+    ctx->pos += len;
+    ctx->pos++;
 }
 
 static void __lz77_dump_triplet_to_dst_buffer(lz77CtxPtr _ctx, lz77TripletPtr _curTriplet)
@@ -140,7 +180,7 @@ static void __lz77_dump_triplet_to_dst_buffer(lz77CtxPtr _ctx, lz77TripletPtr _c
     lz77CtxPtr ctx = _ctx;
     lz77TripletPtr curTriplet = _curTriplet;
 
-    /*  todo dumping triplet into dst buffer maybe allocating 
+    /*  TODO dumping triplet into dst buffer maybe allocating 
         chunks with 64,128, 256, 512 etc blocks(reducing sys calls for memory)
     */
 }
@@ -151,15 +191,20 @@ static void __lz77_encode(lz77CtxPtr _ctx)
     lz77_priplet_t curTriplet;
     lz77TripletPtr curTripletPtr = &curTriplet;
 
-    while ( __lz77_lookahed_buffer_available(ctx) )
-    {
+    __lz77_set_lookahed_buffer(ctx);
+    
+    while ( __lz77_lookahed_buffer_available(ctx) ) 
+    {    
         __lz77_set_search_buffer(ctx);
 
         /* mybe __lz77_search_buffer_available is not needed */
         __lz77_search_next_triplet(ctx, curTripletPtr);
 
         __lz77_dump_triplet_to_dst_buffer(ctx, curTripletPtr);
-    }
+
+        __lz77_set_lookahed_buffer(ctx);
+    } 
+    
 
 }
 
@@ -168,7 +213,10 @@ static void __lz77_encode(lz77CtxPtr _ctx)
 lz77_result_t en_lz77_u8(lz77BufPtr srcBuf, lz77BufPtr* dstBuf, lz77ParamPtr param)
 {
     lz77_ctx_t ctx;
+    //TODO Check if buffer is available and correct
     __lz77_init_algo(&ctx, srcBuf, dstBuf, param);
+
+    __lz77_encode(&ctx);
 
     return LZ77_OK;
 }

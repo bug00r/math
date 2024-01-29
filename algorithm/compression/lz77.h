@@ -1,6 +1,10 @@
 #ifndef LZ77_H
 #define LZ77_H
 
+#if defined(debug) && debug != 0
+#include <stdio.h>
+#endif
+
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
