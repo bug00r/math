@@ -87,7 +87,7 @@ static void __lz77_set_lookahed_buffer(lz77CtxPtr _ctx)
         uint16_t curLaBufSize = ( maxPossLaBufSize < paramLaBufSize ? maxPossLaBufSize : paramLaBufSize );
 
         lookAheadBufPos->start = ctx->pos;
-        lookAheadBufPos->start = ctx->pos + curLaBufSize;
+        lookAheadBufPos->end = ctx->pos + curLaBufSize;
     }
     else 
     {
@@ -158,14 +158,45 @@ static void __lz77_search_triplet(lz77CtxPtr _ctx,
                                   uint32_t *_offset, uint32_t *_len, uint8_t *_chr)
 {
     lz77CtxPtr ctx = _ctx;
-    uint32_t offset = *_offset, len = *_len;
-    uint8_t chr = *_chr;
-
     lz77SlidingWindowPtr slWinPtr = &ctx->slWin;
     lz77BufPosPtr sbBufPtr = &slWinPtr->sbBuf;
     lz77BufPosPtr laBufPtr = &slWinPtr->laBuf;
-    //TODO implement seach details
+    
+    uint32_t *offset = _offset, *len = _len;
+    uint8_t *chr = _chr, *curSBufStartPos = sbBufPtr->start;
 
+    //TODO implement seach details
+    while ( curSBufStartPos >= sbBufPtr->end )
+    {
+        //#if defined(debug) && debug != 0
+        //printf("sBuf: cur: %p end: %p \n", curSBufStartPos, sbBufPtr->end);
+        //printf("laBuf: start: %p end: %p \n", laBufPtr->start, laBufPtr->end);
+        //#endif
+        
+        uint8_t *curSBufcmpPos = curSBufStartPos, *curlaBufcmpPos = laBufPtr->start;
+
+        while ( (curSBufcmpPos <= sbBufPtr->start) && (curlaBufcmpPos <= laBufPtr->end) )
+        {
+            #if defined(debug) && debug != 0
+            printf("cmp: %c && %c\n", *curlaBufcmpPos, *curSBufcmpPos);
+            #endif
+            
+            if ( *curSBufcmpPos != *curlaBufcmpPos ) 
+                break;
+
+            curSBufcmpPos++;
+            curlaBufcmpPos++;
+        }
+
+        #if defined(debug) && debug != 0
+        printf("o: %lli, l: %lli n: %c \n", -(sbBufPtr->start - curSBufcmpPos), curlaBufcmpPos - laBufPtr->start, 
+                                        ( curlaBufcmpPos == laBufPtr->end ? 0 : *curlaBufcmpPos));
+        #endif
+
+        //Check if found something and is it larger than before, also best match
+
+        curSBufStartPos--;
+    }
 }
 
 static void __lz77_search_next_triplet(lz77CtxPtr _ctx, lz77TripletPtr _curTriplet)

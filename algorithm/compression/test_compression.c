@@ -42,8 +42,8 @@ static void test_compression_lz77()
 	lz77_result_t result = LZ77_ERR;
 
 	lz77_param_t paramEncoding;
-	paramEncoding.searchBufSize = 8;
-    paramEncoding.lookaheadBufSize = 8;
+	paramEncoding.searchBufSize = 16;
+    paramEncoding.lookaheadBufSize = 16;
 	lz77ParamPtr paramEncodingPtr = &paramEncoding;
 
 	result = en_lz77_u8(bufTextPtr, &bufEncodedPtr, paramEncodingPtr);
