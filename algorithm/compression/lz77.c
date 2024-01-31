@@ -154,6 +154,27 @@ typedef struct __lz77_sliding_window
 } lz77_sliding_window_t, *lz77SlidingWindowPtr;
 */
 
+#if defined(debug) && debug != 0
+
+static void __lz77_printf_string(uint8_t *_strStart, uint8_t *_strEnd)
+{
+    uint8_t *curChar = _strStart, *strEnd = _strEnd;
+    while (curChar <= strEnd) printf("%c", *curChar++);
+}
+
+static void __lz77_cmp_dgb_print(uint8_t *_sbufStart, uint8_t *_sbufEnd,
+                                 uint8_t *_laBufStart, uint8_t *_lsBufEnd)
+{   
+    uint8_t *sbufStart = _sbufStart, *sbufEnd = _sbufEnd,
+            *laBufStart = _laBufStart, *lsBufEnd = _lsBufEnd;
+    __lz77_printf_string(sbufStart, sbufEnd);
+    printf(" && ");
+    __lz77_printf_string(laBufStart, lsBufEnd);
+    printf("\n");
+}
+#endif
+
+
 static void __lz77_search_triplet(lz77CtxPtr _ctx, 
                                   uint32_t *_offset, uint32_t *_len, uint8_t *_chr)
 {
@@ -174,29 +195,47 @@ static void __lz77_search_triplet(lz77CtxPtr _ctx,
         //#endif
         
         uint8_t *curSBufcmpPos = curSBufStartPos, *curlaBufcmpPos = laBufPtr->start;
+        bool match = true;
 
         while ( (curSBufcmpPos <= sbBufPtr->start) && (curlaBufcmpPos <= laBufPtr->end) )
         {
             #if defined(debug) && debug != 0
-            printf("cmp: %c && %c\n", *curlaBufcmpPos, *curSBufcmpPos);
+            //printf("cmp: %c && %c\n", *curlaBufcmpPos, *curSBufcmpPos);
+            __lz77_cmp_dgb_print(curSBufStartPos, curSBufcmpPos, laBufPtr->start, curlaBufcmpPos);
             #endif
             
             if ( *curSBufcmpPos != *curlaBufcmpPos ) 
+            {
                 break;
+            } 
+            else
+            {
+                match = true;
+            }
 
             curSBufcmpPos++;
             curlaBufcmpPos++;
         }
 
-        #if defined(debug) && debug != 0
-        printf("o: %lli, l: %lli n: %c \n", -(sbBufPtr->start - curSBufcmpPos), curlaBufcmpPos - laBufPtr->start, 
-                                        ( curlaBufcmpPos == laBufPtr->end ? 0 : *curlaBufcmpPos));
-        #endif
+        uint32_t curLen = curlaBufcmpPos - laBufPtr->start;
 
-        //Check if found something and is it larger than before, also best match
+        if (match && curLen > *len)
+        {
+            *offset = ctx->pos - curSBufStartPos;
+            *len = curlaBufcmpPos - laBufPtr->start;
+            *chr = ( curlaBufcmpPos == laBufPtr->end ? 0 : *curlaBufcmpPos);
+            #if defined(debug) && debug != 0
+            printf("o: %i, l: %i n: %c \n", *offset, *len, *chr);
+            #endif
+
+            //Check if found something and is it larger than before, also best match
+        }
 
         curSBufStartPos--;
     }
+
+    if ( !*offset && !*len ) *chr = *(ctx->pos + *len );
+
 }
 
 static void __lz77_search_next_triplet(lz77CtxPtr _ctx, lz77TripletPtr _curTriplet)
@@ -221,6 +260,11 @@ static void __lz77_search_next_triplet(lz77CtxPtr _ctx, lz77TripletPtr _curTripl
 
     ctx->pos += len;
     ctx->pos++;
+
+    #if defined(debug) && debug != 0
+    printf("nxt Pos is: %c\n", *ctx->pos);
+    #endif
+
 }
 
 static void __lz77_dump_triplet_to_dst_buffer(lz77CtxPtr _ctx, lz77TripletPtr _curTriplet)
