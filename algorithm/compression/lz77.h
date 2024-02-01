@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 typedef struct __lz77_buff 
 {
@@ -27,7 +28,7 @@ typedef enum __lz77_return_codes {
 } lz77_result_t;
 
 
-lz77_result_t en_lz77_u8(lz77BufPtr srcBuf, lz77BufPtr* dstBuf, lz77ParamPtr param);
-lz77_result_t de_lz77_u8(lz77BufPtr srcBuf, lz77BufPtr* dstBuf);
+lz77_result_t en_lz77_u8(lz77BufPtr srcBuf, lz77BufPtr dstBuf, lz77ParamPtr param);
+lz77_result_t de_lz77_u8(lz77BufPtr srcBuf, lz77BufPtr dstBuf);
 
 #endif

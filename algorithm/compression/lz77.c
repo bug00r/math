@@ -24,7 +24,7 @@ typedef struct __lz77_context
     /* Buffer with bytes to compress */
     lz77BufPtr  srcBuf; 
     /* Buffer with result bytes */
-    lz77BufPtr  *dstBuf;
+    lz77BufPtr  dstBuf;
     /* Definition of lz77 Parameter */ 
     lz77ParamPtr param;    
 } lz77_ctx_t, *lz77CtxPtr;
@@ -105,15 +105,23 @@ static void __lz77_set_sliding_window(lz77CtxPtr _ctx)
     __lz77_set_lookahed_buffer(ctx);
 }
 
-static void __lz77_init_algo(lz77CtxPtr _ctx, lz77BufPtr srcBuf, lz77BufPtr* dstBuf, lz77ParamPtr param)
+static void __lz77_init_dst_buf(lz77CtxPtr _ctx)
+{
+    lz77CtxPtr ctx = _ctx;
+
+    //Destination Buffer will be cleared at Beginning
+    ctx->dstBuf->bytes = NULL;
+    ctx->dstBuf->numBytes = 0;
+}
+
+static void __lz77_init_algo(lz77CtxPtr _ctx, lz77BufPtr srcBuf, lz77BufPtr dstBuf, lz77ParamPtr param)
 {
     lz77CtxPtr ctx = _ctx;
     ctx->pos = &srcBuf->bytes[0]; 
     ctx->srcBuf = srcBuf;
     ctx->dstBuf = dstBuf;
     
-    //Destination Buffer will be cleared at Beginning
-    *ctx->dstBuf = NULL;
+    __lz77_init_dst_buf(ctx);
 
     ctx->param = param;
 }
@@ -124,20 +132,49 @@ typedef struct __lz77_triplet
     uint8_t bytes[3];
 } lz77_priplet_t,*lz77TripletPtr;
 
-static void __lz77_pack_triplet(lz77TripletPtr _curTriplet, 
+static void __lz77_dump_triplet_to_dst_buffer(lz77CtxPtr _ctx, lz77TripletPtr _curTriplet)
+{
+    lz77CtxPtr ctx = _ctx;
+    lz77TripletPtr curTriplet = _curTriplet;
+    
+    lz77BufPtr dstBuf = ctx->dstBuf;
+
+    /*  TODO dumping triplet into dst buffer maybe allocating 
+        chunks with 64,128, 256, 512 etc blocks(reducing sys calls for memory)
+    */
+    if ( dstBuf->bytes == NULL )
+    {
+        dstBuf->bytes = malloc(sizeof(uint8_t) * ctx->srcBuf->numBytes);
+        dstBuf->numBytes = ctx->srcBuf->numBytes;
+    }
+
+    //TODO DUMPING
+
+}
+
+static void __lz77_pack_triplet(lz77CtxPtr _ctx, lz77TripletPtr _curTriplet,
                                 uint32_t *_offset, uint32_t *_len, uint8_t *_chr)
 {
+    //The CTX will be need to implement RLE and Repeat and very long results(must be split because of the limit of len by 15(4bit))
+    lz77CtxPtr ctx = _ctx;
     lz77TripletPtr curTriplet = _curTriplet;
     uint32_t offset = *_offset, len = *_len;
     uint8_t chr = *_chr;
 
     //TODO packing into Byte Array from Triplet Pointer
+    curTriplet->bytes[0] = 0 | ( len << 0x4 ) | (offset >> 0x8);
+    curTriplet->bytes[1] = offset & 0xFF;
+    curTriplet->bytes[2] = chr;
 
     #if defined(debug) && debug != 0
-    printf("packed(o,l,c) => bytes: (%i,%i,%c) => (%c,%c,%c)\n",
-            offset, len, chr, 
+    printf("packed(l,o,c) => bytes: (%i,%i,%c) => (%x,%x,%c)\n",
+            len,offset,chr, 
             curTriplet->bytes[0],curTriplet->bytes[1],curTriplet->bytes[2]);
     #endif
+
+    //This call was moved, because it could be necesarry to dump more triplets in case of Repeats and long matches
+    __lz77_dump_triplet_to_dst_buffer(ctx, curTriplet);
+
 } 
 
 /*
@@ -256,7 +293,7 @@ static void __lz77_search_next_triplet(lz77CtxPtr _ctx, lz77TripletPtr _curTripl
         chr = *ctx->pos;
     }
 
-    __lz77_pack_triplet(curTriplet, &offset, &len, &chr);
+    __lz77_pack_triplet(ctx, curTriplet, &offset, &len, &chr);
 
     ctx->pos += len;
     ctx->pos++;
@@ -265,16 +302,6 @@ static void __lz77_search_next_triplet(lz77CtxPtr _ctx, lz77TripletPtr _curTripl
     printf("nxt Pos is: %c\n", *ctx->pos);
     #endif
 
-}
-
-static void __lz77_dump_triplet_to_dst_buffer(lz77CtxPtr _ctx, lz77TripletPtr _curTriplet)
-{
-    lz77CtxPtr ctx = _ctx;
-    lz77TripletPtr curTriplet = _curTriplet;
-
-    /*  TODO dumping triplet into dst buffer maybe allocating 
-        chunks with 64,128, 256, 512 etc blocks(reducing sys calls for memory)
-    */
 }
 
 static void __lz77_encode(lz77CtxPtr _ctx)
@@ -292,8 +319,6 @@ static void __lz77_encode(lz77CtxPtr _ctx)
         /* mybe __lz77_search_buffer_available is not needed */
         __lz77_search_next_triplet(ctx, curTripletPtr);
 
-        __lz77_dump_triplet_to_dst_buffer(ctx, curTripletPtr);
-
         __lz77_set_lookahed_buffer(ctx);
     } 
     
@@ -302,10 +327,10 @@ static void __lz77_encode(lz77CtxPtr _ctx)
 
 /***** PUBLIC INTERFACE *****/
 
-lz77_result_t en_lz77_u8(lz77BufPtr srcBuf, lz77BufPtr* dstBuf, lz77ParamPtr param)
+lz77_result_t en_lz77_u8(lz77BufPtr srcBuf, lz77BufPtr dstBuf, lz77ParamPtr param)
 {
     lz77_ctx_t ctx;
-    //TODO Check if buffer is available and correct
+
     __lz77_init_algo(&ctx, srcBuf, dstBuf, param);
 
     __lz77_encode(&ctx);
@@ -313,8 +338,14 @@ lz77_result_t en_lz77_u8(lz77BufPtr srcBuf, lz77BufPtr* dstBuf, lz77ParamPtr par
     return LZ77_OK;
 }
 
-lz77_result_t de_lz77_u8(lz77BufPtr srcBuf, lz77BufPtr* dstBuf)
+lz77_result_t de_lz77_u8(lz77BufPtr srcBuf, lz77BufPtr dstBuf)
 {
+    lz77_ctx_t ctx;
+
+    __lz77_init_algo(&ctx, srcBuf, dstBuf, NULL);
+
+    __lz77_init_dst_buf(&ctx);
+
     return LZ77_OK;
 }
 
