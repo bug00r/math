@@ -153,11 +153,8 @@ static void __lz77_dump_triplet_to_dst_buffer(lz77CtxPtr _ctx, lz77TripletPtr _c
     }
 
     //TODO DUMPING
-    printf("dump[0]: %p val: %x\n",ctx->dstBufPos, curTriplet->bytes[0]);
     *ctx->dstBufPos++ = curTriplet->bytes[0]; 
-    printf("dump[1]: %p val: %x\n",ctx->dstBufPos, curTriplet->bytes[1]);
     *ctx->dstBufPos++ = curTriplet->bytes[1];
-    printf("dump[2]: %p val: %x\n",ctx->dstBufPos, curTriplet->bytes[2]);
     *ctx->dstBufPos++ = curTriplet->bytes[2];
 }
 
@@ -232,13 +229,8 @@ static void __lz77_search_triplet(lz77CtxPtr _ctx,
     uint32_t *offset = _offset, *len = _len;
     uint8_t *chr = _chr, *curSBufStartPos = sbBufPtr->start;
 
-    //TODO implement seach details
     while ( curSBufStartPos >= sbBufPtr->end )
     {
-        //#if defined(debug) && debug != 0
-        //printf("sBuf: cur: %p end: %p \n", curSBufStartPos, sbBufPtr->end);
-        //printf("laBuf: start: %p end: %p \n", laBufPtr->start, laBufPtr->end);
-        //#endif
         
         uint8_t *curSBufcmpPos = curSBufStartPos, *curlaBufcmpPos = laBufPtr->start;
         bool match = true;
@@ -246,7 +238,6 @@ static void __lz77_search_triplet(lz77CtxPtr _ctx,
         while ( (curSBufcmpPos <= sbBufPtr->start) && (curlaBufcmpPos <= laBufPtr->end) )
         {
             #if defined(debug) && debug != 0
-            //printf("cmp: %c && %c\n", *curlaBufcmpPos, *curSBufcmpPos);
             __lz77_cmp_dgb_print(curSBufStartPos, curSBufcmpPos, laBufPtr->start, curlaBufcmpPos);
             #endif
             
@@ -270,11 +261,10 @@ static void __lz77_search_triplet(lz77CtxPtr _ctx,
             *offset = ctx->pos - curSBufStartPos;
             *len = curlaBufcmpPos - laBufPtr->start;
             *chr = ( curlaBufcmpPos == laBufPtr->end ? 0 : *curlaBufcmpPos);
+            
             #if defined(debug) && debug != 0
             printf("o: %i, l: %i n: %c \n", *offset, *len, *chr);
             #endif
-
-            //Check if found something and is it larger than before, also best match
         }
 
         curSBufStartPos--;
@@ -325,13 +315,12 @@ static void __lz77_encode(lz77CtxPtr _ctx)
     {    
         __lz77_set_search_buffer(ctx);
 
-        /* mybe __lz77_search_buffer_available is not needed */
         __lz77_search_next_triplet(ctx, curTripletPtr);
 
         __lz77_set_lookahed_buffer(ctx);
     } 
     
-    *ctx->dstBufPos = '\0';
+    ctx->dstBuf->numBytes = ctx->dstBufPos - &ctx->dstBuf->bytes[0];
 }
 
 /***** PUBLIC INTERFACE *****/

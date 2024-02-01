@@ -42,23 +42,24 @@ static void test_compression_lz77()
 	lz77_result_t result = LZ77_ERR;
 
 	lz77_param_t paramEncoding;
-	paramEncoding.searchBufSize = 16;
-    paramEncoding.lookaheadBufSize = 16;
+	paramEncoding.searchBufSize = 15;
+    paramEncoding.lookaheadBufSize = 15;
 	lz77ParamPtr paramEncodingPtr = &paramEncoding;
 
 	result = en_lz77_u8(bufTextPtr, bufEncodedPtr, paramEncodingPtr);
 	
 	assert(result == LZ77_OK);
 
-	size_t len = strlen((const char*)bufEncodedPtr->bytes);
+	size_t len = bufEncodedPtr->numBytes;
 	DEBUG_LOG_ARGS("decoded len: %lli\n", len);
 	for (size_t curChar = 0; curChar < len; curChar++)
 	{
-		printf("%x ", bufEncodedPtr->bytes[curChar]);
+		printf("/0x%x", bufEncodedPtr->bytes[curChar]);
 	}
 	printf("\n");
-	DEBUG_LOG_ARGS("\"%s\" encoded: \"%s\"\n", txt, bufEncodedPtr->bytes);
+
 	assert(len > 0);
+	
 	free(bufEncodedPtr->bytes);
 
 	lz77_buf_t bufDecoded;
