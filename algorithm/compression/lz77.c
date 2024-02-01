@@ -19,6 +19,8 @@ typedef struct __lz77_context
 {
     /* current processing position */
     uint8_t *pos;
+    /* current dump processing position */
+    uint8_t *dstBufPos;
     /* sliding window, depends on current processing position */ 
     lz77_sliding_window_t slWin;
     /* Buffer with bytes to compress */
@@ -144,12 +146,19 @@ static void __lz77_dump_triplet_to_dst_buffer(lz77CtxPtr _ctx, lz77TripletPtr _c
     */
     if ( dstBuf->bytes == NULL )
     {
+        printf("dst Buf Size: %lli\n", sizeof(uint8_t) * ctx->srcBuf->numBytes);
         dstBuf->bytes = malloc(sizeof(uint8_t) * ctx->srcBuf->numBytes);
         dstBuf->numBytes = ctx->srcBuf->numBytes;
+        ctx->dstBufPos = dstBuf->bytes; 
     }
 
     //TODO DUMPING
-
+    printf("dump[0]: %p val: %x\n",ctx->dstBufPos, curTriplet->bytes[0]);
+    *ctx->dstBufPos++ = curTriplet->bytes[0]; 
+    printf("dump[1]: %p val: %x\n",ctx->dstBufPos, curTriplet->bytes[1]);
+    *ctx->dstBufPos++ = curTriplet->bytes[1];
+    printf("dump[2]: %p val: %x\n",ctx->dstBufPos, curTriplet->bytes[2]);
+    *ctx->dstBufPos++ = curTriplet->bytes[2];
 }
 
 static void __lz77_pack_triplet(lz77CtxPtr _ctx, lz77TripletPtr _curTriplet,
@@ -322,7 +331,7 @@ static void __lz77_encode(lz77CtxPtr _ctx)
         __lz77_set_lookahed_buffer(ctx);
     } 
     
-
+    *ctx->dstBufPos = '\0';
 }
 
 /***** PUBLIC INTERFACE *****/

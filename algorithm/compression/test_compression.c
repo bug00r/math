@@ -5,6 +5,7 @@
 
 #include <stdint.h>
 #include <assert.h>
+#include <string.h>
 
 #include "debug.h"
 
@@ -49,8 +50,15 @@ static void test_compression_lz77()
 	
 	assert(result == LZ77_OK);
 
+	size_t len = strlen((const char*)bufEncodedPtr->bytes);
+	DEBUG_LOG_ARGS("decoded len: %lli\n", len);
+	for (size_t curChar = 0; curChar < len; curChar++)
+	{
+		printf("%x ", bufEncodedPtr->bytes[curChar]);
+	}
+	printf("\n");
 	DEBUG_LOG_ARGS("\"%s\" encoded: \"%s\"\n", txt, bufEncodedPtr->bytes);
-
+	assert(len > 0);
 	free(bufEncodedPtr->bytes);
 
 	lz77_buf_t bufDecoded;
