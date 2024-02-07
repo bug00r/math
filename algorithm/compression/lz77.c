@@ -70,7 +70,7 @@ static bool __lz77_lookahed_buffer_available(lz77CtxPtr _ctx)
     lz77CtxPtr ctx = _ctx;
     lz77BufPosPtr lookAheadBufPos = &ctx->slWin.laBuf;
 
-    return ( lookAheadBufPos->start != lookAheadBufPos->end );
+    return ( lookAheadBufPos->start < lookAheadBufPos->end );
 }
 
 static void __lz77_set_lookahed_buffer(lz77CtxPtr _ctx)
@@ -79,17 +79,29 @@ static void __lz77_set_lookahed_buffer(lz77CtxPtr _ctx)
     lz77BufPosPtr lookAheadBufPos = &ctx->slWin.laBuf;
     lz77BufPtr srcBuffer = ctx->srcBuf;
 
-    uint8_t *endSrcBuf = &srcBuffer->bytes[0] + srcBuffer->numBytes - 1;
+    uint8_t *endSrcBuf = &srcBuffer->bytes[0] + srcBuffer->numBytes;
     
     uint16_t paramLaBufSize = ctx->param->lookaheadBufSize;
     size_t maxPossLaBufSize = endSrcBuf - ctx->pos;
 
+    #if defined(debug) && debug != 0
+    printf("maxPossLaBufSize: %lli\n", maxPossLaBufSize);
+    #endif
+
     if ( maxPossLaBufSize )
     {
-        uint16_t curLaBufSize = ( maxPossLaBufSize < paramLaBufSize ? maxPossLaBufSize : paramLaBufSize );
+        if ( maxPossLaBufSize == 1 )
+        {
+            lookAheadBufPos->start = ctx->pos;
+            lookAheadBufPos->end = ctx->pos;
+        }
+        else
+        {
+            uint16_t curLaBufSize = ( maxPossLaBufSize < paramLaBufSize ? maxPossLaBufSize : paramLaBufSize );
 
-        lookAheadBufPos->start = ctx->pos;
-        lookAheadBufPos->end = ctx->pos + curLaBufSize;
+            lookAheadBufPos->start = ctx->pos;
+            lookAheadBufPos->end = ctx->pos + curLaBufSize;
+        }
     }
     else 
     {
@@ -146,9 +158,10 @@ static void __lz77_dump_triplet_to_dst_buffer(lz77CtxPtr _ctx, lz77TripletPtr _c
     */
     if ( dstBuf->bytes == NULL )
     {
-        printf("dst Buf Size: %lli\n", sizeof(uint8_t) * ctx->srcBuf->numBytes);
-        dstBuf->bytes = malloc(sizeof(uint8_t) * ctx->srcBuf->numBytes);
-        dstBuf->numBytes = ctx->srcBuf->numBytes;
+        size_t neededByteCnt = ctx->srcBuf->numBytes * 2;
+        printf("dst Buf Size: %lli\n", sizeof(uint8_t) * neededByteCnt);
+        dstBuf->bytes = malloc(sizeof(uint8_t) * neededByteCnt);
+        dstBuf->numBytes = neededByteCnt;
         ctx->dstBufPos = dstBuf->bytes; 
     }
 
@@ -235,7 +248,8 @@ static void __lz77_search_triplet(lz77CtxPtr _ctx,
         uint8_t *curSBufcmpPos = curSBufStartPos, *curlaBufcmpPos = laBufPtr->start;
         bool match = true;
 
-        while ( (curSBufcmpPos <= sbBufPtr->start) && (curlaBufcmpPos <= laBufPtr->end) )
+        //For Repeats and RLE we have to search until lookahed Buffer at least(Maybe until Buffer end)
+        while ( /*(curSBufcmpPos <= sbBufPtr->start) && */ (curlaBufcmpPos <= laBufPtr->end) )
         {
             #if defined(debug) && debug != 0
             __lz77_cmp_dgb_print(curSBufStartPos, curSBufcmpPos, laBufPtr->start, curlaBufcmpPos);
@@ -321,6 +335,7 @@ static void __lz77_encode(lz77CtxPtr _ctx)
     } 
     
     ctx->dstBuf->numBytes = ctx->dstBufPos - &ctx->dstBuf->bytes[0];
+
 }
 
 /***** PUBLIC INTERFACE *****/

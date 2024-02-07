@@ -26,6 +26,18 @@ static void test_compression_crc32()
 	DEBUG_LOG("<< end crc32 tests:\n");
 }
 
+static void test_lz77_print_buffer(const lz77BufPtr _bufEncodedPtr)
+{
+	const lz77BufPtr bufEncodedPtr = _bufEncodedPtr;
+	size_t len = bufEncodedPtr->numBytes;
+	DEBUG_LOG_ARGS("decoded len: %lli\n", len);
+	for (size_t curChar = 0; curChar < len; curChar++)
+	{
+		printf("/0x%x", bufEncodedPtr->bytes[curChar]);
+	}
+	printf("\n");
+}
+
 static void test_compression_lz77()
 {
 	DEBUG_LOG(">> Start lz77 tests:\n");
@@ -35,7 +47,9 @@ static void test_compression_lz77()
 
 	unsigned char txt[] = "ababcbababaa";
 	bufTextPtr->bytes = (uint8_t*)&txt[0];
-	bufTextPtr->numBytes = sizeof(txt);
+	bufTextPtr->numBytes = sizeof(txt) - 1 ; //-1 no termination byte processing
+
+	DEBUG_LOG_ARGS("ENCODE TEST BYTE CNT: %lli\n", bufTextPtr->numBytes);
 
 	lz77_buf_t bufEncoded;
 	lz77BufPtr bufEncodedPtr = &bufEncoded;
@@ -50,15 +64,9 @@ static void test_compression_lz77()
 	
 	assert(result == LZ77_OK);
 
-	size_t len = bufEncodedPtr->numBytes;
-	DEBUG_LOG_ARGS("decoded len: %lli\n", len);
-	for (size_t curChar = 0; curChar < len; curChar++)
-	{
-		printf("/0x%x", bufEncodedPtr->bytes[curChar]);
-	}
-	printf("\n");
+	test_lz77_print_buffer((const lz77BufPtr)bufEncodedPtr);
 
-	assert(len > 0);
+	assert(bufEncodedPtr->numBytes > 0);
 	
 	free(bufEncodedPtr->bytes);
 
@@ -71,6 +79,25 @@ static void test_compression_lz77()
 	assert(result == LZ77_OK);
 
 	free(bufDecodedPtr->bytes);
+
+	printf("\n######################################################################\n\n");
+
+	unsigned char txt2[] = "ababccccccccccRSRSRSRSRSRSbabab";
+	bufTextPtr->bytes = (uint8_t*)&txt2[0];
+	bufTextPtr->numBytes = sizeof(txt2) - 1 ; //-1 no termination byte processing
+
+	paramEncoding.searchBufSize = 30;
+    paramEncoding.lookaheadBufSize = 30;
+
+	result = en_lz77_u8(bufTextPtr, bufEncodedPtr, paramEncodingPtr);
+	
+	assert(result == LZ77_OK);
+
+	test_lz77_print_buffer((const lz77BufPtr)bufEncodedPtr);
+
+	assert(bufEncodedPtr->numBytes > 0);
+
+	free(bufEncodedPtr->bytes);
 
 	DEBUG_LOG("<< end lz77 tests:\n");
 }
