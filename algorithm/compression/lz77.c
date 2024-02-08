@@ -25,6 +25,8 @@ typedef struct __lz77_context
     lz77_sliding_window_t slWin;
     /* Buffer with bytes to compress */
     lz77BufPtr  srcBuf; 
+    /* End of srcBuffer */
+    uint8_t *eofSrcBuf;
     /* Buffer with result bytes */
     lz77BufPtr  dstBuf;
     /* Definition of lz77 Parameter */ 
@@ -88,27 +90,10 @@ static void __lz77_set_lookahed_buffer(lz77CtxPtr _ctx)
     printf("maxPossLaBufSize: %lli\n", maxPossLaBufSize);
     #endif
 
-    if ( maxPossLaBufSize )
-    {
-        if ( maxPossLaBufSize == 1 )
-        {
-            lookAheadBufPos->start = ctx->pos;
-            lookAheadBufPos->end = ctx->pos;
-        }
-        else
-        {
-            uint16_t curLaBufSize = ( maxPossLaBufSize < paramLaBufSize ? maxPossLaBufSize : paramLaBufSize );
+    int16_t curLaBufSize = ( maxPossLaBufSize < paramLaBufSize ? maxPossLaBufSize : paramLaBufSize );
 
-            lookAheadBufPos->start = ctx->pos;
-            lookAheadBufPos->end = ctx->pos + curLaBufSize;
-        }
-    }
-    else 
-    {
-        lookAheadBufPos->start = ctx->pos;
-        lookAheadBufPos->end = ctx->pos;
-    }
-
+    lookAheadBufPos->start = ctx->pos;
+    lookAheadBufPos->end = ctx->pos + curLaBufSize;
 }
 
 static void __lz77_set_sliding_window(lz77CtxPtr _ctx)
@@ -135,6 +120,8 @@ static void __lz77_init_algo(lz77CtxPtr _ctx, lz77BufPtr srcBuf, lz77BufPtr dstB
     ctx->srcBuf = srcBuf;
     ctx->dstBuf = dstBuf;
     
+    ctx->eofSrcBuf = ctx->pos + srcBuf->numBytes;
+
     __lz77_init_dst_buf(ctx);
 
     ctx->param = param;
@@ -274,8 +261,14 @@ static void __lz77_search_triplet(lz77CtxPtr _ctx,
         {
             *offset = ctx->pos - curSBufStartPos;
             *len = curlaBufcmpPos - laBufPtr->start;
-            *chr = ( curlaBufcmpPos == laBufPtr->end ? 0 : *curlaBufcmpPos);
+            *chr = *curlaBufcmpPos;
             
+            if ( curlaBufcmpPos == laBufPtr->end )
+            {
+                *len = *len - 1;
+                *chr = *(curlaBufcmpPos - 1);
+            }
+
             #if defined(debug) && debug != 0
             printf("o: %i, l: %i n: %c \n", *offset, *len, *chr);
             #endif
@@ -324,8 +317,7 @@ static void __lz77_encode(lz77CtxPtr _ctx)
     lz77TripletPtr curTripletPtr = &curTriplet;
 
     __lz77_set_lookahed_buffer(ctx);
-    
-    while ( __lz77_lookahed_buffer_available(ctx) ) 
+    while ( ctx->pos <ctx->eofSrcBuf ) 
     {    
         __lz77_set_search_buffer(ctx);
 

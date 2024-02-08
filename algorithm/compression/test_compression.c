@@ -82,7 +82,7 @@ static void test_compression_lz77()
 
 	printf("\n######################################################################\n\n");
 
-	unsigned char txt2[] = "ababccccccccccRSRSRSRSRSRSbabab";
+	unsigned char txt2[] = "ababccccccccccRSRSRSRSRSRSbababsowatsowasowatsowa";
 	bufTextPtr->bytes = (uint8_t*)&txt2[0];
 	bufTextPtr->numBytes = sizeof(txt2) - 1 ; //-1 no termination byte processing
 
