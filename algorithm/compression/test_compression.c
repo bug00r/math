@@ -99,6 +99,25 @@ static void test_compression_lz77()
 
 	free(bufEncodedPtr->bytes);
 
+	printf("\n######################################################################\n\n");
+
+	unsigned char txt3[] = "aaaaaaaaaaaaaaaaaaaaRSTbbbbbbbbbbbbbbbGFcccccccccccc";
+	bufTextPtr->bytes = (uint8_t*)&txt3[0];
+	bufTextPtr->numBytes = sizeof(txt3) - 1 ; //-1 no termination byte processing
+
+	paramEncoding.searchBufSize = 30;
+    paramEncoding.lookaheadBufSize = 30;
+
+	result = en_lz77_u8(bufTextPtr, bufEncodedPtr, paramEncodingPtr);
+	
+	assert(result == LZ77_OK);
+
+	test_lz77_print_buffer((const lz77BufPtr)bufEncodedPtr);
+
+	assert(bufEncodedPtr->numBytes > 0);
+
+	free(bufEncodedPtr->bytes);
+
 	DEBUG_LOG("<< end lz77 tests:\n");
 }
 
