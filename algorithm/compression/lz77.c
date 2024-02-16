@@ -1,5 +1,8 @@
 #include "lz77.h"
 
+//max len of triplets based on one Nibble
+#define TR_MAX_LEN 0xF
+
 /***** PRIVATE INTERFACE *****/
 typedef struct __lz77_buf_pos
 {
@@ -158,16 +161,13 @@ static void __lz77_dump_triplet_to_dst_buffer(lz77CtxPtr _ctx, lz77TripletPtr _c
     *ctx->dstBufPos++ = curTriplet->bytes[2];
 }
 
-static void __lz77_pack_triplet(lz77CtxPtr _ctx, lz77TripletPtr _curTriplet,
+static void __lz77_pack_triplet(lz77TripletPtr _curTriplet,
                                 uint32_t *_offset, uint32_t *_len, uint8_t *_chr)
 {
-    //The CTX will be need to implement RLE and Repeat and very long results(must be split because of the limit of len by 15(4bit))
-    lz77CtxPtr ctx = _ctx;
     lz77TripletPtr curTriplet = _curTriplet;
     uint32_t offset = *_offset, len = *_len;
     uint8_t chr = *_chr;
 
-    //TODO packing into Byte Array from Triplet Pointer
     curTriplet->bytes[0] = 0 | ( len << 0x4 ) | (offset >> 0x8);
     curTriplet->bytes[1] = offset & 0xFF;
     curTriplet->bytes[2] = chr;
@@ -178,8 +178,71 @@ static void __lz77_pack_triplet(lz77CtxPtr _ctx, lz77TripletPtr _curTriplet,
             curTriplet->bytes[0],curTriplet->bytes[1],curTriplet->bytes[2]);
     #endif
 
-    //This call was moved, because it could be necesarry to dump more triplets in case of Repeats and long matches
+}
+
+static void __lz77_pack_and_dump_byte_repeat_triplet(lz77CtxPtr _ctx, lz77TripletPtr _curTriplet,
+                                uint32_t *_offset, uint32_t *_len, uint8_t *_chr)
+{
+    lz77CtxPtr ctx = _ctx;
+    lz77TripletPtr curTriplet = _curTriplet;
+    uint32_t len = *_len, offset = *_offset, maxLen = TR_MAX_LEN;
+    uint8_t nextChr = *_chr, repeatChr = *(ctx->pos);
+
+    #if defined(debug) && debug != 0
+    printf("repeating single bytes: (%i,%i,%c) ... splitting into:\n",
+            len,offset,nextChr);
+    #endif
+    
+
+    while( len > TR_MAX_LEN)
+    {
+        len -= TR_MAX_LEN;  //reduce by max len
+        len--;              //reduce next char
+
+        __lz77_pack_triplet(curTriplet, &offset, &maxLen, &repeatChr);
+        __lz77_dump_triplet_to_dst_buffer(ctx, curTriplet);
+    }
+    
+    #if defined(debug) && debug != 0
+    printf("-- packing rest --\n");
+    #endif
+
+    if ( len == 0 ) offset = 0;
+    
+    __lz77_pack_triplet(curTriplet, &offset, &len, &nextChr);
     __lz77_dump_triplet_to_dst_buffer(ctx, curTriplet);
+    
+
+}
+
+static void __lz77_pack_and_dump_triplet(lz77CtxPtr _ctx, lz77TripletPtr _curTriplet,
+                                uint32_t *_offset, uint32_t *_len, uint8_t *_chr)
+{
+    //The CTX will be need to implement RLE and Repeat and very long results(must be split because of the limit of len by 15(4bit))
+    lz77CtxPtr ctx = _ctx;
+    lz77TripletPtr curTriplet = _curTriplet;
+    uint32_t len = *_len, offset = *_offset;
+
+    if ( len > TR_MAX_LEN )
+    {
+        if ( offset == 1 )
+        {
+            __lz77_pack_and_dump_byte_repeat_triplet(ctx, curTriplet, _offset, _len, _chr);
+        }
+        else if ( len > offset )
+        {
+            //packing repeats
+        }
+        else 
+        {
+            //packing normal
+        }
+    }
+    else
+    {
+        __lz77_pack_triplet(curTriplet, _offset, _len, _chr);
+        __lz77_dump_triplet_to_dst_buffer(ctx, curTriplet);
+    }
 
 } 
 
@@ -299,7 +362,7 @@ static void __lz77_search_next_triplet(lz77CtxPtr _ctx, lz77TripletPtr _curTripl
         chr = *ctx->pos;
     }
 
-    __lz77_pack_triplet(ctx, curTriplet, &offset, &len, &chr);
+    __lz77_pack_and_dump_triplet(ctx, curTriplet, &offset, &len, &chr);
 
     ctx->pos += len;
     ctx->pos++;

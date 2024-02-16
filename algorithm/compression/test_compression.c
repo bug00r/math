@@ -38,16 +38,17 @@ static void test_lz77_print_buffer(const lz77BufPtr _bufEncodedPtr)
 	printf("\n");
 }
 
-static void test_compression_lz77()
+static void test_compression_lz77_single_test(const char *_txt, const char *_cap, uint16_t searchBufferSize, 
+											  uint16_t lookAheadBufferSize)
 {
-	DEBUG_LOG(">> Start lz77 tests:\n");
+	printf("\n################ %s #################### \n\n", _cap);
 
 	lz77_buf_t bufText;
 	lz77BufPtr bufTextPtr = &bufText;
 
-	unsigned char txt[] = "ababcbababaa";
-	bufTextPtr->bytes = (uint8_t*)&txt[0];
-	bufTextPtr->numBytes = sizeof(txt) - 1 ; //-1 no termination byte processing
+	unsigned char *txt = (unsigned char *)_txt;
+	bufTextPtr->bytes = (uint8_t*)txt;
+	bufTextPtr->numBytes = strlen(_txt); //-1 no termination byte processing
 
 	DEBUG_LOG_ARGS("ENCODE TEST BYTE CNT: %lli\n", bufTextPtr->numBytes);
 
@@ -56,8 +57,8 @@ static void test_compression_lz77()
 	lz77_result_t result = LZ77_ERR;
 
 	lz77_param_t paramEncoding;
-	paramEncoding.searchBufSize = 15;
-    paramEncoding.lookaheadBufSize = 15;
+	paramEncoding.searchBufSize = searchBufferSize;
+    paramEncoding.lookaheadBufSize = lookAheadBufferSize;
 	lz77ParamPtr paramEncodingPtr = &paramEncoding;
 
 	result = en_lz77_u8(bufTextPtr, bufEncodedPtr, paramEncodingPtr);
@@ -79,45 +80,21 @@ static void test_compression_lz77()
 	assert(result == LZ77_OK);
 
 	free(bufDecodedPtr->bytes);
+}
 
-	printf("\n######################################################################\n\n");
+static void test_compression_lz77()
+{
+	DEBUG_LOG(">> Start lz77 tests:\n");
 
-	unsigned char txt2[] = "ababccccccccccRSRSRSRSRSRSbababsowatsowasowatsowa";
-	bufTextPtr->bytes = (uint8_t*)&txt2[0];
-	bufTextPtr->numBytes = sizeof(txt2) - 1 ; //-1 no termination byte processing
-
-	paramEncoding.searchBufSize = 30;
-    paramEncoding.lookaheadBufSize = 30;
-
-	result = en_lz77_u8(bufTextPtr, bufEncodedPtr, paramEncodingPtr);
+	test_compression_lz77_single_test("ababcbababaa", "Wiki Example", 15, 15);
+	test_compression_lz77_single_test("ababccccccccccRSRSRSRSRSRSbababsowatsowasowatsowa", "Test 1", 30, 30);
+	test_compression_lz77_single_test("aaaaaaaaaaaaaaaaaaaaRSTbbbbbbbbbbbbbbbGFcccccccccccc", "Repeat Test 1", 30, 30);
+	test_compression_lz77_single_test("aaaaaaaaaaaaaaa", "15 Same Chars", 30, 30);
+	test_compression_lz77_single_test("aaaaaaaaaaaaaaaa", "16 Same Chars", 30, 30);
+	test_compression_lz77_single_test("aaaaaaaaaaaaaaaaa", "17 Same Chars", 30, 30);
+	test_compression_lz77_single_test("aaaaaaaaaaaaaaaaaa", "18 Same Chars", 30, 30);
+	test_compression_lz77_single_test("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "60 Same Chars", 30, 30);
 	
-	assert(result == LZ77_OK);
-
-	test_lz77_print_buffer((const lz77BufPtr)bufEncodedPtr);
-
-	assert(bufEncodedPtr->numBytes > 0);
-
-	free(bufEncodedPtr->bytes);
-
-	printf("\n######################################################################\n\n");
-
-	unsigned char txt3[] = "aaaaaaaaaaaaaaaaaaaaRSTbbbbbbbbbbbbbbbGFcccccccccccc";
-	bufTextPtr->bytes = (uint8_t*)&txt3[0];
-	bufTextPtr->numBytes = sizeof(txt3) - 1 ; //-1 no termination byte processing
-
-	paramEncoding.searchBufSize = 30;
-    paramEncoding.lookaheadBufSize = 30;
-
-	result = en_lz77_u8(bufTextPtr, bufEncodedPtr, paramEncodingPtr);
-	
-	assert(result == LZ77_OK);
-
-	test_lz77_print_buffer((const lz77BufPtr)bufEncodedPtr);
-
-	assert(bufEncodedPtr->numBytes > 0);
-
-	free(bufEncodedPtr->bytes);
-
 	DEBUG_LOG("<< end lz77 tests:\n");
 }
 
