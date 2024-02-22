@@ -290,13 +290,14 @@ static void __lz77_search_triplet(lz77CtxPtr _ctx,
     lz77BufPosPtr laBufPtr = &slWinPtr->laBuf;
     
     uint32_t *offset = _offset, *len = _len;
-    uint8_t *chr = _chr, *curSBufStartPos = sbBufPtr->start;
+    uint8_t *chr = _chr, *curSBufStartPos = sbBufPtr->start, *curlaBufcmpPos = laBufPtr->start;
 
     while ( curSBufStartPos >= sbBufPtr->end )
     {
         
-        uint8_t *curSBufcmpPos = curSBufStartPos, *curlaBufcmpPos = laBufPtr->start;
+        uint8_t *curSBufcmpPos = curSBufStartPos; 
         bool match = true;
+        curlaBufcmpPos = laBufPtr->start;
 
         //For Repeats and RLE we have to search until lookahed Buffer at least(Maybe until Buffer end)
         while ( /*(curSBufcmpPos <= sbBufPtr->start) && */ (curlaBufcmpPos <= laBufPtr->end) )
@@ -328,13 +329,22 @@ static void __lz77_search_triplet(lz77CtxPtr _ctx,
             
             if ( curlaBufcmpPos == laBufPtr->end )
             {
-                *len = *len - 1;
+                *len -= 1;
                 *chr = *(curlaBufcmpPos - 1);
             }
 
             #if defined(debug) && debug != 0
             printf("o: %i, l: %i n: %c \n", *offset, *len, *chr);
+            printf("cur la pos: %p eof src Buf: %p\n", curlaBufcmpPos, ctx->eofSrcBuf);
             #endif
+
+            if ( curlaBufcmpPos == ctx->eofSrcBuf )
+            {
+                #if defined(debug) && debug != 0
+                printf("SRC BUFFER END REACHED...ABORT\n");
+                #endif
+                break;
+            }
         }
 
         curSBufStartPos--;
@@ -380,7 +390,7 @@ static void __lz77_encode(lz77CtxPtr _ctx)
     lz77TripletPtr curTripletPtr = &curTriplet;
 
     __lz77_set_lookahed_buffer(ctx);
-    while ( ctx->pos <ctx->eofSrcBuf ) 
+    while ( ctx->pos < ctx->eofSrcBuf ) 
     {    
         __lz77_set_search_buffer(ctx);
 
