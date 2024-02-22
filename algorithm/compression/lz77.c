@@ -290,17 +290,17 @@ static void __lz77_search_triplet(lz77CtxPtr _ctx,
     lz77BufPosPtr laBufPtr = &slWinPtr->laBuf;
     
     uint32_t *offset = _offset, *len = _len;
-    uint8_t *chr = _chr, *curSBufStartPos = sbBufPtr->start, *curlaBufcmpPos = laBufPtr->start;
+    uint8_t *chr = _chr, *curSBufStartPos = sbBufPtr->start;
 
+    //Search Buffer Available?
     while ( curSBufStartPos >= sbBufPtr->end )
     {
         
-        uint8_t *curSBufcmpPos = curSBufStartPos; 
+        uint8_t *curSBufcmpPos = curSBufStartPos, *curlaBufcmpPos = laBufPtr->start; 
         bool match = true;
-        curlaBufcmpPos = laBufPtr->start;
 
         //For Repeats and RLE we have to search until lookahed Buffer at least(Maybe until Buffer end)
-        while ( /*(curSBufcmpPos <= sbBufPtr->start) && */ (curlaBufcmpPos <= laBufPtr->end) )
+        while ( curlaBufcmpPos <= laBufPtr->end )
         {
             #if defined(debug) && debug != 0
             __lz77_cmp_dgb_print(curSBufStartPos, curSBufcmpPos, laBufPtr->start, curlaBufcmpPos);
@@ -321,15 +321,19 @@ static void __lz77_search_triplet(lz77CtxPtr _ctx,
 
         uint32_t curLen = curlaBufcmpPos - laBufPtr->start;
 
+        //Found Something and result is larger than a match before
         if (match && curLen > *len)
         {
             *offset = ctx->pos - curSBufStartPos;
             *len = curlaBufcmpPos - laBufPtr->start;
             *chr = *curlaBufcmpPos;
             
+            // If EOF Lookahead Buffer reached
             if ( curlaBufcmpPos == laBufPtr->end )
             {
+                //reduce len because we need to add next char
                 *len -= 1;
+                //last char from one step ahead Lookahead Buffer compare Position
                 *chr = *(curlaBufcmpPos - 1);
             }
 
@@ -337,7 +341,8 @@ static void __lz77_search_triplet(lz77CtxPtr _ctx,
             printf("o: %i, l: %i n: %c \n", *offset, *len, *chr);
             printf("cur la pos: %p eof src Buf: %p\n", curlaBufcmpPos, ctx->eofSrcBuf);
             #endif
-
+            
+            //Lookahead Compare Position reached EOF SRC Buffer. This can happen during RLE Search.
             if ( curlaBufcmpPos == ctx->eofSrcBuf )
             {
                 #if defined(debug) && debug != 0
