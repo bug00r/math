@@ -1,7 +1,7 @@
 #include "lz77.h"
 
 //max len of triplets based on one Nibble
-#define TR_MAX_LEN 0xF
+static const uint32_t TR_MAX_LEN = 0xF;
 
 /***** PRIVATE INTERFACE *****/
 typedef struct __lz77_buf_pos
@@ -215,6 +215,101 @@ static void __lz77_pack_and_dump_byte_repeat_triplet(lz77CtxPtr _ctx, lz77Triple
 
 }
 
+static void __lz77_pack_and_dump_bytes_repeat_triplet(lz77CtxPtr _ctx, lz77TripletPtr _curTriplet,
+                                uint32_t *_offset, uint32_t *_len, uint8_t *_chr)
+{
+    lz77CtxPtr ctx = _ctx;
+    lz77TripletPtr curTriplet = _curTriplet;
+    uint32_t len = *_len, offset = *_offset, maxLen = TR_MAX_LEN;
+    uint8_t nextChr = *_chr, repeatChr = *(ctx->pos);
+
+    /* possible Situations
+
+        RSRSRSRSRSR && RSRSRSRSRSb  OK, because len is lower than 15
+        o: 2, l: 10 n: b
+
+        RSTRSTRSTRSTRSTRSTRSTR && RSTRSTRSTRSTRSTRSTRSTb
+        o: 3, l: 21 n: b
+
+            process: RSTRSTRSTRSTRSTRSTRSTb
+                     RSTRSTRSTRSTRST'R'STRSTb   o: 3 l: 15 n: R
+                     STRST'b'                   //starting with S which has other Offset: o: 2 ( o = o - ((l+1) % o))                     
+                                                o: 2 l: 5 n: b
+
+        RSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTR && RSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTR
+        o: 3, l: 61 n: S
+
+            process: RSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTR
+                     RSTRSTRSTRSTRST'R'STRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTR    o: 3 l: 15 n: R
+                     STRSTRSTRSTRSTR'S'TRSTRSTRSTRSTRSTRSTRSTRSTRSTR                    o: 2 l: 15 n: S
+                     TRSTRSTRSTRSTRS'T'RSTRSTRSTRSTR                                    o: 1 l: 15 n: T
+                     ----------------------------------------------------------------------------------
+                     RSTRSTRSTRST'R' + S                                                o: 3 l: 12 n: R  
+                     RSTRSTRSTRSTR'S'                                                   o: 3 l: 13 n: S
+
+            decode: R                                                                   o: 0 l: 0 n: R
+                    RS                                                                  o: 0 l: 0 n: S
+                    RST                                                                 o: 0 l: 0 n: T
+                    RST RSTRSTRSTRSTRSTR                                                 o: 3 l: 15 n: R
+                    RST RSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRS                                 o: 2 l: 15 n: S
+                    RST RSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRST                 o: 1 l: 15 n: T
+                    RST RSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRS   o: 3 l: 13 n: S
+
+        TRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTR && TRSTRSTRSTRSTRSTRSTRSTRSTRSTRST
+        o: 3, l: 30 n: T
+
+            process: TRSTRSTRSTRSTRSTRSTRSTRSTRSTRST
+                     TRSTRSTRSTRSTRS'T'                                                 o: 3 l: 15 n: T
+                     RSTRSTRSTRSTRS'T'                                                  o: 2 l: 14 n: T
+    */
+
+    #if defined(debug) && debug != 0
+    printf("repeating multiple bytes: (%i,%i,%c) ... splitting into:\n",
+            len,offset,nextChr);
+    #endif
+
+    uint8_t *lastPos = ctx->pos - offset;
+    uint8_t *startPos = ctx->pos;
+
+    #if defined(debug) && debug != 0
+    printf("last pos byte: %c \n",*lastPos);
+    #endif
+
+    while( len > TR_MAX_LEN)
+    {
+        len -= TR_MAX_LEN;  //reduce by max len
+        len--;              //reduce next char
+
+        lastPos += TR_MAX_LEN;
+
+        //redundant #1
+        uint32_t curOffset = 1;
+        while ( *lastPos != *(startPos - curOffset) ) curOffset++;
+        //eof redundant #1
+
+        #if defined(debug) && debug != 0
+        printf("offset of \"%c\" =  %i \n",*lastPos, curOffset);
+        #endif
+
+        __lz77_pack_triplet(curTriplet, &curOffset, &maxLen, lastPos++);
+        __lz77_dump_triplet_to_dst_buffer(ctx, curTriplet);
+    
+    }
+    
+    #if defined(debug) && debug != 0
+    printf("-- packing rest --\n");
+    #endif
+
+    //redundant #1
+    uint32_t curOffset = 1;
+    while ( *lastPos != *(startPos - curOffset) ) curOffset++;
+    //eof redundant #1
+
+    __lz77_pack_triplet(curTriplet, &curOffset, &len, &nextChr);
+    __lz77_dump_triplet_to_dst_buffer(ctx, curTriplet);
+
+}
+
 static void __lz77_pack_and_dump_triplet(lz77CtxPtr _ctx, lz77TripletPtr _curTriplet,
                                 uint32_t *_offset, uint32_t *_len, uint8_t *_chr)
 {
@@ -231,7 +326,7 @@ static void __lz77_pack_and_dump_triplet(lz77CtxPtr _ctx, lz77TripletPtr _curTri
         }
         else if ( len > offset )
         {
-            //packing repeats
+            __lz77_pack_and_dump_bytes_repeat_triplet(ctx, curTriplet, _offset, _len, _chr);
         }
         else 
         {
