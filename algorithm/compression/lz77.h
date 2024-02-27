@@ -9,6 +9,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct __lz77_buff 
 {
@@ -30,5 +31,9 @@ typedef enum __lz77_return_codes {
 
 lz77_result_t en_lz77_u8(lz77BufPtr srcBuf, lz77BufPtr dstBuf, lz77ParamPtr param);
 lz77_result_t de_lz77_u8(lz77BufPtr srcBuf, lz77BufPtr dstBuf);
+
+size_t lz77_get_dst_buf_size(lz77BufPtr srcBuf);
+
+//TODO for external memory mgmt there could be a callback registration for handling en- and decoded chars
 
 #endif

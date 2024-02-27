@@ -2,6 +2,8 @@
 
 //max len of triplets based on one Nibble
 static const uint32_t TR_MAX_LEN = 0xF;
+#define _TRIPLET_SIZE 0x3
+static const uint32_t TRIPLET_SIZE = _TRIPLET_SIZE;
 
 /***** PRIVATE INTERFACE *****/
 typedef struct __lz77_buf_pos
@@ -116,7 +118,7 @@ static void __lz77_init_dst_buf(lz77CtxPtr _ctx)
     ctx->dstBuf->numBytes = 0;
 }
 
-static void __lz77_init_algo(lz77CtxPtr _ctx, lz77BufPtr srcBuf, lz77BufPtr dstBuf, lz77ParamPtr param)
+static void __lz77_init_ctx(lz77CtxPtr _ctx, lz77BufPtr srcBuf, lz77BufPtr dstBuf, lz77ParamPtr param)
 {
     lz77CtxPtr ctx = _ctx;
     ctx->pos = &srcBuf->bytes[0]; 
@@ -133,7 +135,7 @@ static void __lz77_init_algo(lz77CtxPtr _ctx, lz77BufPtr srcBuf, lz77BufPtr dstB
 /* currently not using bitfields because lib should be usable with c99 too*/
 typedef struct __lz77_triplet 
 {
-    uint8_t bytes[3];
+    uint8_t bytes[_TRIPLET_SIZE];
 } lz77_priplet_t,*lz77TripletPtr;
 
 static void __lz77_dump_triplet_to_dst_buffer(lz77CtxPtr _ctx, lz77TripletPtr _curTriplet)
@@ -223,46 +225,6 @@ static void __lz77_pack_and_dump_bytes_repeat_triplet(lz77CtxPtr _ctx, lz77Tripl
     uint32_t len = *_len, offset = *_offset, maxLen = TR_MAX_LEN;
     uint8_t nextChr = *_chr, repeatChr = *(ctx->pos);
 
-    /* possible Situations
-
-        RSRSRSRSRSR && RSRSRSRSRSb  OK, because len is lower than 15
-        o: 2, l: 10 n: b
-
-        RSTRSTRSTRSTRSTRSTRSTR && RSTRSTRSTRSTRSTRSTRSTb
-        o: 3, l: 21 n: b
-
-            process: RSTRSTRSTRSTRSTRSTRSTb
-                     RSTRSTRSTRSTRST'R'STRSTb   o: 3 l: 15 n: R
-                     STRST'b'                   //starting with S which has other Offset: o: 2 ( o = o - ((l+1) % o))                     
-                                                o: 2 l: 5 n: b
-
-        RSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTR && RSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTR
-        o: 3, l: 61 n: S
-
-            process: RSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTR
-                     RSTRSTRSTRSTRST'R'STRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTR    o: 3 l: 15 n: R
-                     STRSTRSTRSTRSTR'S'TRSTRSTRSTRSTRSTRSTRSTRSTRSTR                    o: 2 l: 15 n: S
-                     TRSTRSTRSTRSTRS'T'RSTRSTRSTRSTR                                    o: 1 l: 15 n: T
-                     ----------------------------------------------------------------------------------
-                     RSTRSTRSTRST'R' + S                                                o: 3 l: 12 n: R  
-                     RSTRSTRSTRSTR'S'                                                   o: 3 l: 13 n: S
-
-            decode: R                                                                   o: 0 l: 0 n: R
-                    RS                                                                  o: 0 l: 0 n: S
-                    RST                                                                 o: 0 l: 0 n: T
-                    RST RSTRSTRSTRSTRSTR                                                 o: 3 l: 15 n: R
-                    RST RSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRS                                 o: 2 l: 15 n: S
-                    RST RSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRST                 o: 1 l: 15 n: T
-                    RST RSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRS   o: 3 l: 13 n: S
-
-        TRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTR && TRSTRSTRSTRSTRSTRSTRSTRSTRSTRST
-        o: 3, l: 30 n: T
-
-            process: TRSTRSTRSTRSTRSTRSTRSTRSTRSTRST
-                     TRSTRSTRSTRSTRS'T'                                                 o: 3 l: 15 n: T
-                     RSTRSTRSTRSTRS'T'                                                  o: 2 l: 14 n: T
-    */
-
     #if defined(debug) && debug != 0
     printf("repeating multiple bytes: (%i,%i,%c) ... splitting into:\n",
             len,offset,nextChr);
@@ -331,6 +293,7 @@ static void __lz77_pack_and_dump_triplet(lz77CtxPtr _ctx, lz77TripletPtr _curTri
         else 
         {
             //packing normal
+            //TODO implement normal packing
         }
     }
     else
@@ -503,13 +466,149 @@ static void __lz77_encode(lz77CtxPtr _ctx)
 
 }
 
+bool __lz77_cnt_triplets_valid(lz77BufPtr srcBuf)
+{
+    return (srcBuf->numBytes % TRIPLET_SIZE) == 0;
+}
+
+bool __lz77_enc_src_buf_valid(lz77BufPtr srcBuf)
+{
+    return ( (srcBuf->bytes != NULL) && (srcBuf->numBytes > 2) && __lz77_cnt_triplets_valid(srcBuf));
+}
+
+size_t __lz77_calc_dst_buf_size(lz77BufPtr _srcBuf)
+{
+    lz77BufPtr srcBuf = _srcBuf;
+    uint8_t *curLenBytePtr = srcBuf->bytes, *srcBufEndPtr = srcBuf->bytes + srcBuf->numBytes;
+    size_t neededDstBufSize = 0;
+    
+    while ( curLenBytePtr < srcBufEndPtr )
+    {
+        #if defined(debug) && debug != 0
+        printf("Add Len: %c = %i\n", *curLenBytePtr, *curLenBytePtr >> 0x4 );
+        #endif 
+
+        neededDstBufSize += ( *curLenBytePtr >> 0x4 );
+        neededDstBufSize++;
+
+        curLenBytePtr += TRIPLET_SIZE;
+    }
+
+    return neededDstBufSize;
+}
+
+void __lz77_calc_size_and_init_dst_buf(lz77CtxPtr _ctx)
+{
+    lz77CtxPtr ctx = _ctx;
+    lz77BufPtr srcBuf = ctx->srcBuf, dstBuf = ctx->dstBuf;
+
+    size_t neededDstBufSize = __lz77_calc_dst_buf_size(srcBuf);
+
+    dstBuf->numBytes = neededDstBufSize;
+    dstBuf->bytes = malloc( sizeof(uint8_t) * neededDstBufSize );
+
+    ctx->dstBufPos = dstBuf->bytes;
+
+    #if defined(debug) && debug != 0
+    printf("Needed Dst Buf Size: %lli\n", dstBuf->numBytes);
+    #endif
+
+}
+
+void __lz77_print_cur_dst_buf(lz77CtxPtr _ctx)
+{
+    lz77CtxPtr ctx = _ctx;
+    lz77BufPtr dstBuf = ctx->dstBuf;
+    uint8_t *curDstBufPos = ctx->dstBufPos, *dstStartPos = dstBuf->bytes;
+    
+    printf("dstBuf: \"");
+    while(dstStartPos != curDstBufPos)
+    {
+        printf("%c", *dstStartPos);
+        dstStartPos++;
+    }
+    printf("\n");
+
+}
+
+void __lz77_extend_dst_buf(lz77CtxPtr _ctx, uint32_t *_len, uint32_t *_offset, uint8_t *_nextChr)
+{
+    lz77CtxPtr ctx = _ctx;
+    lz77BufPtr dstBuf = ctx->dstBuf;
+    uint32_t len = *_len, offset = *_offset;
+    uint8_t nextChr = *_nextChr;
+
+    //add new Character to buffer
+    if ( len == 0 )
+    {
+        *ctx->dstBufPos = nextChr;
+        ctx->dstBufPos++;
+        __lz77_print_cur_dst_buf(ctx);
+    }
+    //Repeating
+    else if ( len > offset )
+    {
+        //Repeat single bytes (RLE)
+        if ( offset == 1 )
+        {
+            memset(ctx->dstBufPos, *(ctx->dstBufPos - offset), len);
+            ctx->dstBufPos += len;
+            *ctx->dstBufPos = nextChr;
+            ctx->dstBufPos++;
+            __lz77_print_cur_dst_buf(ctx);
+        }
+        //Repeat multiple bytes
+        else{
+            TODO ADD DECODE MULTIPLE BYTES HERE
+        }
+    }
+    //normal adding 
+    else 
+    {
+        memcpy(ctx->dstBufPos, ctx->dstBufPos - offset, len);
+        ctx->dstBufPos += len;
+        *ctx->dstBufPos = nextChr;
+        ctx->dstBufPos++;
+        __lz77_print_cur_dst_buf(ctx);
+    }
+}
+
+void __lz77_decode(lz77CtxPtr _ctx)
+{
+    lz77CtxPtr ctx = _ctx;
+
+    lz77BufPtr srcBuf = ctx->srcBuf, dstBuf = ctx->dstBuf;
+
+    __lz77_calc_size_and_init_dst_buf(ctx);
+
+    uint8_t *curLenBytePtr = srcBuf->bytes, *srcBufEndPtr = srcBuf->bytes + srcBuf->numBytes, nextChr = 0, curByte = 0;
+    uint32_t len = 0, offset = 0;
+
+    while ( curLenBytePtr < srcBufEndPtr )
+    {
+        curByte = *curLenBytePtr;
+        len = curByte >> 0x4;
+        offset = ((curByte & 0xF) << 0x4) | *(curLenBytePtr + 1);
+        nextChr = *(curLenBytePtr + 2);
+        
+        #if defined(debug) && debug != 0
+            printf("l: %i, o: %i n: %c \n", len, offset, nextChr);
+        #endif
+
+        __lz77_extend_dst_buf(ctx, &len, &offset, &nextChr);
+
+        curLenBytePtr += TRIPLET_SIZE;
+    }
+
+}
+
 /***** PUBLIC INTERFACE *****/
 
 lz77_result_t en_lz77_u8(lz77BufPtr srcBuf, lz77BufPtr dstBuf, lz77ParamPtr param)
 {
     lz77_ctx_t ctx;
 
-    __lz77_init_algo(&ctx, srcBuf, dstBuf, param);
+    __lz77_init_ctx(&ctx, srcBuf, dstBuf, param);
 
     __lz77_encode(&ctx);
 
@@ -520,10 +619,24 @@ lz77_result_t de_lz77_u8(lz77BufPtr srcBuf, lz77BufPtr dstBuf)
 {
     lz77_ctx_t ctx;
 
-    __lz77_init_algo(&ctx, srcBuf, dstBuf, NULL);
+    __lz77_init_ctx(&ctx, srcBuf, dstBuf, NULL);
 
-    __lz77_init_dst_buf(&ctx);
+    lz77_result_t result = LZ77_OK; 
 
-    return LZ77_OK;
+    if ( __lz77_cnt_triplets_valid(ctx.srcBuf) )
+    {
+        __lz77_decode(&ctx);
+    }
+    else 
+    {
+        result = LZ77_ERR;
+    }
+
+    return result;
+}
+
+size_t lz77_get_dst_buf_size(lz77BufPtr srcBuf)
+{
+    return __lz77_calc_dst_buf_size(srcBuf);
 }
 

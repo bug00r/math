@@ -26,7 +26,7 @@ static void test_compression_crc32()
 	DEBUG_LOG("<< end crc32 tests:\n");
 }
 
-static void test_lz77_print_buffer(const lz77BufPtr _bufEncodedPtr)
+static void test_lz77_print_buffer_hex(const lz77BufPtr _bufEncodedPtr)
 {
 	const lz77BufPtr bufEncodedPtr = _bufEncodedPtr;
 	size_t len = bufEncodedPtr->numBytes;
@@ -36,6 +36,18 @@ static void test_lz77_print_buffer(const lz77BufPtr _bufEncodedPtr)
 		printf("/0x%x", bufEncodedPtr->bytes[curChar]);
 	}
 	printf("\n");
+}
+
+static void test_lz77_print_buffer(const lz77BufPtr _bufPtr)
+{
+	const lz77BufPtr bufPtr = _bufPtr;
+	size_t len = bufPtr->numBytes;
+	DEBUG_LOG_ARGS("buffer len: %lli => \"", len);
+	for (size_t curChar = 0; curChar < len; curChar++)
+	{
+		printf("%c", bufPtr->bytes[curChar]);
+	}
+	printf("\"\n");
 }
 
 static void test_compression_lz77_single_test(const char *_txt, const char *_cap, uint16_t searchBufferSize, 
@@ -65,11 +77,9 @@ static void test_compression_lz77_single_test(const char *_txt, const char *_cap
 	
 	assert(result == LZ77_OK);
 
-	test_lz77_print_buffer((const lz77BufPtr)bufEncodedPtr);
+	test_lz77_print_buffer_hex((const lz77BufPtr)bufEncodedPtr);
 
 	assert(bufEncodedPtr->numBytes > 0);
-	
-	free(bufEncodedPtr->bytes);
 
 	lz77_buf_t bufDecoded;
 	lz77BufPtr bufDecodedPtr = &bufDecoded;
@@ -77,8 +87,12 @@ static void test_compression_lz77_single_test(const char *_txt, const char *_cap
 	result = LZ77_ERR;
 	result = de_lz77_u8(bufEncodedPtr, bufDecodedPtr);
 
+	DEBUG_LOG_ARGS("Original:\"%s\"\n", _txt);
+	test_lz77_print_buffer(bufDecodedPtr);
+
 	assert(result == LZ77_OK);
 
+	free(bufEncodedPtr->bytes);
 	free(bufDecodedPtr->bytes);
 }
 
