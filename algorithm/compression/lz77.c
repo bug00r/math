@@ -2,6 +2,7 @@
 
 //max len of triplets based on one Nibble
 static const uint32_t TR_MAX_LEN = 0xF;
+static const uint32_t TR_MAXP1_LEN = 0x10;
 #define _TRIPLET_SIZE 0x3
 static const uint32_t TRIPLET_SIZE = _TRIPLET_SIZE;
 
@@ -198,8 +199,7 @@ static void __lz77_pack_and_dump_byte_repeat_triplet(lz77CtxPtr _ctx, lz77Triple
 
     while( len > TR_MAX_LEN)
     {
-        len -= TR_MAX_LEN;  //reduce by max len
-        len--;              //reduce next char
+        len -= TR_MAXP1_LEN;  //reduce by max len
 
         __lz77_pack_triplet(curTriplet, &offset, &maxLen, &repeatChr);
         __lz77_dump_triplet_to_dst_buffer(ctx, curTriplet);
@@ -229,25 +229,34 @@ static void __lz77_pack_and_dump_bytes_repeat_triplet(lz77CtxPtr _ctx, lz77Tripl
     printf("repeating multiple bytes: (%i,%i,%c) ... splitting into:\n",
             len,offset,nextChr);
     #endif
+    /*  RSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTR && RSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTR
+        o: 3, l: 61 n: S
 
+        RSTRSTRSTRSTRST'R'STRSTRSTRSTRSTR'S'TRSTRSTRSTRSTRS'T'RSTRSTRSTRSTR'S'
+                                                                            ^
+                                                                            next Charackter
+        RSTRSTRSTRSTRST'R' = 15,3,R
+        STRSTRSTRSTRSTR'S' = 15,15,S
+        TRSTRSTRSTRSTRS'T' = 15,15,T
+        RSTRSTRSTRSTR'S'   = 15,13,S
+    */
     uint8_t *lastPos = ctx->pos - offset;
-    uint8_t *startPos = ctx->pos;
 
     #if defined(debug) && debug != 0
     printf("last pos byte: %c \n",*lastPos);
     #endif
 
-    while( len > TR_MAX_LEN)
+    size_t cntFullTriplets = (int)((float)len / (float)(TR_MAX_LEN + 1));
+    size_t curTriplets = 0;
+
+    uint32_t curOffset = 0;
+    while( curTriplets < cntFullTriplets)
     {
-        len -= TR_MAX_LEN;  //reduce by max len
-        len--;              //reduce next char
+        len -= TR_MAXP1_LEN;
 
         lastPos += TR_MAX_LEN;
 
-        //redundant #1
-        uint32_t curOffset = 1;
-        while ( *lastPos != *(startPos - curOffset) ) curOffset++;
-        //eof redundant #1
+        curOffset = ( curTriplets == 0 ? offset : TR_MAX_LEN );
 
         #if defined(debug) && debug != 0
         printf("offset of \"%c\" =  %i \n",*lastPos, curOffset);
@@ -255,21 +264,54 @@ static void __lz77_pack_and_dump_bytes_repeat_triplet(lz77CtxPtr _ctx, lz77Tripl
 
         __lz77_pack_triplet(curTriplet, &curOffset, &maxLen, lastPos++);
         __lz77_dump_triplet_to_dst_buffer(ctx, curTriplet);
-    
+
+        curTriplets++;
     }
     
     #if defined(debug) && debug != 0
     printf("-- packing rest --\n");
     #endif
 
-    //redundant #1
-    uint32_t curOffset = 1;
-    while ( *lastPos != *(startPos - curOffset) ) curOffset++;
-    //eof redundant #1
+    curOffset = ( curTriplets == 0 ? offset : TR_MAX_LEN );
 
     __lz77_pack_triplet(curTriplet, &curOffset, &len, &nextChr);
     __lz77_dump_triplet_to_dst_buffer(ctx, curTriplet);
 
+}
+
+static void __lz77_pack_and_dump_overflow_triplet(lz77CtxPtr _ctx, lz77TripletPtr _curTriplet,
+                                uint32_t *_offset, uint32_t *_len, uint8_t *_chr)
+{
+    lz77CtxPtr ctx = _ctx;
+    lz77TripletPtr curTriplet = _curTriplet;
+    uint32_t len = *_len, offset = *_offset, maxLen = TR_MAX_LEN;
+    uint8_t nextChr = *_chr, repeatChr = *(ctx->pos);
+
+    #if defined(debug) && debug != 0
+    printf("normal triplet overflow: (%i,%i,%c) ... splitting into:\n",
+            len,offset,nextChr);
+    #endif
+    
+    //NOT Implement YET
+    /*while( len > TR_MAX_LEN)
+    {
+        len -= TR_MAX_LEN;  //reduce by max len
+        len--;              //reduce next char
+
+        __lz77_pack_triplet(curTriplet, &offset, &maxLen, &repeatChr);
+        __lz77_dump_triplet_to_dst_buffer(ctx, curTriplet);
+    }
+    
+    #if defined(debug) && debug != 0
+    printf("-- packing rest --\n");
+    #endif
+
+    if ( len == 0 ) offset = 0;
+    
+    __lz77_pack_triplet(curTriplet, &offset, &len, &nextChr);
+    __lz77_dump_triplet_to_dst_buffer(ctx, curTriplet);
+    
+    */
 }
 
 static void __lz77_pack_and_dump_triplet(lz77CtxPtr _ctx, lz77TripletPtr _curTriplet,
@@ -292,8 +334,7 @@ static void __lz77_pack_and_dump_triplet(lz77CtxPtr _ctx, lz77TripletPtr _curTri
         }
         else 
         {
-            //packing normal
-            //TODO implement normal packing
+            __lz77_pack_and_dump_overflow_triplet(ctx, curTriplet, _offset, _len, _chr);
         }
     }
     else
@@ -303,20 +344,6 @@ static void __lz77_pack_and_dump_triplet(lz77CtxPtr _ctx, lz77TripletPtr _curTri
     }
 
 } 
-
-/*
-typedef struct __lz77_buf_pos
-{
-    uint8_t *start;
-    uint8_t *end;
-} lz77_buf_pos_t, *lz77BufPosPtr;
-
-typedef struct __lz77_sliding_window 
-{
-    lz77_buf_pos_t sbBuf; 
-    lz77_buf_pos_t laBuf;
-} lz77_sliding_window_t, *lz77SlidingWindowPtr;
-*/
 
 #if defined(debug) && debug != 0
 
@@ -542,8 +569,6 @@ void __lz77_extend_dst_buf(lz77CtxPtr _ctx, uint32_t *_len, uint32_t *_offset, u
     if ( len == 0 )
     {
         *ctx->dstBufPos = nextChr;
-        ctx->dstBufPos++;
-        __lz77_print_cur_dst_buf(ctx);
     }
     //Repeating
     else if ( len > offset )
@@ -552,25 +577,24 @@ void __lz77_extend_dst_buf(lz77CtxPtr _ctx, uint32_t *_len, uint32_t *_offset, u
         if ( offset == 1 )
         {
             memset(ctx->dstBufPos, *(ctx->dstBufPos - offset), len);
-            ctx->dstBufPos += len;
-            *ctx->dstBufPos = nextChr;
-            ctx->dstBufPos++;
-            __lz77_print_cur_dst_buf(ctx);
         }
         //Repeat multiple bytes
         else{
-            TODO ADD DECODE MULTIPLE BYTES HERE
+            //FIXME This is wrong, does not work
+            memcpy(ctx->dstBufPos, ctx->dstBufPos - offset, len);
         }
     }
     //normal adding 
     else 
     {
-        memcpy(ctx->dstBufPos, ctx->dstBufPos - offset, len);
-        ctx->dstBufPos += len;
-        *ctx->dstBufPos = nextChr;
-        ctx->dstBufPos++;
-        __lz77_print_cur_dst_buf(ctx);
+        memcpy(ctx->dstBufPos, ctx->dstBufPos - offset, len);  
     }
+
+    ctx->dstBufPos += len;
+    *ctx->dstBufPos = nextChr;
+    ctx->dstBufPos++;
+
+    __lz77_print_cur_dst_buf(ctx);
 }
 
 void __lz77_decode(lz77CtxPtr _ctx)
