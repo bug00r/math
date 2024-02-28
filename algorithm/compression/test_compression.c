@@ -91,7 +91,7 @@ static void test_compression_lz77_single_test(const char *_txt, const char *_cap
 	test_lz77_print_buffer(bufDecodedPtr);
 
 	assert(result == LZ77_OK);
-	//assert(memcmp(_txt, bufDecodedPtr->bytes, bufDecodedPtr->numBytes) == 0);
+	assert(memcmp(_txt, bufDecodedPtr->bytes, bufDecodedPtr->numBytes) == 0);
 
 	free(bufEncodedPtr->bytes);
 	free(bufDecodedPtr->bytes);
@@ -112,7 +112,7 @@ static void test_compression_lz77()
 	test_compression_lz77_single_test("ababRSTRSTRSTRSTRSTRSTRSTRSTblubb", "Repeat-1: Triplet overflow", 30, 30);
 	test_compression_lz77_single_test("RSTRSTRSTRSTRSTRSTRSTRST", "Repeat-2: Triplet overflow", 30, 30);
 	test_compression_lz77_single_test("RSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRST", "Repeat-3: Higher Triplet overflow", 60, 60);
-	//test_compression_lz77_single_test("0123456789ABCDEFGHIJK0123456789ABCDEFGHIJK0123456789ABCDEFGHIJK0123456789ABCDEFGHIJK", "Found: Triplet overflow", 30, 30);
+	test_compression_lz77_single_test("0123456789ABCDEFGHIJK0123456789ABCDEFGHIJK0123456789ABCDEFGHIJK0123456789ABCDEFGHIJK", "Found: Triplet overflow", 30, 30);
 	
 	DEBUG_LOG("<< end lz77 tests:\n");
 }

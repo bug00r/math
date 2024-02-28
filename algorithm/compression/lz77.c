@@ -564,6 +564,8 @@ void __lz77_extend_dst_buf(lz77CtxPtr _ctx, uint32_t *_len, uint32_t *_offset, u
     lz77BufPtr dstBuf = ctx->dstBuf;
     uint32_t len = *_len, offset = *_offset;
     uint8_t nextChr = *_nextChr;
+    
+    bool needLen = true;
 
     //add new Character to buffer
     if ( len == 0 )
@@ -580,8 +582,17 @@ void __lz77_extend_dst_buf(lz77CtxPtr _ctx, uint32_t *_len, uint32_t *_offset, u
         }
         //Repeat multiple bytes
         else{
-            //FIXME This is wrong, does not work
-            memcpy(ctx->dstBufPos, ctx->dstBufPos - offset, len);
+            size_t completeRepeats = (int)((float)len / (float)offset);
+            size_t curRepeat = 0;
+            while(curRepeat++ < completeRepeats)
+            {
+                memcpy(ctx->dstBufPos, ctx->dstBufPos - offset, offset);
+                ctx->dstBufPos += offset;
+            }
+            size_t rest = len % offset;
+            memcpy(ctx->dstBufPos, ctx->dstBufPos - rest, rest);
+            ctx->dstBufPos += rest;
+            needLen = false;
         }
     }
     //normal adding 
@@ -590,7 +601,7 @@ void __lz77_extend_dst_buf(lz77CtxPtr _ctx, uint32_t *_len, uint32_t *_offset, u
         memcpy(ctx->dstBufPos, ctx->dstBufPos - offset, len);  
     }
 
-    ctx->dstBufPos += len;
+    if ( needLen )  ctx->dstBufPos += len;
     *ctx->dstBufPos = nextChr;
     ctx->dstBufPos++;
 
