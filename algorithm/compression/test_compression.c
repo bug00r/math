@@ -112,8 +112,8 @@ static void test_compression_lz77()
 	test_compression_lz77_single_test("ababRSTRSTRSTRSTRSTRSTRSTRSTblubb", "Repeat-1: Triplet overflow", 30, 30);
 	test_compression_lz77_single_test("RSTRSTRSTRSTRSTRSTRSTRST", "Repeat-2: Triplet overflow", 30, 30);
 	test_compression_lz77_single_test("RSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRST", "Repeat-3: Higher Triplet overflow", 60, 60);
-	test_compression_lz77_single_test("0123456789ABCDEFGHIJK0123456789ABCDEFGHIJK0123456789ABCDEFGHIJK0123456789ABCDEFGHIJK", "Found: Triplet overflow", 30, 30);
-	
+	test_compression_lz77_single_test("0123456789ABCDEFGHIJK0123456789ABCDEFGHIJK0123456789ABCDEFGHIJK0123456789ABCDEFGHIJK", "Found: Bytes repeat Triplet overflow", 256, 256);
+	test_compression_lz77_single_test("eine Quadraturamplitudenmodulation eine eine Quadraturamplitudenmodulation bezeichnet!!", "Found: Triplet overflow", 256, 256);
 	DEBUG_LOG("<< end lz77 tests:\n");
 }
 

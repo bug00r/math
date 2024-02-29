@@ -229,17 +229,7 @@ static void __lz77_pack_and_dump_bytes_repeat_triplet(lz77CtxPtr _ctx, lz77Tripl
     printf("repeating multiple bytes: (%i,%i,%c) ... splitting into:\n",
             len,offset,nextChr);
     #endif
-    /*  RSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTR && RSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTR
-        o: 3, l: 61 n: S
 
-        RSTRSTRSTRSTRST'R'STRSTRSTRSTRSTR'S'TRSTRSTRSTRSTRS'T'RSTRSTRSTRSTR'S'
-                                                                            ^
-                                                                            next Charackter
-        RSTRSTRSTRSTRST'R' = 15,3,R
-        STRSTRSTRSTRSTR'S' = 15,15,S
-        TRSTRSTRSTRSTRS'T' = 15,15,T
-        RSTRSTRSTRSTR'S'   = 15,13,S
-    */
     uint8_t *lastPos = ctx->pos - offset;
 
     #if defined(debug) && debug != 0
@@ -256,7 +246,7 @@ static void __lz77_pack_and_dump_bytes_repeat_triplet(lz77CtxPtr _ctx, lz77Tripl
 
         lastPos += TR_MAX_LEN;
 
-        curOffset = ( curTriplets == 0 ? offset : TR_MAX_LEN );
+        curOffset = ( curTriplets == 0 ? offset : (TR_MAX_LEN < offset ? offset : TR_MAX_LEN));
 
         #if defined(debug) && debug != 0
         printf("offset of \"%c\" =  %i \n",*lastPos, curOffset);
@@ -272,7 +262,7 @@ static void __lz77_pack_and_dump_bytes_repeat_triplet(lz77CtxPtr _ctx, lz77Tripl
     printf("-- packing rest --\n");
     #endif
 
-    curOffset = ( curTriplets == 0 ? offset : TR_MAX_LEN );
+    curOffset = ( curTriplets == 0 ? offset : (TR_MAX_LEN < offset ? offset : TR_MAX_LEN));
 
     __lz77_pack_triplet(curTriplet, &curOffset, &len, &nextChr);
     __lz77_dump_triplet_to_dst_buffer(ctx, curTriplet);
@@ -291,7 +281,8 @@ static void __lz77_pack_and_dump_overflow_triplet(lz77CtxPtr _ctx, lz77TripletPt
     printf("normal triplet overflow: (%i,%i,%c) ... splitting into:\n",
             len,offset,nextChr);
     #endif
-    
+
+
     //NOT Implement YET
     /*while( len > TR_MAX_LEN)
     {
@@ -581,17 +572,22 @@ void __lz77_extend_dst_buf(lz77CtxPtr _ctx, uint32_t *_len, uint32_t *_offset, u
             memset(ctx->dstBufPos, *(ctx->dstBufPos - offset), len);
         }
         //Repeat multiple bytes
-        else{
+        else
+        {
             size_t completeRepeats = (int)((float)len / (float)offset);
             size_t curRepeat = 0;
+
             while(curRepeat++ < completeRepeats)
             {
                 memcpy(ctx->dstBufPos, ctx->dstBufPos - offset, offset);
                 ctx->dstBufPos += offset;
             }
+
             size_t rest = len % offset;
             memcpy(ctx->dstBufPos, ctx->dstBufPos - rest, rest);
+            
             ctx->dstBufPos += rest;
+            
             needLen = false;
         }
     }
