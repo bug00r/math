@@ -378,7 +378,7 @@ static void __lz77_search_triplet(lz77CtxPtr _ctx,
         //For Repeats and RLE we have to search until lookahed Buffer at least(Maybe until Buffer end)
         while ( curlaBufcmpPos <= laBufPtr->end )
         {
-            #if defined(debug) && debug != 0
+            #if defined(debug) && debug > 1
             __lz77_cmp_dgb_print(curSBufStartPos, curSBufcmpPos, laBufPtr->start, curlaBufcmpPos);
             #endif
             
@@ -502,7 +502,7 @@ size_t __lz77_calc_dst_buf_size(lz77BufPtr _srcBuf)
     
     while ( curLenBytePtr < srcBufEndPtr )
     {
-        #if defined(debug) && debug != 0
+        #if defined(debug) && debug > 1
         printf("Add Len: %c = %i\n", *curLenBytePtr, *curLenBytePtr >> 0x4 );
         #endif 
 
@@ -533,6 +533,7 @@ void __lz77_calc_size_and_init_dst_buf(lz77CtxPtr _ctx)
 
 }
 
+#if defined(debug) && debug > 1
 void __lz77_print_cur_dst_buf(lz77CtxPtr _ctx)
 {
     lz77CtxPtr ctx = _ctx;
@@ -548,6 +549,7 @@ void __lz77_print_cur_dst_buf(lz77CtxPtr _ctx)
     printf("\n");
 
 }
+#endif
 
 void __lz77_extend_dst_buf(lz77CtxPtr _ctx, uint32_t *_len, uint32_t *_offset, uint8_t *_nextChr)
 {
@@ -601,7 +603,9 @@ void __lz77_extend_dst_buf(lz77CtxPtr _ctx, uint32_t *_len, uint32_t *_offset, u
     *ctx->dstBufPos = nextChr;
     ctx->dstBufPos++;
 
+    #if defined(debug) && debug > 1
     __lz77_print_cur_dst_buf(ctx);
+    #endif
 }
 
 void __lz77_decode(lz77CtxPtr _ctx)
@@ -622,7 +626,7 @@ void __lz77_decode(lz77CtxPtr _ctx)
         offset = ((curByte & 0xF) << 0x4) | *(curLenBytePtr + 1);
         nextChr = *(curLenBytePtr + 2);
         
-        #if defined(debug) && debug != 0
+        #if defined(debug) && debug > 1
             printf("l: %i, o: %i n: %c \n", len, offset, nextChr);
         #endif
 
