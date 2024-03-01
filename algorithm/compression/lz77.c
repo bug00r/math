@@ -73,13 +73,13 @@ static void __lz77_set_search_buffer(lz77CtxPtr _ctx)
     }        
 }
 
-static bool __lz77_lookahed_buffer_available(lz77CtxPtr _ctx)
+/*static bool __lz77_lookahed_buffer_available(lz77CtxPtr _ctx)
 {
     lz77CtxPtr ctx = _ctx;
     lz77BufPosPtr lookAheadBufPos = &ctx->slWin.laBuf;
 
     return ( lookAheadBufPos->start < lookAheadBufPos->end );
-}
+}*/
 
 static void __lz77_set_lookahed_buffer(lz77CtxPtr _ctx)
 {
@@ -102,13 +102,13 @@ static void __lz77_set_lookahed_buffer(lz77CtxPtr _ctx)
     lookAheadBufPos->end = ctx->pos + curLaBufSize;
 }
 
-static void __lz77_set_sliding_window(lz77CtxPtr _ctx)
+/*static void __lz77_set_sliding_window(lz77CtxPtr _ctx)
 {
     lz77CtxPtr ctx = _ctx;
 
     __lz77_set_search_buffer(ctx);
     __lz77_set_lookahed_buffer(ctx);
-}
+}*/
 
 static void __lz77_init_dst_buf(lz77CtxPtr _ctx)
 {
@@ -146,13 +146,14 @@ static void __lz77_dump_triplet_to_dst_buffer(lz77CtxPtr _ctx, lz77TripletPtr _c
     
     lz77BufPtr dstBuf = ctx->dstBuf;
 
-    /*  TODO dumping triplet into dst buffer maybe allocating 
-        chunks with 64,128, 256, 512 etc blocks(reducing sys calls for memory)
-    */
     if ( dstBuf->bytes == NULL )
     {
         size_t neededByteCnt = ctx->srcBuf->numBytes * 2;
+
+        #if defined(debug) && debug != 0
         printf("dst Buf Size: %lli\n", sizeof(uint8_t) * neededByteCnt);
+        #endif
+        
         dstBuf->bytes = malloc(sizeof(uint8_t) * neededByteCnt);
         dstBuf->numBytes = neededByteCnt;
         ctx->dstBufPos = dstBuf->bytes; 
@@ -223,7 +224,7 @@ static void __lz77_pack_and_dump_bytes_repeat_triplet(lz77CtxPtr _ctx, lz77Tripl
     lz77CtxPtr ctx = _ctx;
     lz77TripletPtr curTriplet = _curTriplet;
     uint32_t len = *_len, offset = *_offset, maxLen = TR_MAX_LEN;
-    uint8_t nextChr = *_chr, repeatChr = *(ctx->pos);
+    uint8_t nextChr = *_chr;
 
     #if defined(debug) && debug != 0
     printf("repeating multiple bytes: (%i,%i,%c) ... splitting into:\n",
@@ -274,25 +275,37 @@ static void __lz77_pack_and_dump_overflow_triplet(lz77CtxPtr _ctx, lz77TripletPt
 {
     lz77CtxPtr ctx = _ctx;
     lz77TripletPtr curTriplet = _curTriplet;
-    uint32_t len = *_len, offset = *_offset, maxLen = TR_MAX_LEN;
-    uint8_t nextChr = *_chr, repeatChr = *(ctx->pos);
+    uint32_t len = *_len, offset = *_offset, usedOffset = *_offset;
+    uint8_t nextChr = *_chr;
 
     #if defined(debug) && debug != 0
     printf("normal triplet overflow: (%i,%i,%c) ... splitting into:\n",
             len,offset,nextChr);
     #endif
+    /*
+        ine Quadraturamplitudenmodulation e && ine Quadraturamplitudenmodulation b
 
+        splitting: "ine Quadraturamplitudenmodulation " (34,40,b)
 
-    //NOT Implement YET
-    /*while( len > TR_MAX_LEN)
+        "ine Quadraturamp"      (15,40,p)       //für das komplette Start triplet l=15,o=Base Offset,c=ctxPos-(offset-15)  
+        "litudenmodulation "    (15,24,o)       //für jedes weitere triplet wird l=15, o= offset-=16,c=ctxPos-(offset-15)
+        "n "                    (1,8,' ')       //für das letzte Triplet gilt: l=restlen-1, o= offset-=16, c=ctxPos-1
+
+    */
+
+    size_t completeTriplets = (int)((float)len / (float)TR_MAXP1_LEN);
+    size_t curCompleteTriplet = 0;
+
+    while(curCompleteTriplet++ < completeTriplets)
     {
-        len -= TR_MAX_LEN;  //reduce by max len
-        len--;              //reduce next char
-
-        __lz77_pack_triplet(curTriplet, &offset, &maxLen, &repeatChr);
-        __lz77_dump_triplet_to_dst_buffer(ctx, curTriplet);
-    }
     
+        __lz77_pack_triplet(curTriplet, &offset, (uint32_t*)&TR_MAX_LEN, ctx->pos-usedOffset+TR_MAX_LEN);
+        __lz77_dump_triplet_to_dst_buffer(ctx, curTriplet);
+
+        usedOffset -= TR_MAXP1_LEN;
+        len -= TR_MAXP1_LEN;
+    }
+
     #if defined(debug) && debug != 0
     printf("-- packing rest --\n");
     #endif
@@ -301,8 +314,7 @@ static void __lz77_pack_and_dump_overflow_triplet(lz77CtxPtr _ctx, lz77TripletPt
     
     __lz77_pack_triplet(curTriplet, &offset, &len, &nextChr);
     __lz77_dump_triplet_to_dst_buffer(ctx, curTriplet);
-    
-    */
+
 }
 
 static void __lz77_pack_and_dump_triplet(lz77CtxPtr _ctx, lz77TripletPtr _curTriplet,
@@ -554,7 +566,6 @@ void __lz77_print_cur_dst_buf(lz77CtxPtr _ctx)
 void __lz77_extend_dst_buf(lz77CtxPtr _ctx, uint32_t *_len, uint32_t *_offset, uint8_t *_nextChr)
 {
     lz77CtxPtr ctx = _ctx;
-    lz77BufPtr dstBuf = ctx->dstBuf;
     uint32_t len = *_len, offset = *_offset;
     uint8_t nextChr = *_nextChr;
     
@@ -612,7 +623,7 @@ void __lz77_decode(lz77CtxPtr _ctx)
 {
     lz77CtxPtr ctx = _ctx;
 
-    lz77BufPtr srcBuf = ctx->srcBuf, dstBuf = ctx->dstBuf;
+    lz77BufPtr srcBuf = ctx->srcBuf;
 
     __lz77_calc_size_and_init_dst_buf(ctx);
 

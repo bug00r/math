@@ -9,6 +9,8 @@
 
 #include "debug.h"
 
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
 static void test_compression_crc32()
 {
 	DEBUG_LOG(">> Start crc32 tests:\n");
@@ -26,6 +28,7 @@ static void test_compression_crc32()
 	DEBUG_LOG("<< end crc32 tests:\n");
 }
 
+#if defined(debug)
 static void test_lz77_print_buffer_hex(const lz77BufPtr _bufEncodedPtr)
 {
 	const lz77BufPtr bufEncodedPtr = _bufEncodedPtr;
@@ -49,11 +52,12 @@ static void test_lz77_print_buffer(const lz77BufPtr _bufPtr)
 	}
 	printf("\"\n");
 }
+#endif 
 
 static void test_compression_lz77_single_test(const char *_txt, const char *_cap, uint16_t searchBufferSize, 
 											  uint16_t lookAheadBufferSize)
 {
-	printf("\n################ %s #################### \n\n", _cap);
+	DEBUG_LOG_ARGS("\n################ %s #################### \n\n", _cap);
 
 	lz77_buf_t bufText;
 	lz77BufPtr bufTextPtr = &bufText;
@@ -77,7 +81,9 @@ static void test_compression_lz77_single_test(const char *_txt, const char *_cap
 	
 	assert(result == LZ77_OK);
 
+	#if defined(debug)
 	test_lz77_print_buffer_hex((const lz77BufPtr)bufEncodedPtr);
+	#endif 
 
 	assert(bufEncodedPtr->numBytes > 0);
 
@@ -88,8 +94,9 @@ static void test_compression_lz77_single_test(const char *_txt, const char *_cap
 	result = de_lz77_u8(bufEncodedPtr, bufDecodedPtr);
 
 	DEBUG_LOG_ARGS("Original:\"%s\"\n", _txt);
+	#if defined(debug)
 	test_lz77_print_buffer(bufDecodedPtr);
-
+	#endif
 	assert(result == LZ77_OK);
 	assert(memcmp(_txt, bufDecodedPtr->bytes, bufDecodedPtr->numBytes) == 0);
 
@@ -114,6 +121,7 @@ static void test_compression_lz77()
 	test_compression_lz77_single_test("RSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRST", "Repeat-3: Higher Triplet overflow", 60, 60);
 	test_compression_lz77_single_test("0123456789ABCDEFGHIJK0123456789ABCDEFGHIJK0123456789ABCDEFGHIJK0123456789ABCDEFGHIJK", "Found: Bytes repeat Triplet overflow", 256, 256);
 	test_compression_lz77_single_test("eine Quadraturamplitudenmodulation eine eine Quadraturamplitudenmodulation bezeichnet!!", "Found: Triplet overflow", 256, 256);
+	
 	DEBUG_LOG("<< end lz77 tests:\n");
 }
 
