@@ -54,8 +54,28 @@ static void test_lz77_print_buffer(const lz77BufPtr _bufPtr)
 }
 #endif 
 
+static void __write_lz77Buffer_to_File(const char *filename, const char *_txt, lz77BufPtr bufPtr)
+{
+	FILE *fptr;
+
+	fptr = fopen(filename, "w");
+
+	if ( fptr == NULL )
+	{
+		DEBUG_LOG_ARGS("Could not open File: %s\n", filename);
+		return;
+	}
+
+	fprintf(fptr, (const char *)_txt);
+	fprintf(fptr, "\n");
+	fprintf(fptr, (const char *)bufPtr->bytes);
+
+	// Close the file
+	fclose(fptr); 
+}
+
 static void test_compression_lz77_single_test(const char *_txt, const char *_cap, uint16_t searchBufferSize, 
-											  uint16_t lookAheadBufferSize)
+											  uint16_t lookAheadBufferSize, bool writeDecodeToFile)
 {
 	DEBUG_LOG_ARGS("\n################ %s #################### \n\n", _cap);
 
@@ -98,30 +118,97 @@ static void test_compression_lz77_single_test(const char *_txt, const char *_cap
 	test_lz77_print_buffer(bufDecodedPtr);
 	#endif
 	assert(result == LZ77_OK);
-	assert(memcmp(_txt, bufDecodedPtr->bytes, bufDecodedPtr->numBytes) == 0);
+
+	if (writeDecodeToFile)
+	{
+		__write_lz77Buffer_to_File("dump_file2.txt", _txt, bufDecodedPtr);
+	}
+
+	int rsCmp = memcmp(_txt, bufDecodedPtr->bytes, bufDecodedPtr->numBytes);
+
+	if (rsCmp != 0)
+	{
+		for ( uint32_t curByteIdx = 0; curByteIdx < bufDecodedPtr->numBytes; curByteIdx++)
+		{
+			if ( _txt[curByteIdx] != bufDecodedPtr->bytes[curByteIdx] )
+			{
+				DEBUG_LOG_ARGS("First difference at pos: %i of %i\n", curByteIdx, bufDecodedPtr->numBytes);
+				break;
+			}
+		}
+	}
+
+	assert(rsCmp == 0);
 
 	free(bufEncodedPtr->bytes);
 	free(bufDecodedPtr->bytes);
+}
+
+static void test_compression_lz77_file(const char *filename, const char *_cap, uint16_t searchBufferSize, 
+											  uint16_t lookAheadBufferSize, bool writeDecodeToFile)
+{
+	DEBUG_LOG_ARGS("\n################ %s (%s) #################### \n\n", _cap, filename);
+	FILE *fptr;
+
+	// Open a file in read mode
+	fptr = fopen(filename, "r");
+
+	if (fptr == NULL) {
+		DEBUG_LOG_ARGS("Test File Error: %s ... abort\n", filename);
+		return;
+	}
+	
+	//File size
+	fseek(fptr, 0L, SEEK_END);
+	int fileSize = ftell(fptr);
+	
+	DEBUG_LOG_ARGS("File Size: %i\n", fileSize);
+	
+	// Store the content of the file
+	char *buffer = malloc((sizeof(char) * fileSize) + 1);
+	char *curBuff = buffer;
+	//return to start 
+	rewind(fptr);
+
+	// Read the content
+	while (!feof(fptr)) {
+        *curBuff = (char)fgetc(fptr);
+		#if defined(debug)
+        printf("%c", *curBuff);
+		#endif
+		curBuff++;
+    }
+	*curBuff = '\0';
+
+	test_compression_lz77_single_test((const char *)buffer, _cap, searchBufferSize, lookAheadBufferSize, writeDecodeToFile);
+
+	free(buffer);
+	// Close the file
+	fclose(fptr); 
 }
 
 static void test_compression_lz77()
 {
 	DEBUG_LOG(">> Start lz77 tests:\n");
 
-	test_compression_lz77_single_test("ababcbababaa", "Wiki Example", 15, 15);
-	test_compression_lz77_single_test("ababccccccccccRSRSRSRSRSRSbababsowatsowasowatsowa", "Test 1", 30, 30);
-	test_compression_lz77_single_test("aaaaaaaaaaaaaaaaaaaaRSTbbbbbbbbbbbbbbbGFcccccccccccc", "Repeat Test 1", 30, 30);
-	test_compression_lz77_single_test("aaaaaaaaaaaaaaa", "15 Same Chars", 30, 30);
-	test_compression_lz77_single_test("aaaaaaaaaaaaaaaa", "16 Same Chars", 30, 30);
-	test_compression_lz77_single_test("aaaaaaaaaaaaaaaaa", "17 Same Chars", 30, 30);
-	test_compression_lz77_single_test("aaaaaaaaaaaaaaaaaa", "18 Same Chars", 30, 30);
-	test_compression_lz77_single_test("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "60 Same Chars", 30, 30);
-	test_compression_lz77_single_test("ababRSTRSTRSTRSTRSTRSTRSTRSTblubb", "Repeat-1: Triplet overflow", 30, 30);
-	test_compression_lz77_single_test("RSTRSTRSTRSTRSTRSTRSTRST", "Repeat-2: Triplet overflow", 30, 30);
-	test_compression_lz77_single_test("RSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRST", "Repeat-3: Higher Triplet overflow", 60, 60);
-	test_compression_lz77_single_test("0123456789ABCDEFGHIJK0123456789ABCDEFGHIJK0123456789ABCDEFGHIJK0123456789ABCDEFGHIJK", "Found: Bytes repeat Triplet overflow", 256, 256);
-	test_compression_lz77_single_test("eine Quadraturamplitudenmodulation eine eine Quadraturamplitudenmodulation bezeichnet!!", "Found: Triplet overflow", 256, 256);
+	test_compression_lz77_single_test("ababcbababaa", "Wiki Example", 15, 15, false);
+	test_compression_lz77_single_test("ababccccccccccRSRSRSRSRSRSbababsowatsowasowatsowa", "Test 1", 30, 30, false);
+	test_compression_lz77_single_test("aaaaaaaaaaaaaaaaaaaaRSTbbbbbbbbbbbbbbbGFcccccccccccc", "Repeat Test 1", 30, 30, false);
+	test_compression_lz77_single_test("aaaaaaaaaaaaaaa", "15 Same Chars", 30, 30, false);
+	test_compression_lz77_single_test("aaaaaaaaaaaaaaaa", "16 Same Chars", 30, 30, false);
+	test_compression_lz77_single_test("aaaaaaaaaaaaaaaaa", "17 Same Chars", 30, 30, false);
+	test_compression_lz77_single_test("aaaaaaaaaaaaaaaaaa", "18 Same Chars", 30, 30, false);
+	test_compression_lz77_single_test("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "60 Same Chars", 30, 30, false);
+	test_compression_lz77_single_test("ababRSTRSTRSTRSTRSTRSTRSTRSTblubb", "Repeat-1: Triplet overflow", 30, 30, false);
+	test_compression_lz77_single_test("RSTRSTRSTRSTRSTRSTRSTRST", "Repeat-2: Triplet overflow", 30, 30, false);
+	test_compression_lz77_single_test("RSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRSTRST", "Repeat-3: Higher Triplet overflow", 60, 60, false);
+	test_compression_lz77_single_test("0123456789ABCDEFGHIJK0123456789ABCDEFGHIJK0123456789ABCDEFGHIJK0123456789ABCDEFGHIJK", "Found: Bytes repeat Triplet overflow", 256, 256, false);
+	test_compression_lz77_single_test("eine Quadraturamplitudenmodulation eine eine Quadraturamplitudenmodulation bezeichnet!!", "Found: Triplet overflow", 256, 256, false);
+	test_compression_lz77_single_test("At accusam aliquyam diam diam dolore dolores duo eirmod", "Regression 1: Error from File", 5000, 5000, false);
+	test_compression_lz77_single_test("Lorem ipsum dolor sit amet, consetetur sadipscing elitr,  sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr,  sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr,  sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.", "Regression 2: Error from File", 5000, 5000, false);
 	
+	test_compression_lz77_file("test_file_1.txt", "Test File 1", 30, 5000, false);
+	test_compression_lz77_file("test_file_2.txt", "Test File 2", 5000, 5000, true);
 	DEBUG_LOG("<< end lz77 tests:\n");
 }
 

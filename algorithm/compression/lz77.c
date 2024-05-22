@@ -3,6 +3,7 @@
 //max len of triplets based on one Nibble
 static const uint32_t TR_MAX_LEN = 0xF;
 static const uint32_t TR_MAXP1_LEN = 0x10;
+static const uint32_t MAX_SBUFF_SIZE = 0x1000;
 #define _TRIPLET_SIZE 0x3
 static const uint32_t TRIPLET_SIZE = _TRIPLET_SIZE;
 
@@ -63,6 +64,8 @@ static void __lz77_set_search_buffer(lz77CtxPtr _ctx)
     {
         uint16_t curSBufSize = ( maxPossSBufSize < paramSBufSize ? maxPossSBufSize : paramSBufSize );
         
+        curSBufSize = (curSBufSize < MAX_SBUFF_SIZE ? curSBufSize : MAX_SBUFF_SIZE );
+
         searchBufPos->start = ctx->pos - 1;
         searchBufPos->end = ctx->pos - curSBufSize;
     } 
@@ -85,12 +88,11 @@ static void __lz77_set_lookahed_buffer(lz77CtxPtr _ctx)
 {
     lz77CtxPtr ctx = _ctx;
     lz77BufPosPtr lookAheadBufPos = &ctx->slWin.laBuf;
-    lz77BufPtr srcBuffer = ctx->srcBuf;
+    //lz77BufPtr srcBuffer = ctx->srcBuf;
 
-    uint8_t *endSrcBuf = &srcBuffer->bytes[0] + srcBuffer->numBytes;
-    
+    //uint8_t *endSrcBuf = &srcBuffer->bytes[0] + srcBuffer->numBytes;
     uint16_t paramLaBufSize = ctx->param->lookaheadBufSize;
-    size_t maxPossLaBufSize = endSrcBuf - ctx->pos;
+    size_t maxPossLaBufSize = ctx->eofSrcBuf /*endSrcBuf*/ - ctx->pos;
 
     #if defined(debug) && debug != 0
     printf("maxPossLaBufSize: %lli\n", maxPossLaBufSize);
@@ -597,7 +599,7 @@ void __lz77_extend_dst_buf(lz77CtxPtr _ctx, uint32_t *_len, uint32_t *_offset, u
             }
 
             size_t rest = len % offset;
-            memcpy(ctx->dstBufPos, ctx->dstBufPos - rest, rest);
+            memcpy(ctx->dstBufPos, ctx->dstBufPos - offset, rest);
             
             ctx->dstBufPos += rest;
             

@@ -66,7 +66,7 @@ $(OBJS): $(NAME).h
 	$(CC) $(CFLAGS) -c $(@F:.o=.c) -o $@
 	
 $(TESTBIN): $(LIB)
-	$(CC) $(CFLAGS) $(@F:.exe=.c) -o $@ $(LDFLAGS)
+	$(CC) $(CFLAGS) -Wno-overlength-strings $(@F:.exe=.c) -o $@ $(LDFLAGS)
 	
 .PHONY: createdir clean test install
 
