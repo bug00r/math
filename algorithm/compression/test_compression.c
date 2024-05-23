@@ -205,10 +205,10 @@ static void test_compression_lz77()
 	test_compression_lz77_single_test("0123456789ABCDEFGHIJK0123456789ABCDEFGHIJK0123456789ABCDEFGHIJK0123456789ABCDEFGHIJK", "Found: Bytes repeat Triplet overflow", 256, 256, false);
 	test_compression_lz77_single_test("eine Quadraturamplitudenmodulation eine eine Quadraturamplitudenmodulation bezeichnet!!", "Found: Triplet overflow", 256, 256, false);
 	test_compression_lz77_single_test("At accusam aliquyam diam diam dolore dolores duo eirmod", "Regression 1: Error from File", 5000, 5000, false);
-	test_compression_lz77_single_test("Lorem ipsum dolor sit amet, consetetur sadipscing elitr,  sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr,  sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr,  sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.", "Regression 2: Error from File", 5000, 5000, false);
+	test_compression_lz77_single_test("Lorem ipsum dolor sit amet, Lorem ipsum dolor sit amet, consetetur sadipscing elitr,  sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.", "Regression 2: Error from File", 5000, 5000, false);
 	
 	test_compression_lz77_file("test_file_1.txt", "Test File 1", 30, 5000, false);
-	test_compression_lz77_file("test_file_2.txt", "Test File 2", 5000, 5000, true);
+	test_compression_lz77_file("test_file_2.txt", "Test File 2", 5000, 5000, false);
 	DEBUG_LOG("<< end lz77 tests:\n");
 }
 

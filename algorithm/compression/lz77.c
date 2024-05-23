@@ -310,6 +310,7 @@ static void __lz77_pack_and_dump_overflow_triplet(lz77CtxPtr _ctx, lz77TripletPt
 
     #if defined(debug) && debug != 0
     printf("-- packing rest --\n");
+    printf("start offset: %i , cur Offset: %i\n", offset, usedOffset);
     #endif
 
     if ( len == 0 ) offset = 0;
@@ -636,7 +637,7 @@ void __lz77_decode(lz77CtxPtr _ctx)
     {
         curByte = *curLenBytePtr;
         len = curByte >> 0x4;
-        offset = ((curByte & 0xF) << 0x4) | *(curLenBytePtr + 1);
+        offset = ((curByte & 0xF) << 0x8) | *(curLenBytePtr + 1) ;
         nextChr = *(curLenBytePtr + 2);
         
         #if defined(debug) && debug > 1
