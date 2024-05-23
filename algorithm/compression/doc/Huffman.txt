@@ -1,1 +1,4 @@
 TODO analyzing and process
+
+https://www.inf.fu-berlin.de/lehre/WS12/ALP1/lectures/V16_ALPI_Huffman-Kodierung_2013.pdf
+/dev/doc/algorithm
