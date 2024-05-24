@@ -2,3 +2,25 @@ TODO analyzing and process
 
 https://www.inf.fu-berlin.de/lehre/WS12/ALP1/lectures/V16_ALPI_Huffman-Kodierung_2013.pdf
 /dev/doc/algorithm
+
+Needed: 
+
+1. min Priority Queue
+    - realisiert mit einer linked oder double linked list (Neue Lib in Collections)
+        - INterface: https://de.wikipedia.org/wiki/Vorrangwarteschlange => Implementierung
+2. Baum- / Knoten Struktur left / right und value
+    - value besitzt 
+         - eine Gewichtung (Häufigkeit im vorkommenden Text) => frequency
+         - einen pointer auf ein byte array (unicode kompatiblität)
+
+                Nachträglicher Gedanke: Es müssen keine Byte Arrays als value verwendet werden. Jedes Byte eines Unicodes Zeichens
+                                        ist ebenfalls einzigartig und spielt keine Rolle. 
+
+                    Falls byte nicht funktioniert, einfach unten den Unicode Ansatz umsetzen
+
+                - unicode kann mit r_font.c function __r_font_compute_charcode ermittelt werden (Auslagerung in Utils: CharUtils)
+                    Reference: https://colab.mpdl.mpg.de/mw010/images/8/81/UTF_8_pubman.pdf
+                               /dev/doc/UTF_8_pubman.pdf
+
+                               https://www.asciitable.com/
+
