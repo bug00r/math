@@ -18,7 +18,7 @@ main() {
 	int w = 512;
 	int h = 512;
 	
-	julia_t *julia = julia_new(w, h);
+	Julia *julia = julia_new(w, h);
 	julia->minreal =  0.f;//-1.3f;
 	julia->maxreal =  .5f;//-1.f;
 	julia->minimag =  0.f;//-.3f;
@@ -32,7 +32,7 @@ main() {
 	create_julia(julia);
 	julia_free(julia);
 		
-	mandelbrot_t *mb = mandelbrot_new(w, h);
+	Mandelbrot *mb = mandelbrot_new(w, h);
 	mb->minreal = -2.f;//-1.3f;
 	mb->maxreal = 0.5f;//-1.f;
 	mb->minimag = -1.f;//-.3f;

@@ -1,6 +1,6 @@
 typedef enum {
 	SPAWN_BOX, SPAWN_CROSS, SPAWN_DIAG_CROSS
-} spawn_type_t;
+} SpawnType;
 
 typedef struct {
 	float value;		 			//current value
@@ -11,17 +11,17 @@ typedef struct {
 	unsigned int spawn;				//spawned n times
 	unsigned int max_spawn;			//max spawn count
 	unsigned int spawn_range;		//range in x and y which must be checked during every evolution
-	spawn_type_t spawn_type;
+	SpawnType spawn_type;
 	unsigned int width;
 	unsigned int height;
-} evolution_item_t;
+} EvolutionItem;
 
 typedef struct {
-	noise_t * noise;
+	Noise * noise;
 	float min_value;
 	float max_value;
 	unsigned int max_evolution;
 	unsigned int cnt_items;
-} evolution_t;
+} Evolution;
 
-void create_evolution(evolution_t * param);
+void create_evolution(Evolution * param);

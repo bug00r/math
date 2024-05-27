@@ -10,8 +10,8 @@ typedef struct {
 	float minimag;
 	float maximag;
 	int cntiterations;
-	array_t * map;
-} mandelbrot_t;
+	Array * map;
+} Mandelbrot;
 
 typedef struct {
 	float minreal; 
@@ -21,8 +21,8 @@ typedef struct {
 	int cntiterations;
 	float _Complex c;
 	float _Complex (*polyfunc)(const float _Complex *cp, const float _Complex *c);
-	array_t * map;
-} julia_t;
+	Array * map;
+} Julia;
 
 #if 0
 	//z^2 + c
@@ -85,13 +85,13 @@ float _Complex julia_pfunc_pow_3_p_2_p_1_p_c(const float _Complex *cp, const flo
 float _Complex julia_pfunc_px_random(const float _Complex *cp, const float _Complex *c);
 
 
-julia_t * julia_new(const unsigned int width, const unsigned int height);
-void julia_free(julia_t * julia);
+Julia * julia_new(const unsigned int width, const unsigned int height);
+void julia_free(Julia * julia);
 
-mandelbrot_t * mandelbrot_new(const unsigned int width, const unsigned int height);
-void mandelbrot_free(mandelbrot_t * mandelbrots);
+Mandelbrot * mandelbrot_new(const unsigned int width, const unsigned int height);
+void mandelbrot_free(Mandelbrot * mandelbrots);
 
-void create_mandelbrot(const mandelbrot_t * mandelbrot);
-void create_julia(const julia_t * julia);
+void create_mandelbrot(const Mandelbrot * mandelbrot);
+void create_julia(const Julia * julia);
 
 #endif

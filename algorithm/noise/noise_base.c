@@ -1,6 +1,6 @@
-noise_t * 
+Noise * 
 noise_new(const unsigned int width, const unsigned int height){
-	noise_t * newnoise = malloc(sizeof(noise_t));
+	Noise * newnoise = malloc(sizeof(Noise));
 	newnoise->map = farray2D_new(width, height);
 	newnoise->min = FLT_MAX;
 	newnoise->max = FLT_MIN;
@@ -8,20 +8,20 @@ noise_new(const unsigned int width, const unsigned int height){
 }
 
 void 
-noise_free(noise_t * noise){
+noise_free(Noise * noise){
 	array_free(noise->map);
 	free(noise);
 }
 
-float create_noise_value(noise_t * noise,  const float range_min, const float range_max) {
-	noise_t *curnoise = noise;
+float create_noise_value(Noise * noise,  const float range_min, const float range_max) {
+	Noise *curnoise = noise;
 	float noiseval = seedrndlh(range_min, range_max);
 	curnoise->min = fminf(curnoise->min, noiseval);
 	curnoise->max = fmaxf(curnoise->max, noiseval);
 	return noiseval;
 }
 
-void getnewcolor(noise_t * noise,  const float * startseed, float * colortarget){
+void getnewcolor(Noise * noise,  const float * startseed, float * colortarget){
 	*colortarget = create_noise_value(noise, -*startseed, *startseed);
 }
 
@@ -153,7 +153,7 @@ float seed_reduction_harmonic_div(const float seed, const float reduction)
 	return seed / middle_harmonic2(seed, reduction);
 }
 
-void filter_noise_gauss(noise_t *noise, float deviation) {
+void filter_noise_gauss(Noise *noise, float deviation) {
 	
 	int _w = noise->map->config->cnt;
 	int _h = noise->map->config->size;
@@ -175,7 +175,7 @@ void filter_noise_gauss(noise_t *noise, float deviation) {
 	
 	
 	float fref;
-	array_error_t array_res;
+	ArrayError array_res;
 	float noise_min = FLT_MAX;
 	float noise_max = FLT_MIN;
 	//float gauss_max = gausskernel[pxrange * kernelside + pxrange];
@@ -201,7 +201,7 @@ void filter_noise_gauss(noise_t *noise, float deviation) {
 	free(gausskernel);
 }
 
-void filter_noise_circle(noise_t *noise, float radius) {
+void filter_noise_circle(Noise *noise, float radius) {
 	
 	int _w = noise->map->config->cnt;
 	int _h = noise->map->config->size;
@@ -209,7 +209,7 @@ void filter_noise_circle(noise_t *noise, float radius) {
 	int pxrange = (_w >> 1);
 	
 	float fref;
-	array_error_t array_res;
+	ArrayError array_res;
 
 	float _len = pxrange;
 	const float max_len = sqrtf(2*(_len*_len));

@@ -11,7 +11,7 @@
 
 typedef struct {
 	float _11, _12, _13,_14, _21, _22, _23, _24, _31, _32, _33, _34 , _41, _42, _43, _44;
-} mat4_t;
+} Mat4;
 
 extern const size_t mat4_size;
 
@@ -20,28 +20,28 @@ extern const size_t mat4_size;
 	Calculate determinant.
 */
 #endif
-float mat4_determinant( const mat4_t *  m);
+float mat4_determinant( const Mat4 *  m);
 
 #if 0
 /**
 	compares two mat4 matrix.
 */
 #endif
-bool mat4_equals( const mat4_t *  m, const mat4_t *  m2);
+bool mat4_equals( const Mat4 *  m, const Mat4 *  m2);
 
 #if 0
 /**
 	Transponse matrix.
 */
 #endif
-void mat4_transponse( mat4_t *  m);
+void Mat4ransponse( Mat4 *  m);
 
 #if 0
 /**
 	Creates transponse from matrix m and creates a new result.
 */
 #endif
-mat4_t * mat4_transponse_new( const mat4_t *  m);
+Mat4 * Mat4ransponse_new( const Mat4 *  m);
 
 #if 0
 /**
@@ -49,7 +49,7 @@ mat4_t * mat4_transponse_new( const mat4_t *  m);
 	NOTE: You must free the string by yourself.
 */
 #endif
-void mat4_copy( mat4_t *  m, const mat4_t *  m2);
+void mat4_copy( Mat4 *  m, const Mat4 *  m2);
 
 #if 0
 /**
@@ -57,85 +57,85 @@ void mat4_copy( mat4_t *  m, const mat4_t *  m2);
 	NOTE: You must free the string by yourself.
 */
 #endif
-mat4_t * mat4_copy_new( const mat4_t *   m);
+Mat4 * mat4_copy_new( const Mat4 *   m);
 
 #if 0
 /**
 	Creates string from mat4 coordinates.
 */
 #endif
-void mat4_print( const mat4_t *  m);
+void mat4_print( const Mat4 *  m);
 
 #if 0
 /**
 	Add two mat4 matrix and stores result in matrix m.
 */
 #endif
-void mat4_add( mat4_t *  m, const mat4_t *  m2);
+void mat4_add( Mat4 *  m, const Mat4 *  m2);
 
 #if 0
 /**
 	Add two mat4 matrix and stores result in new matrix and return.
 */
 #endif
-mat4_t * mat4_add_new( const mat4_t *  m, const mat4_t *  m2);
+Mat4 * mat4_add_new( const Mat4 *  m, const Mat4 *  m2);
 
 #if 0
 /**
 	Sub two mat4 matrix and stores result in matrix m.
 */
 #endif
-void mat4_sub( mat4_t *  m, const mat4_t *  m2);
+void mat4_sub( Mat4 *  m, const Mat4 *  m2);
 
 #if 0
 /**
 	Sub two mat4 matrix and stores result in new matrix and return.
 */
 #endif
-mat4_t * mat4_sub_new( const mat4_t *  m, const mat4_t *  m2);
+Mat4 * mat4_sub_new( const Mat4 *  m, const Mat4 *  m2);
 
 #if 0
 /**
 	Multiplies two mat4 matrix and stores result in matrix m.
 */
 #endif
-void mat4_mul( mat4_t *  m, const mat4_t *  m2);
-void mat4_mul_dest( mat4_t *  dest, const mat4_t *  m, const mat4_t *  m2);
+void mat4_mul( Mat4 *  m, const Mat4 *  m2);
+void mat4_mul_dest( Mat4 *  dest, const Mat4 *  m, const Mat4 *  m2);
 
 #if 0
 /**
 	Multiplies two mat4 matrix and stores result in new matrix and return.
 */
 #endif
-mat4_t * mat4_mul_new( const mat4_t *  m, const mat4_t *   m2);
+Mat4 * mat4_mul_new( const Mat4 *  m, const Mat4 *   m2);
 
 #if 0
 /**
 	Multiplies mat4 matrix with skalar and stores result in matrix m.
 */
 #endif
-void mat4_mul_skalar( mat4_t *   m, const float skalar);
+void mat4_mul_skalar( Mat4 *   m, const float skalar);
 
 #if 0
 /**
 	Multiplies mat4 matrix with skalat and stores result in new matrix and return.
 */
 #endif
-mat4_t * mat4_mul_skalar_new( const mat4_t *   m, const float skalar);
+Mat4 * mat4_mul_skalar_new( const Mat4 *   m, const float skalar);
 
 #if 0
 /**
 	Calculates the inverse of a matrix and change value from given one.
 */
 #endif
-void mat4_inverse( mat4_t *   m);
-void mat4_inverse_dest(mat4_t *  dest, const mat4_t *   m);
+void mat4_inverse( Mat4 *   m);
+void mat4_inverse_dest(Mat4 *  dest, const Mat4 *   m);
 
 #if 0
 /**
 	Calculates the inverse of a matrix and returns result in a new matrix.
 */
 #endif
-mat4_t * mat4_inverse_new(const mat4_t *   m);
+Mat4 * mat4_inverse_new(const Mat4 *   m);
 
 #endif

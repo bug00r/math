@@ -1,12 +1,12 @@
-static void create_evolution_steps(evolution_t * param, evolution_item_t * ev_items) {
+static void create_evolution_steps(Evolution * param, EvolutionItem * ev_items) {
 		
 		unsigned int spawnable_item_max = param->cnt_items;
-		noise_t * noise = param->noise;
+		Noise * noise = param->noise;
 		int _w = noise->map->config->cnt;
 		int _h = noise->map->config->size;
 		
 		float fref;
-		array_error_t array_res;
+		ArrayError array_res;
 		
 		for (unsigned int h = _h; h--;){
 		  for (unsigned int w = _w; w--;){
@@ -14,7 +14,7 @@ static void create_evolution_steps(evolution_t * param, evolution_item_t * ev_it
 				if(array_res==ARRAY_ERR_OK){
 					float min_value = FLT_MAX;
 					unsigned int cnt_min = 0;
-					evolution_item_t * f_ev_item = NULL;
+					EvolutionItem * f_ev_item = NULL;
 					for (unsigned int hi = spawnable_item_max; hi--;){
 						f_ev_item = &ev_items[hi];
 						float dx = w - f_ev_item->width;
@@ -42,14 +42,14 @@ static void create_evolution_steps(evolution_t * param, evolution_item_t * ev_it
 		}
 }
 
-void create_evolution(evolution_t * param) {
-	noise_t * noise = param->noise;
+void create_evolution(Evolution * param) {
+	Noise * noise = param->noise;
 	int _w = noise->map->config->cnt;
 	int _h = noise->map->config->size;
 	noise->min = 0.f;
 	noise->max = 1.f;
 	param->cnt_items = (unsigned int)seedrndlh(20.f, 100.f);
-	evolution_item_t * ev_items = malloc(param->cnt_items * sizeof(evolution_item_t));
+	EvolutionItem * ev_items = malloc(param->cnt_items * sizeof(EvolutionItem));
 	
 	for (unsigned int cur_item = param->cnt_items; cur_item--;) {
 		int new_w = (int)fabsf(seedrndlh(-_w, _w));
@@ -59,7 +59,7 @@ void create_evolution(evolution_t * param) {
 		printf("new point %i: %i %i", cur_item, new_w, new_h);
 		#endif
 
-		evolution_item_t * cur_ev_item = &ev_items[cur_item];
+		EvolutionItem * cur_ev_item = &ev_items[cur_item];
 		cur_ev_item->width = new_w;
 		cur_ev_item->height = new_h;
 	}

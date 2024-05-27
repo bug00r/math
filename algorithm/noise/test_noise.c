@@ -24,12 +24,12 @@ main()
 	float maxreduction = 2.05f;
 	float reduction = maxreduction/((w-1)*(w-1));
 	
-	noise_t * noise = noise_new(w, h);
+	Noise * noise = noise_new(w, h);
 	#ifdef debug
 		printf("noise w: %i, h: %i\n", noise->map->config->cnt, noise->map->config->size);
 	#endif
 	
-	midpoint_displacement_t md_param;
+	MidpointDisplacement md_param;
 	md_param.noise = noise;
 	md_param.length = w-1;
 	md_param.startseed = 1.f;
@@ -40,7 +40,7 @@ main()
 	md_param.seedreducefunc = seed_reduction_mul;
 	create_midpoint_displacement(&md_param);
 	
-	array_iterator_t * it = array_iterator_new(noise->map);
+	ArrayIterator * it = array_iterator_new(noise->map);
 	
 	#ifdef debug
 		printf("midpoint array contains[");
@@ -54,7 +54,7 @@ main()
 	
 	array_iterator_free(it);
 	
-	diamond_square_t ds_param;
+	DiamondSquare ds_param;
 	ds_param.noise = noise;
 	ds_param.length = w-1;
 	ds_param.startseed = 1.f;
@@ -98,7 +98,7 @@ main()
 	
 	noise = noise_new(w, h);
 	
-	evolution_t ev_param;
+	Evolution ev_param;
 	ev_param.noise = noise;
 	ev_param.min_value=-1.f;
 	ev_param.max_value=2.f;

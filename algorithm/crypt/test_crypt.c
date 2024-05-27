@@ -43,9 +43,9 @@ typedef struct __b64_enc_test_data
 	const unsigned char *text;
 	const char *b64Text;
 	bool padding;
-} b64encdata_t;
+} b64encData;
 
-static const b64encdata_t b64enctestdata[] = { 
+static const b64encData b64enctestdata[] = { 
 	{(const unsigned char *)"Man", "TWFu", true} ,
 	{(const unsigned char *)"Ma", "TWE=", true} ,
 	{(const unsigned char *)"M", "TQ==", true} ,
@@ -77,7 +77,7 @@ static void test_b64_encrypt()
 
 	for ( size_t testDataIdx = 0; b64enctestdata[testDataIdx].text != NULL; testDataIdx++)
 	{
-		const b64encdata_t* testData = &b64enctestdata[testDataIdx];
+		const b64encData* testData = &b64enctestdata[testDataIdx];
 		__test_b64_enc_(testData->text, testData->b64Text, testData->padding);
 	}
 
@@ -98,7 +98,7 @@ static void test_b64_decrypt()
 
 	for ( size_t testDataIdx = 0; b64enctestdata[testDataIdx].text != NULL; testDataIdx++)
 	{
-		const b64encdata_t* testData = &b64enctestdata[testDataIdx];
+		const b64encData* testData = &b64enctestdata[testDataIdx];
 		__test_b64_dec_(testData->b64Text, testData->text);
 	}
 

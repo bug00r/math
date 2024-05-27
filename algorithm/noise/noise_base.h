@@ -1,13 +1,13 @@
 typedef struct {
-	array_t * map;
+	Array * map;
 	float min, max;
-} noise_t;
+} Noise;
 
-noise_t * noise_new(const unsigned int width, const unsigned int height);
-void noise_free(noise_t * noise);
+Noise * noise_new(const unsigned int width, const unsigned int height);
+void noise_free(Noise * noise);
 
-float create_noise_value(noise_t * noise,  const float range_min, const float range_max);
-void getnewcolor(noise_t * noise,  const float * startseed, float * colortarget);
+float create_noise_value(Noise * noise,  const float range_min, const float range_max);
+void getnewcolor(Noise * noise,  const float * startseed, float * colortarget);
 
 float seed_reduction_add(const float seed, const float reduction);
 float seed_reduction_sub(const float seed, const float reduction);
@@ -44,5 +44,5 @@ float seed_reduction_harmonic_sub(const float seed, const float reduction);
 float seed_reduction_harmonic_mul(const float seed, const float reduction);
 float seed_reduction_harmonic_div(const float seed, const float reduction);
 
-void filter_noise_gauss(noise_t *noise, float deviation);
-void filter_noise_circle(noise_t *noise, float radius);
+void filter_noise_gauss(Noise *noise, float deviation);
+void filter_noise_circle(Noise *noise, float radius);

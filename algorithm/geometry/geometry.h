@@ -12,15 +12,15 @@
 #endif
 
 typedef void (*RASTER_FUNC_2D)(int32_t const * const x, int32_t const * const y, void *data);
-typedef void (*RASTER_BEZIER_FUNC_2D)(vec2_t const * const p1, vec2_t const * const p2, void *data);
+typedef void (*RASTER_BEZIER_FUNC_2D)(Vec2 const * const p1, Vec2 const * const p2, void *data);
 
-vec2_t** geometry_convex_hull(vec2_t *points, size_t cnt_points);
+Vec2** geometry_convex_hull(Vec2 *points, size_t cnt_points);
 
-void geometry_line(vec2_t *start, vec2_t *end, RASTER_FUNC_2D rFunc, void *data);
+void geometry_line(Vec2 *start, Vec2 *end, RASTER_FUNC_2D rFunc, void *data);
 
-void geometry_circle(vec2_t *center, int32_t *radius, RASTER_FUNC_2D rFunc, void *data);
+void geometry_circle(Vec2 *center, int32_t *radius, RASTER_FUNC_2D rFunc, void *data);
 
-void geometry_ellipse(vec2_t *center, int32_t *_a, int32_t *_b, RASTER_FUNC_2D rFunc, void *data);
+void geometry_ellipse(Vec2 *center, int32_t *_a, int32_t *_b, RASTER_FUNC_2D rFunc, void *data);
 
 /**
  * functions goes throught vec3 array and will calculate triangles in an simple way.
@@ -30,9 +30,9 @@ void geometry_ellipse(vec2_t *center, int32_t *_a, int32_t *_b, RASTER_FUNC_2D r
  *      t2 = triangle 2
  *      t1p1 = triangle 1 point 1 ....
  */
-dl_list_t *  geometry_triangulate(const vec3_t *vecs, size_t cnt_vecs);
+DlList *  geometry_triangulate(const Vec3 *vecs, size_t cnt_vecs);
 
-void geometry_bezier1(vec2_t *start, vec2_t *cp, vec2_t *end, uint32_t *steps, RASTER_BEZIER_FUNC_2D rFunc, void *data);
-void geometry_bezier2(vec2_t *start, vec2_t *cp1, vec2_t *cp2, vec2_t *end, uint32_t *steps, RASTER_BEZIER_FUNC_2D rFunc, void *data);
+void geometry_bezier1(Vec2 *start, Vec2 *cp, Vec2 *end, uint32_t *steps, RASTER_BEZIER_FUNC_2D rFunc, void *data);
+void geometry_bezier2(Vec2 *start, Vec2 *cp1, Vec2 *cp2, Vec2 *end, uint32_t *steps, RASTER_BEZIER_FUNC_2D rFunc, void *data);
 
 #endif

@@ -11,7 +11,7 @@
 
 typedef struct {
 	float _11, _12, _13, _21, _22, _23, _31, _32, _33;
-} mat3_t;
+} Mat3;
 
 extern const size_t mat3_size;
 
@@ -20,28 +20,28 @@ extern const size_t mat3_size;
 	Calculate determinant.
 */
 #endif
-float mat3_determinant( const mat3_t *  m);
+float mat3_determinant( const Mat3 *  m);
 
 #if 0
 /**
 	compares two mat3 matrix.
 */
 #endif
-bool mat3_equals( const mat3_t *  m, const mat3_t *  m2);
+bool mat3_equals( const Mat3 *  m, const Mat3 *  m2);
 
 #if 0
 /**
 	Transponse matrix.
 */
 #endif
-void mat3_transponse( mat3_t *  m);
+void Mat3ransponse( Mat3 *  m);
 
 #if 0
 /**
 	Creates transponse from matrix m and creates a new result.
 */
 #endif
-mat3_t * mat3_transponse_new( const mat3_t *  m);
+Mat3 * Mat3ransponse_new( const Mat3 *  m);
 
 #if 0
 /**
@@ -49,7 +49,7 @@ mat3_t * mat3_transponse_new( const mat3_t *  m);
 	NOTE: You must free the string by yourself.
 */
 #endif
-void mat3_copy( mat3_t *  m, const mat3_t *  m2);
+void mat3_copy( Mat3 *  m, const Mat3 *  m2);
 
 #if 0
 /**
@@ -57,7 +57,7 @@ void mat3_copy( mat3_t *  m, const mat3_t *  m2);
 	NOTE: You must free the string by yourself.
 */
 #endif
-mat3_t * mat3_copy_new( const mat3_t *  m);
+Mat3 * mat3_copy_new( const Mat3 *  m);
 
 #if 0
 /**
@@ -65,77 +65,77 @@ mat3_t * mat3_copy_new( const mat3_t *  m);
 	NOTE: You must free the string by yourself.
 */
 #endif
-void mat3_print( const mat3_t *   m);
+void mat3_print( const Mat3 *   m);
 
 #if 0
 /**
 	Add two mat3 matrix and stores result in matrix m.
 */
 #endif
-void mat3_add( mat3_t *   m, const mat3_t *   m2);
+void mat3_add( Mat3 *   m, const Mat3 *   m2);
 
 #if 0
 /**
 	Add two mat3 matrix and stores result in new matrix and return.
 */
 #endif
-mat3_t * mat3_add_new( const mat3_t *   m, const mat3_t *  m2);
+Mat3 * mat3_add_new( const Mat3 *   m, const Mat3 *  m2);
 
 #if 0
 /**
 	Sub two mat3 matrix and stores result in matrix m.
 */
 #endif
-void mat3_sub( mat3_t *  m, const mat3_t *  m2);
+void mat3_sub( Mat3 *  m, const Mat3 *  m2);
 
 #if 0
 /**
 	Sub two mat3 matrix and stores result in new matrix and return.
 */
 #endif
-mat3_t * mat3_sub_new( const mat3_t *  m, const mat3_t *  m2);
+Mat3 * mat3_sub_new( const Mat3 *  m, const Mat3 *  m2);
 
 #if 0
 /**
 	Multiplies two mat3 matrix and stores result in matrix m.
 */
 #endif
-void mat3_mul( mat3_t *  m, const mat3_t *  m2);
+void mat3_mul( Mat3 *  m, const Mat3 *  m2);
 
 #if 0
 /**
 	Multiplies two mat3 matrix and stores result in new matrix and return.
 */
 #endif
-mat3_t * mat3_mul_new( const mat3_t *  m, const mat3_t *  m2);
-mat3_t * mat3_mul_dest(mat3_t * dest, const mat3_t *   m, const mat3_t *   m2);
+Mat3 * mat3_mul_new( const Mat3 *  m, const Mat3 *  m2);
+Mat3 * mat3_mul_dest(Mat3 * dest, const Mat3 *   m, const Mat3 *   m2);
 
 #if 0
 /**
 	Multiplies mat3 matrix with skalar and stores result in matrix m.
 */
 #endif
-void mat3_mul_skalar( mat3_t *  m, const float skalar);
+void mat3_mul_skalar( Mat3 *  m, const float skalar);
 
 #if 0
 /**
 	Multiplies mat3 matrix with skalat and stores result in new matrix and return.
 */
 #endif
-mat3_t * mat3_mul_skalar_new( const mat3_t *  m, const float skalar);
+Mat3 * mat3_mul_skalar_new( const Mat3 *  m, const float skalar);
 
 #if 0
 /**
 	Calculates the inverse of a matrix and change value from given one.
 */
 #endif
-void mat3_inverse( mat3_t *  m);
-void mat3_inverse_dest( mat3_t *   dest, const mat3_t *   m);
+void mat3_inverse( Mat3 *  m);
+void mat3_inverse_dest( Mat3 *   dest, const Mat3 *   m);
 #if 0
 /**
 	Calculates the inverse of a matrix and returns result in a new matrix.
 */
 #endif
-mat3_t * mat3_inverse_new( const mat3_t *   m);
+Mat3 * mat3_inverse_new( const Mat3 *   m);
 
 #endif

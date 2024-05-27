@@ -22,7 +22,7 @@ main() {
 			//Test nzero vector
 		#endif
 		
-		vec2_t * new_zero = vec2_zero_new();
+		Vec2 * new_zero = vec2_zero_new();
 		
 		assert(new_zero->x == 0.0f);
 		assert(new_zero->y == 0.0f);
@@ -38,7 +38,7 @@ main() {
 			//Test if Vector struct works
 		#endif
 		
-		vec2_t myvec = {1.0f, 2.0f};
+		Vec2 myvec = {1.0f, 2.0f};
 		
 		assert(myvec.x == 1.0f);
 		assert(myvec.y == 2.0f);
@@ -47,7 +47,7 @@ main() {
 			//Test if Vecor to string method
 		#endif
 		
-		char * string = vec2_tostring(&myvec);
+		char * string = Vec2ostring(&myvec);
 		#ifdef debug
 			printf("result vec2 tostring: \"%s\"\n",string);
 		#endif
@@ -57,14 +57,14 @@ main() {
 			//Test if Vecor additions
 		#endif
 		
-		vec2_t myvec2 = {1.1f, 1.1f};
+		Vec2 myvec2 = {1.1f, 1.1f};
 		
 		vec2_add(&myvec, &myvec2);
 		
 		assert(myvec.x == 2.1f);
 		assert(myvec.y == 3.1f);
 		
-		vec2_t *myvec3 = vec2_add_new(&myvec, &myvec2);
+		Vec2 *myvec3 = vec2_add_new(&myvec, &myvec2);
 		
 		//compare with floating point issue (could be realized into string format and compare as strings=>slow) this is enough for us
 		assert(myvec3->x >= 3.199 &&  myvec3->x <= 3.200001);
@@ -76,15 +76,15 @@ main() {
 			//Test if Vecor difference
 		#endif
 		
-		vec2_t myvec_sub = {2.0f, 2.0f};
-		vec2_t myvec_sub2 = {1.0f, 1.0f};
+		Vec2 myvec_sub = {2.0f, 2.0f};
+		Vec2 myvec_sub2 = {1.0f, 1.0f};
 		
 		vec2_sub(&myvec_sub, &myvec_sub2);
 		
 		assert(myvec_sub.x == 1.0f);
 		assert(myvec_sub.y == 1.0f);
 		
-		vec2_t *myvec3_sub = vec2_sub_new(&myvec_sub, &myvec_sub2);
+		Vec2 *myvec3_sub = vec2_sub_new(&myvec_sub, &myvec_sub2);
 		
 		//compare with floating point issue (could be realized into string format and compare as strings=>slow) this is enough for us
 		assert(myvec3_sub->x >= 0.0f &&  myvec3_sub->x <= 1.0);
@@ -97,14 +97,14 @@ main() {
 			//Test if Vecor negation
 		#endif
 		
-		vec2_t myvec_neg = {1.0f, 2.0f};
+		Vec2 myvec_neg = {1.0f, 2.0f};
 		
 		vec2_negate(&myvec_neg);
 		
 		assert(myvec_neg.x == -1.0f);
 		assert(myvec_neg.y == -2.0f);
 		
-		vec2_t * myvec_neg_new = vec2_negate_new(&myvec_neg);
+		Vec2 * myvec_neg_new = vec2_negate_new(&myvec_neg);
 		
 		assert(myvec_neg_new->x == 1.0f);
 		assert(myvec_neg_new->y == 2.0f);
@@ -115,9 +115,9 @@ main() {
 			//Test Vector copy
 		#endif
 		
-		vec2_t myvec_cpy = {5.0f, 6.0f};
+		Vec2 myvec_cpy = {5.0f, 6.0f};
 		
-		vec2_t * copy = vec2_copy_new(&myvec_cpy);
+		Vec2 * copy = vec2_copy_new(&myvec_cpy);
 		
 		assert(&myvec_cpy != copy);
 		assert(myvec_cpy.x == copy->x);
@@ -129,7 +129,7 @@ main() {
 			//Test Vector length
 		#endif
 		
-		vec2_t myvec_len = {5.0f, 6.0f};
+		Vec2 myvec_len = {5.0f, 6.0f};
 		float length = vec2_length(&myvec_len);
 		assert(length == 7.8102496759066543941297227357591f);
 		
@@ -137,14 +137,14 @@ main() {
 			//Test Vector multiplications
 		#endif
 		
-		vec2_t vec_mul = {2.0f, 3.0f};
-		vec2_t vec_mul2 = {2.0f, 3.0f};
+		Vec2 vec_mul = {2.0f, 3.0f};
+		Vec2 vec_mul2 = {2.0f, 3.0f};
 		float factor = 2.0f;
 		
 		float skalarproduct = vec2_vec2mul(&vec_mul, &vec_mul2);
 		assert(skalarproduct == 13.0f);
 		
-		vec2_t * mulres = vec2_mul_new(&vec_mul, factor);
+		Vec2 * mulres = vec2_mul_new(&vec_mul, factor);
 		assert(mulres->x == 4.0f);
 		assert(mulres->y == 6.0f);
 		
@@ -159,7 +159,7 @@ main() {
 			//Test Vector normalisation
 		#endif
 		
-		vec2_t vec_norm = {2.0f, 3.0f};
+		Vec2 vec_norm = {2.0f, 3.0f};
 		vec2_normalize(&vec_norm);
 		
 		assert(vec_norm.x == 0.554700196225229122018341733457f);
@@ -168,8 +168,8 @@ main() {
 		float norm_len = vec2_length(&vec_norm);
 		assert(norm_len == 1.0f);
 		
-		vec2_t vec_norm2 = {2.0f, 3.0f};
-		vec2_t * normalized = vec2_normalize_new(&vec_norm2);
+		Vec2 vec_norm2 = {2.0f, 3.0f};
+		Vec2 * normalized = vec2_normalize_new(&vec_norm2);
 		
 		assert(normalized->x == 0.554700196225229122018341733457f);
 		assert(normalized->y == 0.8320502943378436830275126001855f);
@@ -181,8 +181,8 @@ main() {
 			//Test Vector 2D Cross product
 		#endif
 		
-		vec2_t vec_cross = {2.0f, 3.0f};
-		vec2_t vec_cross2 = {1.0f, 2.0f};
+		Vec2 vec_cross = {2.0f, 3.0f};
+		Vec2 vec_cross2 = {1.0f, 2.0f};
 		
 		float result = vec2_cross(&vec_cross, &vec_cross2);
 		
@@ -192,8 +192,8 @@ main() {
 			//Test Vector 2D angle
 		#endif
 		
-		vec2_t vec2_angle1 = {0.0f, 1.0f};
-		vec2_t vec2_angle2 = {1.0f, 0.0f};
+		Vec2 vec2_angle1 = {0.0f, 1.0f};
+		Vec2 vec2_angle2 = {1.0f, 0.0f};
 		
 		float _vec2_angle_rad = vec2_angle(&vec2_angle1, &vec2_angle2);
 		float _vec2_degree = _vec2_angle_rad * (180 / M_PI);
@@ -203,9 +203,9 @@ main() {
 			//Test Vector 2D equals
 		#endif
 		
-		vec2_t vec2_eq = {0.0f, 1.0f};
-		vec2_t vec2_eq1 = {1.0f, 0.0f};
-		vec2_t vec2_eq2 = {1.0f, 0.0f};
+		Vec2 vec2_eq = {0.0f, 1.0f};
+		Vec2 vec2_eq1 = {1.0f, 0.0f};
+		Vec2 vec2_eq2 = {1.0f, 0.0f};
 		
 		assert(!vec2_equals(&vec2_eq, &vec2_eq1));
 		assert(vec2_equals(&vec2_eq1, &vec2_eq1));
@@ -222,12 +222,12 @@ main() {
 			//Test Vector 2D multiple addition and subtraction
 		#endif
 		
-		vec2_t n_result;
-		vec2_t *n_result_new;
-		vec2_t n1 = {0.0f, 1.0f};
-		vec2_t n2 = {1.0f, 1.0f};
-		vec2_t n3 = {1.0f, 0.0f};
-		vec2_t n4 = {0.5f, 0.5f};
+		Vec2 n_result;
+		Vec2 *n_result_new;
+		Vec2 n1 = {0.0f, 1.0f};
+		Vec2 n2 = {1.0f, 1.0f};
+		Vec2 n3 = {1.0f, 0.0f};
+		Vec2 n4 = {0.5f, 0.5f};
 		
 		n_result = *vec2_add_n_dest(&n_result, 4, &n1, &n2, &n3, &n4);
 		
@@ -266,7 +266,7 @@ main() {
 			//Test nzero vector
 		#endif
 		
-		vec3_t * new_zero3 = vec3_zero_new();
+		Vec3 * new_zero3 = vec3_zero_new();
 		
 		assert(new_zero3->x == 0.0f);
 		assert(new_zero3->y == 0.0f);
@@ -286,7 +286,7 @@ main() {
 			//Test if Vector struct works
 		#endif
 		
-		vec3_t _myvec = {1.0f, 2.0f, 3.0f};
+		Vec3 _myvec = {1.0f, 2.0f, 3.0f};
 		
 		assert(_myvec.x == 1.0f);
 		assert(_myvec.y == 2.0f);
@@ -296,7 +296,7 @@ main() {
 			//Test if Vecor to string method
 		#endif
 		
-		char * _string = vec3_tostring(&_myvec);
+		char * _string = Vec3ostring(&_myvec);
 		#ifdef debug
 			printf("result vec3 tostring: \"%s\"\n",_string);
 		#endif		
@@ -306,7 +306,7 @@ main() {
 			//Test if Vecor additions
 		#endif
 		
-		vec3_t _myvec2 = {1.1f, 1.1f, 1.1f};
+		Vec3 _myvec2 = {1.1f, 1.1f, 1.1f};
 		
 		vec3_add(&_myvec, &_myvec2);
 		
@@ -314,7 +314,7 @@ main() {
 		assert(_myvec.y == 3.1f);
 		assert(_myvec.z == 4.1f);
 		
-		vec3_t * _myvec3 = vec3_add_new(&_myvec, &_myvec2);
+		Vec3 * _myvec3 = vec3_add_new(&_myvec, &_myvec2);
 		
 		//compare with floating point issue (could be realized into string format and compare as strings=>slow) this is enough for us
 		assert(_myvec3->x >= 3.199 &&  _myvec3->x <= 3.200001);
@@ -328,8 +328,8 @@ main() {
 			//Test if Vecor difference
 		#endif
 		
-		vec3_t _myvec_sub = {2.0f, 2.0f, 2.0f};
-		vec3_t _myvec_sub2 = {1.0f, 1.0f, 1.0f};
+		Vec3 _myvec_sub = {2.0f, 2.0f, 2.0f};
+		Vec3 _myvec_sub2 = {1.0f, 1.0f, 1.0f};
 		
 		vec3_sub(&_myvec_sub, &_myvec_sub2);
 		
@@ -337,7 +337,7 @@ main() {
 		assert(_myvec_sub.y == 1.0f);
 		assert(_myvec_sub.z == 1.0f);
 		
-		vec3_t * _myvec3_sub = vec3_sub_new(&_myvec_sub, &_myvec_sub2);
+		Vec3 * _myvec3_sub = vec3_sub_new(&_myvec_sub, &_myvec_sub2);
 		
 		//compare with floating point issue (could be realized into string format and compare as strings=>slow) this is enough for us
 		assert(_myvec3_sub->x >= 0.0f &&  _myvec3_sub->x <= 1.0);
@@ -350,7 +350,7 @@ main() {
 			//Test if Vecor negation
 		#endif
 		
-		vec3_t _myvec_neg = {1.0f, 2.0f, 3.0f};
+		Vec3 _myvec_neg = {1.0f, 2.0f, 3.0f};
 		
 		vec3_negate(&_myvec_neg);
 		
@@ -358,7 +358,7 @@ main() {
 		assert(_myvec_neg.y == -2.0f);
 		assert(_myvec_neg.z == -3.0f);
 		
-		vec3_t * _myvec_neg_new = vec3_negate_new(&_myvec_neg);
+		Vec3 * _myvec_neg_new = vec3_negate_new(&_myvec_neg);
 		
 		assert(_myvec_neg_new->x == 1.0f);
 		assert(_myvec_neg_new->y == 2.0f);
@@ -370,9 +370,9 @@ main() {
 			//Test Vector copy
 		#endif
 		
-		vec3_t _myvec_cpy = {5.0f, 6.0f, 7.0f};
+		Vec3 _myvec_cpy = {5.0f, 6.0f, 7.0f};
 		
-		vec3_t * _copy = vec3_copy_new(&_myvec_cpy);
+		Vec3 * _copy = vec3_copy_new(&_myvec_cpy);
 		
 		assert(&_myvec_cpy != _copy);
 		assert(_myvec_cpy.x == _copy->x);
@@ -385,7 +385,7 @@ main() {
 			//Test Vector length
 		#endif
 		
-		vec3_t _myvec_len = {5.0f, 6.0f, 7.0f};
+		Vec3 _myvec_len = {5.0f, 6.0f, 7.0f};
 		float _length = vec3_length(&_myvec_len);
 		assert(_length == 10.488088481701515469914535136799f);
 		
@@ -393,14 +393,14 @@ main() {
 			//Test Vector multiplications
 		#endif
 		
-		vec3_t _vec_mul = {2.0f, 3.0f, 4.0f};
-		vec3_t _vec_mul2 = {2.0f, 3.0f, 4.0f};
+		Vec3 _vec_mul = {2.0f, 3.0f, 4.0f};
+		Vec3 _vec_mul2 = {2.0f, 3.0f, 4.0f};
 		float _factor = 2.0f;
 		
 		float _skalarproduct = vec3_vec3mul(&_vec_mul, &_vec_mul2);
 		assert(_skalarproduct == 29.0f);
 		
-		vec3_t * _mulres = vec3_mul_new(&_vec_mul, _factor);
+		Vec3 * _mulres = vec3_mul_new(&_vec_mul, _factor);
 		assert(_mulres->x == 4.0f);
 		assert(_mulres->y == 6.0f);
 		assert(_mulres->z == 8.0f);
@@ -417,7 +417,7 @@ main() {
 			//Test Vector normalisation
 		#endif
 		
-		vec3_t _vec_norm = {2.0f, 3.0f, 4.0f};
+		Vec3 _vec_norm = {2.0f, 3.0f, 4.0f};
 		vec3_normalize(&_vec_norm);
 
 		assert(_vec_norm.x == 0.37139067635410372629315244769244f);
@@ -427,8 +427,8 @@ main() {
 		float _norm_len = vec3_length(&_vec_norm);
 		assert(_norm_len == 1.0f);
 		
-		vec3_t _vec_norm2 = {2.0f, 3.0f, 4.0f};
-		vec3_t * _normalized = vec3_normalize_new(&_vec_norm2);
+		Vec3 _vec_norm2 = {2.0f, 3.0f, 4.0f};
+		Vec3 * _normalized = vec3_normalize_new(&_vec_norm2);
 		
 		assert(_normalized->x == 0.37139067635410372629315244769244f);
 		assert(_normalized->y == 0.55708601453115558943972867153866f);
@@ -441,10 +441,10 @@ main() {
 			//3D Cross product
 		#endif
 		
-		vec3_t v31 = {1.0f, -5.0f, 2.0f};
-		vec3_t v32 = {2.0f, 0.0f, 3.0f};
+		Vec3 v31 = {1.0f, -5.0f, 2.0f};
+		Vec3 v32 = {2.0f, 0.0f, 3.0f};
 		
-		vec3_t * cross = vec3_cross_new(&v31, &v32);
+		Vec3 * cross = vec3_cross_new(&v31, &v32);
 		
 		assert(cross->x == -15.0f);
 		assert(cross->y == 1.0f);
@@ -462,9 +462,9 @@ main() {
 			//3D Spat product
 		#endif
 		
-		vec3_t spat1 = { 2.0f, 0.0f, 5.0f};
-		vec3_t spat2 = { -1.0f, 5.0f, -2.0f};
-		vec3_t spat3 = { 2.0f, 1.0f, 2.0f};
+		Vec3 spat1 = { 2.0f, 0.0f, 5.0f};
+		Vec3 spat2 = { -1.0f, 5.0f, -2.0f};
+		Vec3 spat3 = { 2.0f, 1.0f, 2.0f};
 		
 		float spatvolume = vec3_spat(&spat1, &spat2, &spat3);
 		
@@ -474,8 +474,8 @@ main() {
 			//Test Vector 3D angle
 		#endif
 		
-		vec3_t vec3_angle1 = {0.0f, 1.0f, 0.f};
-		vec3_t vec3_angle2 = {1.0f, 0.0f, 0.f};
+		Vec3 vec3_angle1 = {0.0f, 1.0f, 0.f};
+		Vec3 vec3_angle2 = {1.0f, 0.0f, 0.f};
 		
 		float _vec3_angle_rad = vec3_angle(&vec3_angle1, &vec3_angle2);
 		float _vec3_degree = _vec3_angle_rad * (180 / M_PI);
@@ -485,9 +485,9 @@ main() {
 			//Test Vector 3D equals
 		#endif
 		
-		vec3_t vec3_eq = {0.0f, 1.0f, 0.f};
-		vec3_t vec3_eq1 = {1.0f, 0.0f, 0.f};
-		vec3_t vec3_eq2 = {1.0f, 0.0f, 0.f};
+		Vec3 vec3_eq = {0.0f, 1.0f, 0.f};
+		Vec3 vec3_eq1 = {1.0f, 0.0f, 0.f};
+		Vec3 vec3_eq2 = {1.0f, 0.0f, 0.f};
 		
 		assert(!vec3_equals(&vec3_eq, &vec3_eq1));
 		assert(vec3_equals(&vec3_eq1, &vec3_eq1));
@@ -504,7 +504,7 @@ main() {
 			//Test Vector 3D crossproduct on same line
 		#endif
 		
-		vec3_t * cross_spec = vec3_cross_new(&v31, &v32);
+		Vec3 * cross_spec = vec3_cross_new(&v31, &v32);
 		vec3_normalize(cross_spec);
 		#ifdef debug
 			vec3_print(cross_spec);
@@ -517,12 +517,12 @@ main() {
 			//Test Vector 3D multiple addition and subtraction
 		#endif
 		
-		vec3_t n_result3;
-		vec3_t *n_result_new3;
-		vec3_t n13 = {0.0f, 1.0f, 1.0f};
-		vec3_t n23 = {1.0f, 1.0f, 1.0f};
-		vec3_t n33 = {1.0f, 0.0f, 1.0f};
-		vec3_t n43 = {0.5f, 0.5f, 1.0f};
+		Vec3 n_result3;
+		Vec3 *n_result_new3;
+		Vec3 n13 = {0.0f, 1.0f, 1.0f};
+		Vec3 n23 = {1.0f, 1.0f, 1.0f};
+		Vec3 n33 = {1.0f, 0.0f, 1.0f};
+		Vec3 n43 = {0.5f, 0.5f, 1.0f};
 		
 		n_result3 = *vec3_add_n_dest(&n_result3, 4, &n13, &n23, &n33, &n43);
 		

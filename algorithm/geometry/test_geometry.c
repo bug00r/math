@@ -9,8 +9,8 @@
 static void test_geometry_convex_hull_null() {
 	DEBUG_LOG_ARGS(">>> %s => %s\n", __FILE__, __func__);
 
-	vec2_t *points = NULL;
-	vec2_t **hull_pts = geometry_convex_hull(points, 5);
+	Vec2 *points = NULL;
+	Vec2 **hull_pts = geometry_convex_hull(points, 5);
 
 	assert(hull_pts == NULL);
 
@@ -20,10 +20,10 @@ static void test_geometry_convex_hull_null() {
 static void test_geometry_convex_hull() {
 	DEBUG_LOG_ARGS(">>> %s => %s\n", __FILE__, __func__);
 
-	vec2_t points[12] = { {1.f, 1.f} , { 2.5f, 2.f}, { 4.f, 1.f}  , { 4.f, 3.f}, 
+	Vec2 points[12] = { {1.f, 1.f} , { 2.5f, 2.f}, { 4.f, 1.f}  , { 4.f, 3.f}, 
 						 {4.5f,1.5f}, { 3.f, 3.5f}, { 3.5f, 2.f}, { 2.f, 3.f},
 						 {1.5f,4.f}, { 1.5f, 2.f}, { 3.f, 0.5f}, { 2.0f, .5f}};
-	vec2_t **hull_pts = geometry_convex_hull(points, 12);
+	Vec2 **hull_pts = geometry_convex_hull(points, 12);
 
 	assert(hull_pts != NULL);
 	assert(*hull_pts != NULL);
@@ -51,8 +51,8 @@ static void print_raster(int32_t const * const x, int32_t const * const y, void 
 static void test_geometry_line() {
 	DEBUG_LOG_ARGS(">>> %s => %s\n", __FILE__, __func__);
 
-	vec2_t start = { 1,3 };
-	vec2_t end = { 12, 9 };
+	Vec2 start = { 1,3 };
+	Vec2 end = { 12, 9 };
  
 	void * data = NULL;
 
@@ -65,7 +65,7 @@ static void test_geometry_line() {
 static void test_geometry_circle() {
 	DEBUG_LOG_ARGS(">>> %s => %s\n", __FILE__, __func__);
 
-	vec2_t center = { 7,7 };
+	Vec2 center = { 7,7 };
 	int32_t radius = 5;
  
 	void * data = NULL;
@@ -79,7 +79,7 @@ static void test_geometry_circle() {
 static void test_geometry_ellipse() {
 	DEBUG_LOG_ARGS(">>> %s => %s\n", __FILE__, __func__);
 
-	vec2_t center = { 25,25 };
+	Vec2 center = { 25,25 };
 	int32_t a = 5;  //halfaxis
 	int32_t b = 10;
  
@@ -93,7 +93,7 @@ static void test_geometry_ellipse() {
 
 #ifdef debug
 static void
-__geometry_vec3_print_wrapper(vec3_t **vec) 
+__geometry_vec3_print_wrapper(Vec3 **vec) 
 {
     printf("%p = ",*vec);vec3_print(*vec);
 }
@@ -102,7 +102,7 @@ __geometry_vec3_print_wrapper(vec3_t **vec)
 static void test_geometry_triangulation() {
 	DEBUG_LOG_ARGS(">>> %s => %s\n", __FILE__, __func__);
 
-	vec3_t points[8] = { {5.f, .0f, .0f} , { 5.f, 10.f, .0f}, { .0f, 10.f, .0f}  , { .0f, 14.f, .0f}, 
+	Vec3 points[8] = { {5.f, .0f, .0f} , { 5.f, 10.f, .0f}, { .0f, 10.f, .0f}  , { .0f, 14.f, .0f}, 
 						  {14.f, 14.f, .0f}, { 14.f, 10.f, .0f}, { 9.f, 10.f, .0f}, { 9.f, .0f, .0f}};
 
 	#ifdef debug
@@ -112,7 +112,7 @@ static void test_geometry_triangulation() {
     #endif
 
 
-	dl_list_t * triangles = geometry_triangulate(points, 8);
+	DlList * triangles = geometry_triangulate(points, 8);
 
 	#ifdef debug
 		printf("LETTER T\n");
@@ -128,13 +128,13 @@ static void test_geometry_triangulation() {
 static void test_geometry_triangulation_mc() {
 	DEBUG_LOG_ARGS(">>> %s => %s\n", __FILE__, __func__);
 
-	vec3_t points2[14] = { {0.f, .0f, .0f} , { .0f, .8f, .0f}, { .2f, 1.1f, .0f}  , { .3f, 1.4f, .0f}, 
+	Vec3 points2[14] = { {0.f, .0f, .0f} , { .0f, .8f, .0f}, { .2f, 1.1f, .0f}  , { .3f, 1.4f, .0f}, 
 						 {.5f, 1.1f, .0f}, { .8f, 0.9f, .0f}, { 1.f, 1.2f, .0f}, { 1.0f, 0.7f, .0f},
 						 { 0.7f, 0.6f, .0f}, { 1.0f, 0.4f, .0f}, { 0.7f, .0f, .0f}, { .5f, .2f, .0f},
 						 { .3f, .0f, .0f}, { 0.2f, 0.2f, .0f}};
 
 
-	dl_list_t * triangles = geometry_triangulate(points2, 14);
+	DlList * triangles = geometry_triangulate(points2, 14);
 
 	#ifdef debug
 		printf("FIRST MORE COMPLEX\n");
@@ -150,11 +150,11 @@ static void test_geometry_triangulation_mc() {
 static void test_geometry_triangulation_vc() {
 	DEBUG_LOG_ARGS(">>> %s => %s\n", __FILE__, __func__);
 
-	vec3_t points3[10] = { {0.f, .0f, .0f} , { .0f, 1.1f, .0f}, { .3f, .8f, .0f}  , { .6f, 1.1f, .0f}, 
+	Vec3 points3[10] = { {0.f, .0f, .0f} , { .0f, 1.1f, .0f}, { .3f, .8f, .0f}  , { .6f, 1.1f, .0f}, 
 						 {.4f, .6f, .0f}, { .1f, 0.9f, .0f}, { .1f, .3f, .0f}, { .4f, .5f, .0f},
 						 { 0.6f, 0.1f, .0f}, { .3f, 0.3f, .0f}};
 
-	dl_list_t * triangles = geometry_triangulate(points3, 10);
+	DlList * triangles = geometry_triangulate(points3, 10);
 
 	#ifdef debug
 		printf("SECOND VERY COMPLEX\n");
@@ -170,14 +170,14 @@ static void test_geometry_triangulation_vc() {
 static void test_geometry_triangulation_vc2() {
 	DEBUG_LOG_ARGS(">>> %s => %s\n", __FILE__, __func__);
 
-	vec3_t points3[22] = {	{1.f, .0f, .0f}, { .0f, .0f, .0f }, { .0f, 1.f, .0f}  , { 1.f, 1.f, .0f}, 
+	Vec3 points3[22] = {	{1.f, .0f, .0f}, { .0f, .0f, .0f }, { .0f, 1.f, .0f}  , { 1.f, 1.f, .0f}, 
 						 	{1.f, .2f, .0f}, { .2f, 0.2f, .0f}, { .2f, .8f, .0f}, { .8f, .8f, .0f}, { .8f, .4f, .0f},
 						 	{ 0.4f, 0.4f, .0f}, { .4f, 0.6f, .0f} ,{.5f, .6f, .0f} , { .5f, .5f, .0f}, { .7f, .5f, .0f}, 
 						 	{.7f, .7f, .0f}, { .3f, .7f, .0f}, { .3f, .3f, .0f}, { .9f, .3f, .0f},
 						 	{ 0.9f, 0.9f, .0f}, { .1f, 0.9f, .0f}, { 0.1f, 0.1f, .0f}, { 1.f, 0.1f, .0f}
 						};
 
-	dl_list_t * triangles = geometry_triangulate(points3, 22);
+	DlList * triangles = geometry_triangulate(points3, 22);
 
 	#ifdef debug
 		printf("THIRD VERY COMPLEX\n");
@@ -193,7 +193,7 @@ static void test_geometry_triangulation_vc2() {
 static void test_geometry_triangulation_skull() {
 	DEBUG_LOG_ARGS(">>> %s => %s\n", __FILE__, __func__);
 
-	vec3_t points3[46] = {  {.0f, 1.1f, .0f}, { .1f, 1.4f, .0f }, { .4f, 1.6f, .0f}  , { .9f, 1.7f, .0f}, 
+	Vec3 points3[46] = {  {.0f, 1.1f, .0f}, { .1f, 1.4f, .0f }, { .4f, 1.6f, .0f}  , { .9f, 1.7f, .0f}, 
 						 	{1.4f, 1.6f, .0f}, { 1.7f, 1.4f, .0f}, { 1.8f, 1.1f, .0f},   { 1.7f, .8f, .0f}, { 1.6f, .5f, .0f},
 						 	{1.7f, .4f, .0f}, { 1.5f, .3f, .0f}, { 1.4f, .4f, .0f} ,   { 1.2f, .4f, .0f}, { 1.3f, .2f, .0f}, 
 						 	{1.2f, .0f, .0f}, { 1.1f, .2f, .0f},  { 1.f, .0f, .0f},   { .92f, .2f, .0f},
@@ -204,7 +204,7 @@ static void test_geometry_triangulation_skull() {
 						 	{.7f, .2f, .0f}, { .6f, .0f, .0f},  { .5f, .2f, .0f},   { .6f, .4f, .0f}, { .4f, .4f, .0f}, 
 						 	{.3f, .3f, .0f}, { .1f, 0.4f, .0f}, { 0.2f, 0.5f, .0f}, { .1f, 0.8f, .0f}};
 
-	dl_list_t * triangles = geometry_triangulate(points3, 46);
+	DlList * triangles = geometry_triangulate(points3, 46);
 
 	#ifdef debug
 		printf("THIRD VERY COMPLEX\n");
@@ -217,7 +217,7 @@ static void test_geometry_triangulation_skull() {
 	DEBUG_LOG("<<<\n");
 }
 
-static void print_bezier(vec2_t const * const p, vec2_t const * const p2, void *data) {
+static void print_bezier(Vec2 const * const p, Vec2 const * const p2, void *data) {
 	#ifdef debug
 	printf("bezier1: ");
 	vec2_print(p);
@@ -230,9 +230,9 @@ static void print_bezier(vec2_t const * const p, vec2_t const * const p2, void *
 static void test_geometry_bezier1() {
 	DEBUG_LOG_ARGS(">>> %s => %s\n", __FILE__, __func__);
 	
-	vec2_t start = { 0.f, 0.f };
-	vec2_t cp = { 0.5f, 0.5f };
-	vec2_t end = { 1.f, 0.f };
+	Vec2 start = { 0.f, 0.f };
+	Vec2 cp = { 0.5f, 0.5f };
+	Vec2 end = { 1.f, 0.f };
 	uint32_t steps = 10;
 	void *data = NULL;
 	
@@ -244,10 +244,10 @@ static void test_geometry_bezier1() {
 static void test_geometry_bezier2() {
 	DEBUG_LOG_ARGS(">>> %s => %s\n", __FILE__, __func__);
 	
-	vec2_t start = { 0.f, 0.f };
-	vec2_t cp1 = { 0.1f, 0.5f };
-	vec2_t cp2 = { 0.9f, 0.5f };
-	vec2_t end = { 1.f, 0.f };
+	Vec2 start = { 0.f, 0.f };
+	Vec2 cp1 = { 0.1f, 0.5f };
+	Vec2 cp2 = { 0.9f, 0.5f };
+	Vec2 end = { 1.f, 0.f };
 	uint32_t steps = 10;
 	void *data = NULL;
 	

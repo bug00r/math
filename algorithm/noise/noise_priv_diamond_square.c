@@ -1,6 +1,6 @@
 void 
-create_diamond_square(diamond_square_t * param){
-	noise_t * noise = param->noise;
+create_diamond_square(DiamondSquare * param){
+	Noise * noise = param->noise;
 	int length = param->length;
 	float startseed = param->startseed;
 	float seed = param->seed;

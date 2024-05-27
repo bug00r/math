@@ -148,11 +148,11 @@ main() {
 			test matrix multiply with vector
 		*/
 	#endif
-	mat2_t mat2 = { 1.f, 2.f, 3.f, 4.f};
-	vec2_t vec2 = { 2.f, 3.f};
-	vec2_t vec2_result = { 8.f, 18.f};
+	Mat2 mat2 = { 1.f, 2.f, 3.f, 4.f};
+	Vec2 vec2 = { 2.f, 3.f};
+	Vec2 vec2_result = { 8.f, 18.f};
 	
-	vec2_t * vec2_result_new = mat_vec_mul_2_new(&mat2, &vec2);
+	Vec2 * vec2_result_new = mat_vec_mul_2_new(&mat2, &vec2);
 	assert(vec2_equals(vec2_result_new, &vec2_result));
 	
 	free(vec2_result_new);
@@ -166,31 +166,31 @@ main() {
 		*/
 	#endif
 	
-	vec3_t start = {0.f, 0.f, 0.f};
-	vec3_t end = {2.f, 2.f, 0.f};
-	vec3_t point = {0.5f, 1.5f, 0.f};
+	Vec3 start = {0.f, 0.f, 0.f};
+	Vec3 end = {2.f, 2.f, 0.f};
+	Vec3 point = {0.5f, 1.5f, 0.f};
 	
 	float place = place_of_vec3(&start, &end, &point);
 	assert(place < 0.f);
 	
-	start = (vec3_t) {0.f, 0.f, 0.f};
-	end = (vec3_t) {2.f, 2.f, 0.f};
-	point = (vec3_t){1.5f, 0.5f, 0.f};
+	start = (Vec3) {0.f, 0.f, 0.f};
+	end = (Vec3) {2.f, 2.f, 0.f};
+	point = (Vec3){1.5f, 0.5f, 0.f};
 	
 	place = place_of_vec3(&start, &end, &point);
 	assert( place > 0.f);
 	
-	start = (vec3_t){0.f, 0.f, 0.f};
-	end = (vec3_t){2.f, 2.f, 0.f};
-	point = (vec3_t){1.f, 1.f, 0.f};
+	start = (Vec3){0.f, 0.f, 0.f};
+	end = (Vec3){2.f, 2.f, 0.f};
+	point = (Vec3){1.f, 1.f, 0.f};
 	
 	place = place_of_vec3(&start, &end, &point);
-	vec3_t *testdiff = vec3_sub_new(&point, &start);
+	Vec3 *testdiff = vec3_sub_new(&point, &start);
 	assert(place == 0.f && testdiff->x >= 0.f && testdiff->y >= 0.f);
 	free(testdiff);
-	start = (vec3_t){0.f, 0.f, 0.f};
-	end = (vec3_t){2.f, 2.f, 0.f};
-	point = (vec3_t){-1.f, -1.f, 0.f};
+	start = (Vec3){0.f, 0.f, 0.f};
+	end = (Vec3){2.f, 2.f, 0.f};
+	point = (Vec3){-1.f, -1.f, 0.f};
 	
 	place = place_of_vec3(&start, &end, &point);
 	testdiff = vec3_sub_new(&point, &start);
@@ -202,28 +202,28 @@ main() {
 		*/
 	#endif
 	
-	vec3_t v0 = {0.f, 0.f, 0.f};
-	vec3_t v1 = {2.f, 2.f, 0.f};
-	vec3_t v2 = {2.f, 0.f, 0.f};
-	vec3_t point_ = {1.5f, .5f, 0.f};
+	Vec3 v0 = {0.f, 0.f, 0.f};
+	Vec3 v1 = {2.f, 2.f, 0.f};
+	Vec3 v2 = {2.f, 0.f, 0.f};
+	Vec3 point_ = {1.5f, .5f, 0.f};
 	
-	barycentric_t bc;
+	Barycentric bc;
 	bc.area = place_of_vec3(&v0, &v1, &v2); 
 	
 	is_inside_triangle(&v0, &v1, &v2, &point_, &bc);
 	assert(bc.inside);
 	
-	point_ = (vec3_t){1.f, 1.f, 0.f};
+	point_ = (Vec3){1.f, 1.f, 0.f};
 	
 	is_inside_triangle(&v0, &v1, &v2, &point_, &bc);
 	assert(bc.inside);
 	
-	point_ = (vec3_t){5.f, 1.f, 0.f};
+	point_ = (Vec3){5.f, 1.f, 0.f};
 	
 	is_inside_triangle(&v0, &v1, &v2, &point_, &bc);
 	assert(!bc.inside);
 	
-	point_ = (vec3_t){1.f, 1.f, 0.f};
+	point_ = (Vec3){1.f, 1.f, 0.f};
 	
 	is_inside_triangle(&v0, &v1, &v2, &point_, &bc);
 	
@@ -237,10 +237,10 @@ main() {
 		*/
 	#endif
 	
-	v0 = (vec3_t){140.800003f, 115.199997f, -1.500000f};
-	v1 = (vec3_t){125.866669f, 140.800003f, -1.500000f};
-	v2 = (vec3_t){113.066666f, 115.199997f, -1.500000f};
-	point_ = (vec3_t){130.5f, 110.f, 0.f};
+	v0 = (Vec3){140.800003f, 115.199997f, -1.500000f};
+	v1 = (Vec3){125.866669f, 140.800003f, -1.500000f};
+	v2 = (Vec3){113.066666f, 115.199997f, -1.500000f};
+	point_ = (Vec3){130.5f, 110.f, 0.f};
 	
 	#if 0
 		/**
@@ -259,12 +259,12 @@ main() {
 		*/
 	#endif
 		
-	vec3_t spv0 = {0.f, 0.f,0.f}; //absolut 0 world coordinate
-	vec3_t spv1 = {-2.f, 1.f,0.f}; //V0'
-	vec3_t spv2 = {.4f, 1.f,0.f}; //V1'
-	vec3_t sppoint_ = {0.f, 1.f,0.f}; //P'
+	Vec3 spv0 = {0.f, 0.f,0.f}; //absolut 0 world coordinate
+	Vec3 spv1 = {-2.f, 1.f,0.f}; //V0'
+	Vec3 spv2 = {.4f, 1.f,0.f}; //V1'
+	Vec3 sppoint_ = {0.f, 1.f,0.f}; //P'
 	
-	barycentric_t spbcc;
+	Barycentric spbcc;
 	spbcc.area = place_of_vec3(&spv0, &spv1, &spv2);
 	
 	is_inside_triangle(&spv0, &spv1, &spv2, &sppoint_, &spbcc);
@@ -311,11 +311,11 @@ main() {
 		*/
 	#endif
 	
-	mat3_t mat3 = { 1.f, 0.f, 2.f, 0.f, 0.f, 4.f, 1.f, -1.f, 1.f};
-	vec3_t vec3 = { 2.f, 2.f, 0.f};
-	vec3_t vec3_result = { 2.f, 0.f, 0.f};
+	Mat3 mat3 = { 1.f, 0.f, 2.f, 0.f, 0.f, 4.f, 1.f, -1.f, 1.f};
+	Vec3 vec3 = { 2.f, 2.f, 0.f};
+	Vec3 vec3_result = { 2.f, 0.f, 0.f};
 	
-	vec3_t * vec3_result_new = mat_vec_mul_3_new(&mat3, &vec3);
+	Vec3 * vec3_result_new = mat_vec_mul_3_new(&mat3, &vec3);
 	assert(vec3_equals(vec3_result_new, &vec3_result));
 	
 	free(vec3_result_new);
@@ -326,7 +326,7 @@ main() {
 	#endif
 	
 	/*
-		vec3_t temp = {
+		Vec3 temp = {
 		(v->x * m->_11) + (v->y * m->_21) + (v->z * m->_31) + m->_41,
 		(v->x * m->_12) + (v->y * m->_22) + (v->z * m->_32) + m->_42,
 		(v->x * m->_13) + (v->y * m->_23) + (v->z * m->_33) + m->_43
@@ -340,24 +340,24 @@ main() {
 		*/
 	#endif
 	
-	//mat4_t mat4_trans = { 1.f, 2.f, 3.f, 0.f, 1.f, 2.f, 3.f, 0.f, 1.f, 2.f, 3.f, 0.f, 0.f, 0.f, 0.f, 1.f};
-	//vec3_t vec3_trans = { 2.f, 2.f, 2.f};
-	//vec3_t vec3_result_trans = { 6.f, 12.f, 18.f};
+	//Mat4 Mat4rans = { 1.f, 2.f, 3.f, 0.f, 1.f, 2.f, 3.f, 0.f, 1.f, 2.f, 3.f, 0.f, 0.f, 0.f, 0.f, 1.f};
+	//Vec3 Vec3rans = { 2.f, 2.f, 2.f};
+	//Vec3 vec3_result_trans = { 6.f, 12.f, 18.f};
 	//
-	//vec3_t *transformed = transform_point_new(&mat4_trans, &vec3_trans);
+	//Vec3 *transformed = transform_point_new(&Mat4rans, &Vec3rans);
 	//assert(vec3_equals(transformed, &vec3_result_trans));
 	//
 	//free(transformed);
 	//
-	//transform_point(&mat4_trans, &vec3_trans);
-	//assert(vec3_equals(&vec3_trans, &vec3_result_trans));
+	//transform_point(&Mat4rans, &Vec3rans);
+	//assert(vec3_equals(&Vec3rans, &vec3_result_trans));
 	//
-	//mat4_trans = (mat4_t) { 1.f, 2.f, 3.f, 0.5f, 1.f, 2.f, 3.f, 0.5f, 1.f, 2.f, 3.f, 0.5f, 0.f, 0.f, 0.f, 1.f};
-	//vec3_trans = (vec3_t) { 2.f, 2.f, 2.f};
-	//vec3_result_trans = (vec3_t) { (6.f/4.), (12.f/4.), (18.f/4.)};
+	//Mat4rans = (Mat4) { 1.f, 2.f, 3.f, 0.5f, 1.f, 2.f, 3.f, 0.5f, 1.f, 2.f, 3.f, 0.5f, 0.f, 0.f, 0.f, 1.f};
+	//Vec3rans = (Vec3) { 2.f, 2.f, 2.f};
+	//vec3_result_trans = (Vec3) { (6.f/4.), (12.f/4.), (18.f/4.)};
 	//
-	//transform_point(&mat4_trans, &vec3_trans);
-	//assert(vec3_equals(&vec3_trans, &vec3_result_trans));
+	//transform_point(&Mat4rans, &Vec3rans);
+	//assert(vec3_equals(&Vec3rans, &vec3_result_trans));
 	
 		
 	float degree = 0.f;
@@ -398,15 +398,15 @@ main() {
 		*/
 	#endif
 	
-	mat3_t * rotx_mat = create_rot_x_mat(90.f);
-	mat3_t * roty_mat = create_rot_y_mat(90.f);
-	mat3_t * rotz_mat = create_rot_z_mat(90.f);
+	Mat3 * rotx_mat = create_rot_x_mat(90.f);
+	Mat3 * roty_mat = create_rot_y_mat(90.f);
+	Mat3 * rotz_mat = create_rot_z_mat(90.f);
 	
-	vec3_t vec31 = { 1.f, 0.f, 0.f};
-	vec3_t vec32 = { 1.f, 0.f, 0.f};
-	vec3_t vec33 = { 1.f, 0.f, 0.f};
+	Vec3 vec31 = { 1.f, 0.f, 0.f};
+	Vec3 vec32 = { 1.f, 0.f, 0.f};
+	Vec3 vec33 = { 1.f, 0.f, 0.f};
 	
-	vec3_t vec31_result = { 1.f, 0.f, 0.f};
+	Vec3 vec31_result = { 1.f, 0.f, 0.f};
 	
 	#ifdef debug
 		printf("before rot x: "); vec3_print(&vec31);
@@ -464,7 +464,7 @@ main() {
 		//test is inside mandelbrotset
 	#endif
 	
-	mandelbrot_point_t result;
+	MandelbrotPoint result;
 	int iteratrions = 20;
 	float _Complex cp = -2.f+1.f*I;
 	
@@ -492,10 +492,10 @@ main() {
 	#ifdef debug
 		printf("line intersection denominator:\n");
 	#endif
-	vec2_t p1 = {-1.f, 1.f};
-	vec2_t p2 = {-1.f, -1.f};
-	vec2_t p3 = {1.f, 1.f};
-	vec2_t p4 = {1.f, -1.f};
+	Vec2 p1 = {-1.f, 1.f};
+	Vec2 p2 = {-1.f, -1.f};
+	Vec2 p3 = {1.f, 1.f};
+	Vec2 p4 = {1.f, -1.f};
 
 	float denominator = line_intersect_denominator(&p1, &p2, &p3, &p4);
 	#ifdef debug
@@ -504,10 +504,10 @@ main() {
 	assert(denominator == 0.f);
 	assert(lines_intersect(&p1, &p2, &p3, &p4) == false);
 
-	p1 = (vec2_t){-1.f, 1.f};
-	p2 = (vec2_t){-1.f, -1.f};
-	p3 = (vec2_t){-.9f, 1.f};
-	p4 = (vec2_t){-.9f, -1.f};
+	p1 = (Vec2){-1.f, 1.f};
+	p2 = (Vec2){-1.f, -1.f};
+	p3 = (Vec2){-.9f, 1.f};
+	p4 = (Vec2){-.9f, -1.f};
 
 	denominator = line_intersect_denominator(&p1, &p2, &p3, &p4);
 	#ifdef debug
@@ -516,10 +516,10 @@ main() {
 	assert(denominator == 0.f);
 	assert(lines_intersect(&p1, &p2, &p3, &p4) == false);
 
-	p1 = (vec2_t){-1.f, 1.f};
-	p2 = (vec2_t){1.f, -1.f};
-	p3 = (vec2_t){-1.f, -1.f};
-	p4 = (vec2_t){1.f, 1.f};
+	p1 = (Vec2){-1.f, 1.f};
+	p2 = (Vec2){1.f, -1.f};
+	p3 = (Vec2){-1.f, -1.f};
+	p4 = (Vec2){1.f, 1.f};
 
 	denominator = line_intersect_denominator(&p1, &p2, &p3, &p4);
 	#ifdef debug
@@ -528,10 +528,10 @@ main() {
 	assert(denominator != 0.f);
 	assert(lines_intersect(&p1, &p2, &p3, &p4) == true);
 
-	p3 = (vec2_t){-1.f, 1.f};
-	p4 = (vec2_t){1.f, -1.f};
-	p2 = (vec2_t){-1.f, -1.f};
-	p1 = (vec2_t){1.f, 1.f};
+	p3 = (Vec2){-1.f, 1.f};
+	p4 = (Vec2){1.f, -1.f};
+	p2 = (Vec2){-1.f, -1.f};
+	p1 = (Vec2){1.f, 1.f};
 
 	denominator = line_intersect_denominator(&p1, &p2, &p3, &p4);
 	#ifdef debug
@@ -542,11 +542,11 @@ main() {
 	assert(lines_intersect(&p1, &p2, &p3, &p4) == true);
 
 
-	p1 = (vec2_t){.6f, 1.1f};
-	p2 = (vec2_t){.4f, .6f};
-	p3 = (vec2_t){0.f, .0f};
-	p4 = (vec2_t){.3f, .8f};
-	vec2_t intersection = {-100.f, -100.f};
+	p1 = (Vec2){.6f, 1.1f};
+	p2 = (Vec2){.4f, .6f};
+	p3 = (Vec2){0.f, .0f};
+	p4 = (Vec2){.3f, .8f};
+	Vec2 intersection = {-100.f, -100.f};
 
 	assert(lineseg_intersect_pt(&intersection, &p1, &p2, &p3, &p4) == false);
 	#ifdef debug
@@ -554,11 +554,11 @@ main() {
 		vec2_print(&intersection);
 	#endif
 	
-	p1 = (vec2_t){-1.f, 1.f};
-	p2 = (vec2_t){1.f, -1.f};
-	p3 = (vec2_t){-1.f, -1.f};
-	p4 = (vec2_t){1.f, 1.f};
-	intersection = (vec2_t){-100.f, -100.f};
+	p1 = (Vec2){-1.f, 1.f};
+	p2 = (Vec2){1.f, -1.f};
+	p3 = (Vec2){-1.f, -1.f};
+	p4 = (Vec2){1.f, 1.f};
+	intersection = (Vec2){-100.f, -100.f};
 
 	assert(lines_intersect_pt(&intersection, &p1, &p2, &p3, &p4) == true);
 	#ifdef debug
@@ -576,11 +576,11 @@ main() {
 	assert(intersection.x == 0.f);
 	assert(intersection.y == 0.f);
 
-	p1 = (vec2_t){-1.5f, .5f};
-	p2 = (vec2_t){.5f, -1.5f};
-	p3 = (vec2_t){-1.5f, -1.5f};
-	p4 = (vec2_t){.5f, .5f};
-	intersection = (vec2_t){-100.f, -100.f};
+	p1 = (Vec2){-1.5f, .5f};
+	p2 = (Vec2){.5f, -1.5f};
+	p3 = (Vec2){-1.5f, -1.5f};
+	p4 = (Vec2){.5f, .5f};
+	intersection = (Vec2){-100.f, -100.f};
 
 	assert(lines_intersect_pt(&intersection, &p1, &p2, &p3, &p4) == true);
 	#ifdef debug
@@ -598,11 +598,11 @@ main() {
 	assert(intersection.x == -0.5f);
 	assert(intersection.y == -0.5f);
 
-	p1 = (vec2_t){-.5f, 1.5f};
-	p2 = (vec2_t){2.f, .5f};
-	p3 = (vec2_t){1.f, -.5f};
-	p4 = (vec2_t){1.f, 2.f};
-	intersection = (vec2_t){-100.f, -100.f};
+	p1 = (Vec2){-.5f, 1.5f};
+	p2 = (Vec2){2.f, .5f};
+	p3 = (Vec2){1.f, -.5f};
+	p4 = (Vec2){1.f, 2.f};
+	intersection = (Vec2){-100.f, -100.f};
 
 	assert(lines_intersect_pt(&intersection, &p1, &p2, &p3, &p4) == true);
 	#ifdef debug
@@ -620,17 +620,17 @@ main() {
 	assert(intersection.x == 1.f);
 	assert(intersection.y == 0.9f);
 
-	point = (vec3_t){0.5f, 1.f, 0.5f};
-	vec3_t plane_p1 = {0.f, 0.f, 0.f};
-	vec3_t plane_p2 = {0.f, 0.f, 1.f};
-	vec3_t plane_p3 = {1.f, 0.f, 0.f};
+	point = (Vec3){0.5f, 1.f, 0.5f};
+	Vec3 plane_p1 = {0.f, 0.f, 0.f};
+	Vec3 plane_p2 = {0.f, 0.f, 1.f};
+	Vec3 plane_p3 = {1.f, 0.f, 0.f};
 	float distance = mu_point_plane_distance(&point, &plane_p1, &plane_p2, &plane_p3);
 	assert(distance == 1.f);
 
-	point = (vec3_t){0.5f, 0.5f, 0.5f};
-	vec3_t sub1;
-	vec3_t sub2;
-	vec3_t _norm;
+	point = (Vec3){0.5f, 0.5f, 0.5f};
+	Vec3 sub1;
+	Vec3 sub2;
+	Vec3 _norm;
 	vec3_sub_dest(&sub1, &plane_p2, &plane_p1);
 	vec3_sub_dest(&sub2, &plane_p3, &plane_p1);
 
@@ -639,42 +639,42 @@ main() {
 	distance = mu_point_plane_distance_normal(&point, &plane_p1,&_norm);
 	assert(distance == 0.5f);
 
-	point = (vec3_t){0.5f, -0.5f, 0.5f};
+	point = (Vec3){0.5f, -0.5f, 0.5f};
 
 	distance = mu_point_plane_distance_normal(&point, &plane_p1,&_norm);
 	assert(distance == -0.5f);
 
-	//bool mu_line_plane_intersection(vec3_t *_intersect, vec3_t * _line_p1, vec3_t * _line_p2, vec3_t * _plane_p1, vec3_t * _plane_p2, vec3_t * _plane_p3)
-	vec3_t inter_pt;
-	vec3_t line_p1 = {0.5f, 0.5f, 0.5f};
-	vec3_t line_p2 = {0.5f, -0.5f, 0.5f};
+	//bool mu_line_plane_intersection(Vec3 *_intersect, Vec3 * _line_p1, Vec3 * _line_p2, Vec3 * _plane_p1, Vec3 * _plane_p2, Vec3 * _plane_p3)
+	Vec3 inter_pt;
+	Vec3 line_p1 = {0.5f, 0.5f, 0.5f};
+	Vec3 line_p2 = {0.5f, -0.5f, 0.5f};
 	bool intersects = mu_line_plane_intersection(&inter_pt, &line_p1, &line_p2, &plane_p1, &plane_p2, &plane_p3);
 
 	assert(intersects == true);
-	vec3_t expected_intersection = {0.5f, 0.f, 0.5f};
+	Vec3 expected_intersection = {0.5f, 0.f, 0.5f};
 	assert(vec3_equals(&inter_pt, &expected_intersection));
 
-	line_p1 = (vec3_t){0.5f, 0.5f, 0.5f};
-	line_p2 = (vec3_t){-0.5f, 0.5f, -0.5f};
+	line_p1 = (Vec3){0.5f, 0.5f, 0.5f};
+	line_p2 = (Vec3){-0.5f, 0.5f, -0.5f};
 	intersects = mu_line_plane_intersection(&inter_pt, &line_p1, &line_p2, &plane_p1, &plane_p2, &plane_p3);
 
 	assert(intersects == false);
 
-	line_p1 = (vec3_t){0.5f, 0.5f, 0.5f};
-	line_p2 = (vec3_t){-0.5f, -0.5f, -0.5f};
+	line_p1 = (Vec3){0.5f, 0.5f, 0.5f};
+	line_p2 = (Vec3){-0.5f, -0.5f, -0.5f};
 	intersects = mu_line_plane_intersection(&inter_pt, &line_p1, &line_p2, &plane_p1, &plane_p2, &plane_p3);
 
 	assert(intersects == true);
-	expected_intersection = (vec3_t){0.f, 0.f, 0.0f};
+	expected_intersection = (Vec3){0.f, 0.f, 0.0f};
 	assert(vec3_equals(&inter_pt, &expected_intersection));
 
 
-	vec3_t p1__ = {-1.f, -1.f, 0.f};
-	vec3_t p2__ = {-1.f, 1.f, 0.f};
-	vec3_t p3__ = {1.f, -1.f, 0.f};
-	vec3_t p21;
-	vec3_t p31;
-	vec3_t n__;
+	Vec3 p1__ = {-1.f, -1.f, 0.f};
+	Vec3 p2__ = {-1.f, 1.f, 0.f};
+	Vec3 p3__ = {1.f, -1.f, 0.f};
+	Vec3 p21;
+	Vec3 p31;
+	Vec3 n__;
 	vec3_sub_dest(&p21, &p2__, &p1__);
 	vec3_sub_dest(&p31, &p3__, &p1__);
 
@@ -699,13 +699,13 @@ main() {
 	vec3_print(&n__);
 	#endif
 
-	vec2_t points[5] = {{7.f, 1.f}, {8.f, 5.f}, {5.f, 4.f}, {2.f, 5.f}, {1.f, 1.f}};
+	Vec2 points[5] = {{7.f, 1.f}, {8.f, 5.f}, {5.f, 4.f}, {2.f, 5.f}, {1.f, 1.f}};
 
 	float polyarea = polygon_area_2D(&points[0], 5);
 	assert(polyarea == 21.f);
 	assert(polygon_2D_is_clockwise(&points[0], 5) == false);
 
-	vec2_t points2[5] = { {1.f, 1.f}, {2.f, 5.f}, {5.f, 4.f}, {8.f, 5.f}, {7.f, 1.f}};
+	Vec2 points2[5] = { {1.f, 1.f}, {2.f, 5.f}, {5.f, 4.f}, {8.f, 5.f}, {7.f, 1.f}};
 
 	polyarea = polygon_area_2D(&points2[0], 5);
 	assert(polyarea == -21.f);

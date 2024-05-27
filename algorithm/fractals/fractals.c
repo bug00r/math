@@ -1,35 +1,35 @@
 #include "fractals.h"
 
-julia_t * 
+Julia * 
 julia_new(const unsigned int width, const unsigned int height){
-	julia_t * newjulia = malloc(sizeof(julia_t));
-	newjulia->map = array2D_new(width, height, sizeof(julia_point_t));
+	Julia * newjulia = malloc(sizeof(Julia));
+	newjulia->map = array2D_new(width, height, sizeof(JuliaPoint));
 	return newjulia;
 }
 
 void 
-julia_free(julia_t * julia){
+julia_free(Julia * julia){
 	array_free(julia->map);
 	free(julia);
 }
 
-mandelbrot_t * 
+Mandelbrot * 
 mandelbrot_new(const unsigned int width, const unsigned int height){
-	mandelbrot_t * newmb = malloc(sizeof(mandelbrot_t));
-	newmb->map = array2D_new(width, height, sizeof(mandelbrot_point_t));
+	Mandelbrot * newmb = malloc(sizeof(Mandelbrot));
+	newmb->map = array2D_new(width, height, sizeof(MandelbrotPoint));
 	return newmb;
 }
 
-void mandelbrot_free(mandelbrot_t * mandelbrot){
+void mandelbrot_free(Mandelbrot * mandelbrot){
 	array_free(mandelbrot->map);
 	free(mandelbrot);
 }
 
 void 
-create_mandelbrot(const mandelbrot_t * mandelbrot){
+create_mandelbrot(const Mandelbrot * mandelbrot){
 	float curreal = mandelbrot->minreal;
 	float curimag = mandelbrot->minimag;
-	mandelbrot_point_t * mandelbrot_array = (mandelbrot_point_t *)mandelbrot->map->entries;
+	MandelbrotPoint * mandelbrot_array = (MandelbrotPoint *)mandelbrot->map->entries;
 	float _Complex cp;
 
 	int mwidth = mandelbrot->map->config->size;
@@ -112,10 +112,10 @@ float _Complex julia_pfunc_px_random(const float _Complex *cp, const float _Comp
 }
 
 void 
-create_julia(const julia_t * julia){
+create_julia(const Julia * julia){
 	float curreal = julia->minreal;
 	float curimag = julia->minimag;
-	julia_point_t * julia_array = (julia_point_t *)julia->map->entries;
+	JuliaPoint * julia_array = (JuliaPoint *)julia->map->entries;
 	float _Complex cp;
 
 	int jwidth = julia->map->config->size;

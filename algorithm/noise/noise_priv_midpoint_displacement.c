@@ -1,6 +1,6 @@
 void 
-create_midpoint_displacement( midpoint_displacement_t * param ){
-	noise_t * noise = param->noise;
+create_midpoint_displacement( MidpointDisplacement * param ){
+	Noise * noise = param->noise;
 	int length = param->length;
 	float startseed = param->startseed;
 	float seed = param->seed;

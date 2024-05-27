@@ -79,7 +79,7 @@ static void test_compression_lz77_single_test(const char *_txt, const char *_cap
 {
 	DEBUG_LOG_ARGS("\n################ %s #################### \n\n", _cap);
 
-	lz77_buf_t bufText;
+	LZ77Buf bufText;
 	lz77BufPtr bufTextPtr = &bufText;
 
 	unsigned char *txt = (unsigned char *)_txt;
@@ -88,11 +88,11 @@ static void test_compression_lz77_single_test(const char *_txt, const char *_cap
 
 	DEBUG_LOG_ARGS("ENCODE TEST BYTE CNT: %lli\n", bufTextPtr->numBytes);
 
-	lz77_buf_t bufEncoded;
+	LZ77Buf bufEncoded;
 	lz77BufPtr bufEncodedPtr = &bufEncoded;
-	lz77_result_t result = LZ77_ERR;
+	LZ77Result result = LZ77_ERR;
 
-	lz77_param_t paramEncoding;
+	LZ77Param paramEncoding;
 	paramEncoding.searchBufSize = searchBufferSize;
     paramEncoding.lookaheadBufSize = lookAheadBufferSize;
 	lz77ParamPtr paramEncodingPtr = &paramEncoding;
@@ -107,7 +107,7 @@ static void test_compression_lz77_single_test(const char *_txt, const char *_cap
 
 	assert(bufEncodedPtr->numBytes > 0);
 
-	lz77_buf_t bufDecoded;
+	LZ77Buf bufDecoded;
 	lz77BufPtr bufDecodedPtr = &bufDecoded;
 
 	result = LZ77_ERR;

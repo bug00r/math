@@ -47,7 +47,7 @@ float seedrnd(const float seed){
 
 
 void 
-inside_mandelbrot_set(const float _Complex * point, const int cntiterations, mandelbrot_point_t *result){
+inside_mandelbrot_set(const float _Complex * point, const int cntiterations, MandelbrotPoint *result){
 	float _Complex cur_Complex = 0.f + 0.f*I;
 	float curabs;
 	bool insinde = true;
@@ -68,7 +68,7 @@ inside_mandelbrot_set(const float _Complex * point, const int cntiterations, man
 }
 
 void 
-inside_julia_set(const float _Complex *point, const float _Complex *c, const int cntiterations, julia_point_t *result, 
+inside_julia_set(const float _Complex *point, const float _Complex *c, const int cntiterations, JuliaPoint *result, 
 				 float _Complex (*polyfunc)( const float _Complex *cp, const float _Complex *c))
 {
 	float _Complex cur_Complex = *point;
@@ -103,8 +103,8 @@ rand_path_deg(const int maxdeg){
 }
 #if defined(USE_VEC_3)
 
-vec3_t * 
-vec3_scale_dest(vec3_t * dest, const float scx, const float scy, const float scz){
+Vec3 * 
+vec3_scale_dest(Vec3 * dest, const float scx, const float scy, const float scz){
 	dest->x *= scx;
 	dest->y *= scy;
 	dest->z *= scz;
@@ -116,35 +116,35 @@ vec3_scale_dest(vec3_t * dest, const float scx, const float scy, const float scz
 #if defined(USE_VEC_2) && defined(USE_MAT_2)
 
 void 
-mat_vec_mul_2(const mat2_t* m, vec2_t * v){
-	vec2_t temp = {v->x, v->y};
+mat_vec_mul_2(const Mat2* m, Vec2 * v){
+	Vec2 temp = {v->x, v->y};
 	v->x = (m->_11 * temp.x) + (m->_12 * temp.y);
 	v->y = (m->_21 * temp.x) + (m->_22 * temp.y);
 }
 
-vec2_t * 
-mat_vec_mul_2_new(const mat2_t* m, const vec2_t * v){
-	vec2_t * newvec = malloc(vec2_size);
+Vec2 * 
+mat_vec_mul_2_new(const Mat2* m, const Vec2 * v){
+	Vec2 * newvec = malloc(vec2_size);
 	newvec->x = (m->_11 * v->x) + (m->_12 * v->y);
 	newvec->y = (m->_21 * v->x) + (m->_22 * v->y);
 	return newvec;
 }
 
 float 
-place_of_vec3(const vec3_t * s, const vec3_t * e, const vec3_t * p){	
+place_of_vec3(const Vec3 * s, const Vec3 * e, const Vec3 * p){	
 	return (p->x - s->x) * (e->y - s->y) - (p->y - s->y) * (e->x - s->x);
 	#if 0
-	mat2_t temp = { (p->x - s->x), (p->y - s->y), (e->x - s->x),(e->y - s->y)};
+	Mat2 temp = { (p->x - s->x), (p->y - s->y), (e->x - s->x),(e->y - s->y)};
 	return mat2_determinant(&temp);
 	#endif
 }
 
 void 
-is_inside_triangle(const vec3_t * v0, const vec3_t * v1, const vec3_t * v2, const vec3_t * p, barycentric_t * bc){
+is_inside_triangle(const Vec3 * v0, const Vec3 * v1, const Vec3 * v2, const Vec3 * p, Barycentric * bc){
 	//top left edge test
 	//bc->inside = true;
 	bc->inside = false;
-	const vec3_t *_v0 = v0, *_v1 = v1, *_v2=v2,*_p=p;
+	const Vec3 *_v0 = v0, *_v1 = v1, *_v2=v2,*_p=p;
 	//maybe we have a counter clockwise problem
 	bc->w0_12 = (_p->x - _v1->x) * (_v2->y - _v1->y) - (_p->y - _v1->y) * (_v2->x - _v1->x);
 	if (bc->w0_12 < 0.f) return;
@@ -154,7 +154,7 @@ is_inside_triangle(const vec3_t * v0, const vec3_t * v1, const vec3_t * v2, cons
 	if (bc->w2_01 < 0.f) return;
 	
 	//top left edge test
-	//vec3_t edge0, edge1, edge2;
+	//Vec3 edge0, edge1, edge2;
 	//
 	//vec3_sub_dest(&edge0, v2, v1);
 	//vec3_sub_dest(&edge1, v0, v2);
@@ -174,7 +174,7 @@ is_inside_triangle(const vec3_t * v0, const vec3_t * v1, const vec3_t * v2, cons
 }
 
 void 
-print_barycentric(const barycentric_t * bc){
+print_barycentric(const Barycentric * bc){
 	printf("w0_12:\t%f\n", bc->w0_12);
 	printf("w1_20:\t%f\n", bc->w1_20);
 	printf("w2_01:\t%f\n", bc->w2_01);
@@ -187,33 +187,33 @@ print_barycentric(const barycentric_t * bc){
 
 #endif
 
-float line_intersect_denominator(vec2_t* _l1p1, vec2_t* _l1p2, vec2_t* _l2p1, vec2_t* _l2p2) {
-	vec2_t* l1p1 = _l1p1;
-	vec2_t* l1p2 = _l1p2;
-	vec2_t* l2p1 = _l2p1;
-	vec2_t* l2p2 = _l2p2;
+float line_intersect_denominator(Vec2* _l1p1, Vec2* _l1p2, Vec2* _l2p1, Vec2* _l2p2) {
+	Vec2* l1p1 = _l1p1;
+	Vec2* l1p2 = _l1p2;
+	Vec2* l2p1 = _l2p1;
+	Vec2* l2p2 = _l2p2;
 
 	return (l1p1->x - l1p2->x)*(l2p1->y - l2p2->y) - (l1p1->y - l1p2->y)*(l2p1->x - l2p2->x);
 
 }
 
-bool lines_intersect(vec2_t* _l1p1, vec2_t* _l1p2, vec2_t* _l2p1, vec2_t* _l2p2) {
-	vec2_t* l1p1 = _l1p1;
-	vec2_t* l1p2 = _l1p2;
-	vec2_t* l2p1 = _l2p1;
-	vec2_t* l2p2 = _l2p2;
+bool lines_intersect(Vec2* _l1p1, Vec2* _l1p2, Vec2* _l2p1, Vec2* _l2p2) {
+	Vec2* l1p1 = _l1p1;
+	Vec2* l1p2 = _l1p2;
+	Vec2* l2p1 = _l2p1;
+	Vec2* l2p2 = _l2p2;
 
 	float denom = line_intersect_denominator(l1p1, l1p2, l2p1, l2p2);
 
 	return (denom != 0.f);
 }
 
-bool lines_intersect_pt(vec2_t *intersec, vec2_t* _l1p1, vec2_t* _l1p2, vec2_t* _l2p1, vec2_t* _l2p2) {
+bool lines_intersect_pt(Vec2 *intersec, Vec2* _l1p1, Vec2* _l1p2, Vec2* _l2p1, Vec2* _l2p2) {
 
-	vec2_t* l1p1 = _l1p1;
-	vec2_t* l1p2 = _l1p2;
-	vec2_t* l2p1 = _l2p1;
-	vec2_t* l2p2 = _l2p2;
+	Vec2* l1p1 = _l1p1;
+	Vec2* l1p2 = _l1p2;
+	Vec2* l2p1 = _l2p1;
+	Vec2* l2p2 = _l2p2;
 
 	float denom = line_intersect_denominator(l1p1, l1p2, l2p1, l2p2);
 	if (denom != 0.f && intersec) {
@@ -233,7 +233,7 @@ bool lines_intersect_pt(vec2_t *intersec, vec2_t* _l1p1, vec2_t* _l1p2, vec2_t* 
 	return denom != 0.f;
 }
 
-static void __mu_lineseg_intersec_raw(vec2_t* l1p1, vec2_t* l1p2, vec2_t* l2p1, vec2_t* l2p2, bool *intersect, vec2_t *intersect_pt) {
+static void __mu_lineseg_intersec_raw(Vec2* l1p1, Vec2* l1p2, Vec2* l2p1, Vec2* l2p2, bool *intersect, Vec2 *intersect_pt) {
 
 	*intersect = line_intersect_denominator(l1p1, l1p2, l2p1, l2p2);
 
@@ -267,17 +267,17 @@ static void __mu_lineseg_intersec_raw(vec2_t* l1p1, vec2_t* l1p2, vec2_t* l2p1, 
 
 }
 
-bool lineseg_intersect(vec2_t* l1p1, vec2_t* l1p2, vec2_t* l2p1, vec2_t* l2p2) {
+bool lineseg_intersect(Vec2* l1p1, Vec2* l1p2, Vec2* l2p1, Vec2* l2p2) {
 
 	bool intersect;
-	vec2_t intersect_pt;
+	Vec2 intersect_pt;
 
 	 __mu_lineseg_intersec_raw(l1p1, l1p2, l2p1, l2p2, &intersect, &intersect_pt);
 
 	return intersect;
 }
 
-bool lineseg_intersect_pt(vec2_t *intersec, vec2_t* l1p1, vec2_t* l1p2, vec2_t* l2p1, vec2_t* l2p2) {
+bool lineseg_intersect_pt(Vec2 *intersec, Vec2* l1p1, Vec2* l1p2, Vec2* l2p1, Vec2* l2p2) {
 	
 	bool intersect;
 	
@@ -290,34 +290,34 @@ bool lineseg_intersect_pt(vec2_t *intersec, vec2_t* l1p1, vec2_t* l1p2, vec2_t* 
 #if defined(USE_VEC_3) && defined(USE_MAT_3)
 
 void 
-mat_vec_mul_3(const mat3_t* m, vec3_t * v){
-	vec3_t temp = {v->x, v->y, v->z};
+mat_vec_mul_3(const Mat3* m, Vec3 * v){
+	Vec3 temp = {v->x, v->y, v->z};
 	v->x = (m->_11 * temp.x) + (m->_12 * temp.y) + (m->_13 * temp.z);
 	v->y = (m->_21 * temp.x) + (m->_22 * temp.y) + (m->_23 * temp.z);
 	v->z = (m->_31 * temp.x) + (m->_32 * temp.y) + (m->_33 * temp.z);
 }
 
 
-vec3_t * 
-mat_vec_mul_3_new(const mat3_t* m, const vec3_t * v){
-	vec3_t * newvec = malloc(vec3_size);
+Vec3 * 
+mat_vec_mul_3_new(const Mat3* m, const Vec3 * v){
+	Vec3 * newvec = malloc(vec3_size);
 	newvec->x = (m->_11 * v->x) + (m->_12 * v->y) + (m->_13 * v->z);
 	newvec->y = (m->_21 * v->x) + (m->_22 * v->y) + (m->_23 * v->z);
 	newvec->z = (m->_31 * v->x) + (m->_32 * v->y) + (m->_33 * v->z);
 	return newvec;
 }
 
-vec3_t * mat_vec_mul_3_dest(vec3_t * dest, const mat3_t *  m, const vec3_t *  v) {
-	vec3_t * newvec = dest;
+Vec3 * mat_vec_mul_3_dest(Vec3 * dest, const Mat3 *  m, const Vec3 *  v) {
+	Vec3 * newvec = dest;
 	newvec->x = (m->_11 * v->x) + (m->_12 * v->y) + (m->_13 * v->z);
 	newvec->y = (m->_21 * v->x) + (m->_22 * v->y) + (m->_23 * v->z);
 	newvec->z = (m->_31 * v->x) + (m->_32 * v->y) + (m->_33 * v->z);
 	return newvec;
 }
 
-mat3_t * 
+Mat3 * 
 create_rot_x_mat(const float degree){
-	mat3_t * rotmat = malloc(mat3_size);
+	Mat3 * rotmat = malloc(mat3_size);
 	const float radian = onedegrad * degree;
 	const float sinus = sinf(radian);
 	const float cosinus = cosf(radian);
@@ -333,9 +333,9 @@ create_rot_x_mat(const float degree){
 	return rotmat;
 }
 
-mat3_t * 
-create_rot_x_mat_dest(mat3_t * dest, const float degree){
-	mat3_t * rotmat = dest;
+Mat3 * 
+create_rot_x_mat_dest(Mat3 * dest, const float degree){
+	Mat3 * rotmat = dest;
 	const float radian = onedegrad * degree;
 	const float sinus = sinf(radian);
 	const float cosinus = cosf(radian);
@@ -351,9 +351,9 @@ create_rot_x_mat_dest(mat3_t * dest, const float degree){
 	return dest;
 }
 
-mat3_t * 
+Mat3 * 
 create_rot_y_mat(const float degree){
-	mat3_t * rotmat = malloc(mat3_size);
+	Mat3 * rotmat = malloc(mat3_size);
 	const float radian = onedegrad * degree;
 	const float sinus = sinf(radian);
 	const float cosinus = cosf(radian);
@@ -369,9 +369,9 @@ create_rot_y_mat(const float degree){
 	return rotmat;
 }
 
-mat3_t * 
-create_rot_y_mat_dest(mat3_t * dest, const float degree){
-	mat3_t * rotmat = dest;
+Mat3 * 
+create_rot_y_mat_dest(Mat3 * dest, const float degree){
+	Mat3 * rotmat = dest;
 	const float radian = onedegrad * degree;
 	const float sinus = sinf(radian);
 	const float cosinus = cosf(radian);
@@ -387,9 +387,9 @@ create_rot_y_mat_dest(mat3_t * dest, const float degree){
 	return dest;
 }
 
-mat3_t * 
+Mat3 * 
 create_rot_z_mat(const float degree){
-	mat3_t * rotmat = malloc(mat3_size);
+	Mat3 * rotmat = malloc(mat3_size);
 	const float radian = onedegrad * degree;
 	const float sinus = sinf(radian);
 	const float cosinus = cosf(radian);
@@ -405,9 +405,9 @@ create_rot_z_mat(const float degree){
 	return rotmat;
 }
 
-mat3_t * 
-create_rot_z_mat_dest(mat3_t * dest, const float degree){
-	mat3_t * rotmat = dest;
+Mat3 * 
+create_rot_z_mat_dest(Mat3 * dest, const float degree){
+	Mat3 * rotmat = dest;
 	const float radian = onedegrad * degree;
 	const float sinus = sinf(radian);
 	const float cosinus = cosf(radian);
@@ -428,8 +428,8 @@ create_rot_z_mat_dest(mat3_t * dest, const float degree){
 #if defined(USE_VEC_3) && defined(USE_MAT_4)
 
 float 
-transform_point(const mat4_t *  m, vec3_t *  v){
-	vec3_t temp = {
+transform_point(const Mat4 *  m, Vec3 *  v){
+	Vec3 temp = {
 		(v->x * m->_11) + (v->y * m->_12) + (v->z * m->_13) + m->_14,
 		(v->x * m->_21) + (v->y * m->_22) + (v->z * m->_23) + m->_24,
 		(v->x * m->_31) + (v->y * m->_32) + (v->z * m->_33) + m->_34
@@ -446,14 +446,14 @@ transform_point(const mat4_t *  m, vec3_t *  v){
 	return weight;
 }
 
-vec3_t * 
-transform_point_new(const mat4_t *  m, const vec3_t *  v){
-	vec3_t * newvec = vec3_copy_new(v);
+Vec3 * 
+transform_point_new(const Mat4 *  m, const Vec3 *  v){
+	Vec3 * newvec = vec3_copy_new(v);
 	transform_point(m, newvec); //weight ignored useless!!!
 	return newvec;
 }
 
-float transform_point_dest(vec3_t *  dest, const mat4_t *  m, const vec3_t *  v){
+float transform_point_dest(Vec3 *  dest, const Mat4 *  m, const Vec3 *  v){
 
 	dest->x = (v->x * m->_11) + (v->y * m->_12) + (v->z * m->_13) + m->_14;
 	dest->y = (v->x * m->_21) + (v->y * m->_22) + (v->z * m->_23) + m->_24;
@@ -471,15 +471,15 @@ float transform_point_dest(vec3_t *  dest, const mat4_t *  m, const vec3_t *  v)
 	//return transform_point(m, dest);
 }
 
-float mu_point_plane_distance(vec3_t *_point, vec3_t *_plane_p1, vec3_t *_plane_p2, vec3_t *_plane_p3) {
-	vec3_t * p = _point;
-	vec3_t * pp1 = _plane_p1;
-	vec3_t * pp2 = _plane_p2;
-	vec3_t * pp3 = _plane_p3;
+float mu_point_plane_distance(Vec3 *_point, Vec3 *_plane_p1, Vec3 *_plane_p2, Vec3 *_plane_p3) {
+	Vec3 * p = _point;
+	Vec3 * pp1 = _plane_p1;
+	Vec3 * pp2 = _plane_p2;
+	Vec3 * pp3 = _plane_p3;
 
-	vec3_t dvec_p21;
-	vec3_t dvec_p31;
-	vec3_t normal;
+	Vec3 dvec_p21;
+	Vec3 dvec_p31;
+	Vec3 normal;
 
 	vec3_sub_dest(&dvec_p21, pp2, pp1);
 	vec3_sub_dest(&dvec_p31, pp3, pp1);
@@ -489,29 +489,29 @@ float mu_point_plane_distance(vec3_t *_point, vec3_t *_plane_p1, vec3_t *_plane_
 	return mu_point_plane_distance_normal(p, pp1, &normal);
 }
 
-float mu_point_plane_distance_normal(vec3_t *_point, vec3_t *_plane_point, vec3_t *_normal) {
-	vec3_t * p = _point;
-	vec3_t * pp = _plane_point;
-	vec3_t * normal = _normal;
+float mu_point_plane_distance_normal(Vec3 *_point, Vec3 *_plane_point, Vec3 *_normal) {
+	Vec3 * p = _point;
+	Vec3 * pp = _plane_point;
+	Vec3 * normal = _normal;
 
-	vec3_t p_pp1_sub;
+	Vec3 p_pp1_sub;
 	vec3_sub_dest(&p_pp1_sub, p, pp);
 
 	return vec3_vec3mul(normal, &p_pp1_sub) / vec3_length(normal);
 }
 
-bool mu_line_plane_intersection(vec3_t *_intersect, vec3_t * _line_p1, vec3_t * _line_p2, vec3_t * _plane_p1, vec3_t * _plane_p2, vec3_t * _plane_p3) {
-	vec3_t * pp1 = _plane_p1;
-	vec3_t * pp2 = _plane_p2;
-	vec3_t * pp3 = _plane_p3;
-	vec3_t * lp1 = _line_p1;
-	vec3_t * lp2 = _line_p2;
-	vec3_t * inter = _intersect;
+bool mu_line_plane_intersection(Vec3 *_intersect, Vec3 * _line_p1, Vec3 * _line_p2, Vec3 * _plane_p1, Vec3 * _plane_p2, Vec3 * _plane_p3) {
+	Vec3 * pp1 = _plane_p1;
+	Vec3 * pp2 = _plane_p2;
+	Vec3 * pp3 = _plane_p3;
+	Vec3 * lp1 = _line_p1;
+	Vec3 * lp2 = _line_p2;
+	Vec3 * inter = _intersect;
 
 	// redundant normal vector calc => outsourcing
-	vec3_t dvec_p21;
-	vec3_t dvec_p31;
-	vec3_t normal;
+	Vec3 dvec_p21;
+	Vec3 dvec_p31;
+	Vec3 normal;
 
 	vec3_sub_dest(&dvec_p21, pp2, pp1);
 	vec3_sub_dest(&dvec_p31, pp3, pp1);
@@ -520,7 +520,7 @@ bool mu_line_plane_intersection(vec3_t *_intersect, vec3_t * _line_p1, vec3_t * 
 
 	
 
-	/*vec3_t dvec_lp21;
+	/*Vec3 dvec_lp21;
 	vec3_sub_dest(&dvec_lp21, lp2, lp1);
 	vec3_normalize(&dvec_lp21);
 
@@ -528,7 +528,7 @@ bool mu_line_plane_intersection(vec3_t *_intersect, vec3_t * _line_p1, vec3_t * 
 	bool intersects = (n_mul_a != 0.f);
 
 	if ( intersects ) {
-		vec3_t r0_sub_r1;
+		Vec3 r0_sub_r1;
 		vec3_sub_dest(&r0_sub_r1, pp1, lp1);
 
 		vec3_mul_dest(inter, &dvec_lp21, vec3_vec3mul(&normal, &r0_sub_r1) / n_mul_a);
@@ -539,15 +539,15 @@ bool mu_line_plane_intersection(vec3_t *_intersect, vec3_t * _line_p1, vec3_t * 
 	return mu_line_plane_intersection_normal(inter, lp1, lp2, pp1, &normal);
 
 }
-//vec3_t *_point, vec3_t *_plane_point, vec3_t *_normal
-bool mu_line_plane_intersection_normal(vec3_t *intersect, vec3_t *_line_p1, vec3_t *_line_p2, vec3_t * _point, vec3_t *_normal) {
-	vec3_t * pp1 = _point;
-	vec3_t * lp1 = _line_p1;
-	vec3_t * lp2 = _line_p2;
-	vec3_t * inter = intersect;
-	vec3_t * normal = _normal;
+//Vec3 *_point, Vec3 *_plane_point, Vec3 *_normal
+bool mu_line_plane_intersection_normal(Vec3 *intersect, Vec3 *_line_p1, Vec3 *_line_p2, Vec3 * _point, Vec3 *_normal) {
+	Vec3 * pp1 = _point;
+	Vec3 * lp1 = _line_p1;
+	Vec3 * lp2 = _line_p2;
+	Vec3 * inter = intersect;
+	Vec3 * normal = _normal;
 
-	vec3_t dvec_lp21;
+	Vec3 dvec_lp21;
 	vec3_sub_dest(&dvec_lp21, lp2, lp1);
 	vec3_normalize(&dvec_lp21);
 
@@ -555,7 +555,7 @@ bool mu_line_plane_intersection_normal(vec3_t *intersect, vec3_t *_line_p1, vec3
 	bool intersects = (n_mul_a != 0.f);
 
 	if ( intersects ) {
-		vec3_t r0_sub_r1;
+		Vec3 r0_sub_r1;
 		vec3_sub_dest(&r0_sub_r1, pp1, lp1);
 
 		vec3_mul_dest(inter, &dvec_lp21, vec3_vec3mul(normal, &r0_sub_r1) / n_mul_a);
@@ -565,14 +565,14 @@ bool mu_line_plane_intersection_normal(vec3_t *intersect, vec3_t *_line_p1, vec3
 	return intersects;
 }
 
-float polygon_area_2D(vec2_t *_points, size_t _cntPoints)
+float polygon_area_2D(Vec2 *_points, size_t _cntPoints)
 {
-	vec2_t *points = _points;
+	Vec2 *points = _points;
 	size_t cntPoints =_cntPoints;
 
 	float polyarea = 0.f;
-	mat2_t matrix;
-	vec2_t *p1, *p2;
+	Mat2 matrix;
+	Vec2 *p1, *p2;
 	for ( size_t curPt = 1; curPt <= cntPoints; curPt++)
 	{
 		if ( curPt == cntPoints )
@@ -585,14 +585,14 @@ float polygon_area_2D(vec2_t *_points, size_t _cntPoints)
 			p2 = &points[curPt];
 		}
 
-		matrix = (mat2_t){ p1->x, p2->x, p1->y, p2->y};
+		matrix = (Mat2){ p1->x, p2->x, p1->y, p2->y};
 		polyarea += mat2_determinant(&matrix);
 	}
 
 	return polyarea * 0.5f;
 }
 
-bool polygon_2D_is_clockwise(vec2_t *points, size_t cntPoints)
+bool polygon_2D_is_clockwise(Vec2 *points, size_t cntPoints)
 {
 	return polygon_area_2D(points, cntPoints) < 0.f;
 }

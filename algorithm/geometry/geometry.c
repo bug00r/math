@@ -4,9 +4,9 @@
 
 typedef struct {
     size_t     cnt_points;
-    vec2_t      **points;
-    dl_list_t    *upper;
-    dl_list_t    *lower;
+    Vec2      **points;
+    DlList    *upper;
+    DlList    *lower;
 } convex_hull_t;
 
 
@@ -14,15 +14,15 @@ typedef int (*__GEOM_CMP_FUNC)(const void*, const void*);
 
 #ifdef debug
 static void
-__geometry_vec2_print_wrapper(vec2_t **vec) 
+__geometry_vec2_print_wrapper(Vec2 **vec) 
 {
     printf("%p = ",*vec);vec2_print(*vec);
 }
 
 static void
-__geometry_print_points(vec2_t *_points, size_t _cnt_points)
+__geometry_print_points(Vec2 *_points, size_t _cnt_points)
 {
-    vec2_t *points = _points;
+    Vec2 *points = _points;
     size_t cnt_points = _cnt_points;
     for(int i = 0; i < cnt_points; ++i)
     {
@@ -32,9 +32,9 @@ __geometry_print_points(vec2_t *_points, size_t _cnt_points)
 #endif
 
 static 
-int __geometry_compare_points_ch(const vec2_t *_a, const vec2_t *_b) 
+int __geometry_compare_points_ch(const Vec2 *_a, const Vec2 *_b) 
 {
-    const vec2_t *a = _a, *b = _b;
+    const Vec2 *a = _a, *b = _b;
     int result = 0;
     if ( a->x > b->x ) 
     {
@@ -65,7 +65,7 @@ void __geometry_sort_points(convex_hull_t* ctx)
         __geometry_print_points(*ctx->points, ctx->cnt_points);
     #endif
 
-    qsort(*ctx->points, ctx->cnt_points, sizeof(vec2_t), (__GEOM_CMP_FUNC)__geometry_compare_points_ch);
+    qsort(*ctx->points, ctx->cnt_points, sizeof(Vec2), (__GEOM_CMP_FUNC)__geometry_compare_points_ch);
 
     #ifdef debug
         printf("points(sorted): \n");
@@ -74,16 +74,16 @@ void __geometry_sort_points(convex_hull_t* ctx)
 }
 
 static float 
-__geometry_curve_direction(vec2_t *start, vec2_t *end, vec2_t *point) 
+__geometry_curve_direction(Vec2 *start, Vec2 *end, Vec2 *point) 
 {
-    vec2_t *s = start, *e = end, *p = point;
+    Vec2 *s = start, *e = end, *p = point;
     return (p->x - s->x) * (e->y - s->y) - (p->y - s->y) * (e->x - s->x);
 }
 
 static bool
-__geometry_ch_should_delete(dl_list_t *list)
+__geometry_ch_should_delete(DlList *list)
 {   
-    dl_list_t *u = list;
+    DlList *u = list;
     return (    (u->cnt > 2 ) 
             &&  (__geometry_curve_direction(dl_list_get(u, (u->cnt-3))
                                            ,dl_list_get(u, (u->cnt-1))
@@ -94,8 +94,8 @@ static void
 __geometry_upper_cv(const convex_hull_t* ctx) 
 {
     size_t cnt_points = ctx->cnt_points;
-    dl_list_t *upper = ctx->upper;
-    vec2_t *points = *ctx->points;
+    DlList *upper = ctx->upper;
+    Vec2 *points = *ctx->points;
 
     uint32_t cur_upper_idx = 0;
 
@@ -123,8 +123,8 @@ __geometry_lower_cv(const convex_hull_t* ctx)
 {
 
     size_t cnt_points = ctx->cnt_points;
-    dl_list_t *lower = ctx->lower;
-    vec2_t *points = *ctx->points;
+    DlList *lower = ctx->lower;
+    Vec2 *points = *ctx->points;
 
     size_t cur_lower_idx = cnt_points-1;
     dl_list_append(lower, &points[cur_lower_idx]);
@@ -145,11 +145,11 @@ __geometry_lower_cv(const convex_hull_t* ctx)
 struct __gemoetry_join_ctx 
 {
     int32_t index;
-    vec2_t **array;
+    Vec2 **array;
 };
 
 static void
-__add_data_to_array(vec2_t **point, struct __gemoetry_join_ctx* _join_ctx) 
+__add_Datao_array(Vec2 **point, struct __gemoetry_join_ctx* _join_ctx) 
 {
     struct __gemoetry_join_ctx *join_ctx = _join_ctx;
     #ifdef debug
@@ -160,11 +160,11 @@ __add_data_to_array(vec2_t **point, struct __gemoetry_join_ctx* _join_ctx)
 }
 
 static void
- __geometry_join_ul(convex_hull_t* ctx, vec2_t ***_result)
+ __geometry_join_ul(convex_hull_t* ctx, Vec2 ***_result)
 {
-    dl_list_t *upper = ctx->upper;
-    dl_list_t *lower = ctx->lower;
-    vec2_t **result;
+    DlList *upper = ctx->upper;
+    DlList *lower = ctx->lower;
+    Vec2 **result;
 
     dl_list_remove(lower, (lower->cnt-1));
     dl_list_remove(lower, 0);
@@ -174,12 +174,12 @@ static void
     #endif
 
     size_t elements = (lower->cnt + upper->cnt + 1);
-    result = calloc(elements, sizeof(vec2_t*));
+    result = calloc(elements, sizeof(Vec2*));
 
     struct __gemoetry_join_ctx join_ctx = {0, result};
 
-    dl_list_each_data(upper, &join_ctx, (EACH_FUNC_DATA) __add_data_to_array);
-    dl_list_each_data(lower, &join_ctx, (EACH_FUNC_DATA) __add_data_to_array);
+    dl_list_each_data(upper, &join_ctx, (EACH_FUNC_DATA) __add_Datao_array);
+    dl_list_each_data(lower, &join_ctx, (EACH_FUNC_DATA) __add_Datao_array);
 
     *_result = result;
 }
@@ -189,10 +189,10 @@ static void __geometry_cleanup_ch_ctx(convex_hull_t* ctx) {
     dl_list_free(&ctx->lower);
 }
 
-vec2_t**
-geometry_convex_hull(vec2_t *points, size_t cnt_points) 
+Vec2**
+geometry_convex_hull(Vec2 *points, size_t cnt_points) 
 {
-    vec2_t **result = NULL;
+    Vec2 **result = NULL;
 
     if (points && (cnt_points > 3)) {
         convex_hull_t ch_ctx = { cnt_points, &points, dl_list_new(), dl_list_new() };
@@ -216,9 +216,9 @@ geometry_convex_hull(vec2_t *points, size_t cnt_points)
 
 //algorithm: https://de.wikipedia.org/wiki/Bresenham-Algorithmus :D
 void 
-geometry_line(vec2_t *start, vec2_t *end, RASTER_FUNC_2D rFunc, void *data)
+geometry_line(Vec2 *start, Vec2 *end, RASTER_FUNC_2D rFunc, void *data)
 {   
-    vec2_t  *s = start,
+    Vec2  *s = start,
             *e = end;
     RASTER_FUNC_2D func = rFunc;
     void * dat = data;
@@ -240,10 +240,10 @@ geometry_line(vec2_t *start, vec2_t *end, RASTER_FUNC_2D rFunc, void *data)
 }
 
 void 
-geometry_circle(vec2_t *center, int32_t *_radius, RASTER_FUNC_2D rFunc, void *data)
+geometry_circle(Vec2 *center, int32_t *_radius, RASTER_FUNC_2D rFunc, void *data)
 {
     int32_t radius = *_radius;
-    vec2_t  *c = center;
+    Vec2  *c = center;
     int32_t x0 = (int32_t)c->x,
             y0 = (int32_t)c->y;
     RASTER_FUNC_2D func = rFunc;
@@ -299,7 +299,7 @@ geometry_circle(vec2_t *center, int32_t *_radius, RASTER_FUNC_2D rFunc, void *da
 }
 
 void 
-geometry_ellipse(vec2_t *center, int32_t *_a, int32_t *_b, RASTER_FUNC_2D rFunc, void *data)
+geometry_ellipse(Vec2 *center, int32_t *_a, int32_t *_b, RASTER_FUNC_2D rFunc, void *data)
 {
 
     RASTER_FUNC_2D func = rFunc;
@@ -338,9 +338,9 @@ geometry_ellipse(vec2_t *center, int32_t *_a, int32_t *_b, RASTER_FUNC_2D rFunc,
 /* TRIANGULATION */
 
 /* creats a list from pointer to vec, there is no need to allocate extra memory. */
-static dl_list_t * __geometry_create_list_from_vecs(const vec3_t *vecs, size_t cnt_vecs) 
+static DlList * __geometry_create_list_from_vecs(const Vec3 *vecs, size_t cnt_vecs) 
 {
-    dl_list_t * vec_list = dl_list_new();
+    DlList * vec_list = dl_list_new();
 
     for ( size_t curVec = 0; curVec < cnt_vecs; ++curVec ) {
         dl_list_append(vec_list, (void*)&vecs[curVec]);
@@ -349,8 +349,8 @@ static dl_list_t * __geometry_create_list_from_vecs(const vec3_t *vecs, size_t c
     return vec_list;
 }
 
-//bool lines_intersect(vec2_t* _l1p1, vec2_t* _l1p2, vec2_t* _l2p1, vec2_t* _l2p2)
-static bool __geometry_any_intersection(dl_list_t * vec_list, vec3_t *firstPt, vec3_t *lastPt,
+//bool lines_intersect(Vec2* _l1p1, Vec2* _l1p2, Vec2* _l2p1, Vec2* _l2p2)
+static bool __geometry_any_intersection(DlList * vec_list, Vec3 *firstPt, Vec3 *lastPt,
                                                               int32_t *firstPtIdx, int32_t *lastPtIdx) {
 
     bool intersection = false;
@@ -372,10 +372,10 @@ static bool __geometry_any_intersection(dl_list_t * vec_list, vec3_t *firstPt, v
 
         if ( firstIdx < _firstPtIdx || firstIdx >= _lastPtIdx ) {
 
-            vec3_t *f = (vec3_t*)dl_list_get(vec_list, firstIdx);
-            vec3_t *l = (vec3_t*)dl_list_get(vec_list, lastIdx);
+            Vec3 *f = (Vec3*)dl_list_get(vec_list, firstIdx);
+            Vec3 *l = (Vec3*)dl_list_get(vec_list, lastIdx);
 
-            vec2_t l1p1, l1p2, l2p1, l2p2, intersection_pt;
+            Vec2 l1p1, l1p2, l2p1, l2p2, intersection_pt;
             l1p1.x = f->x;
             l1p1.y = f->y; 
             l1p2.x = l->x;
@@ -418,14 +418,14 @@ static bool __geometry_any_intersection(dl_list_t * vec_list, vec3_t *firstPt, v
     return false;
 }
 
-dl_list_t * 
-geometry_triangulate(const vec3_t *vecs, size_t cnt_vecs) 
+DlList * 
+geometry_triangulate(const Vec3 *vecs, size_t cnt_vecs) 
 {
-    dl_list_t * triangulated = NULL;
+    DlList * triangulated = NULL;
 
     if ( cnt_vecs > 3 ) {
 
-        dl_list_t * vec_list = __geometry_create_list_from_vecs(vecs, cnt_vecs);
+        DlList * vec_list = __geometry_create_list_from_vecs(vecs, cnt_vecs);
         
         triangulated = dl_list_new();
 
@@ -443,11 +443,11 @@ geometry_triangulate(const vec3_t *vecs, size_t cnt_vecs)
             printf("f: %i m: %i l: %i max: %i\n", firstIdx, middleIdx, lastIdx, maxIdx);
             #endif
 
-            vec3_t *f,*m,*l;
+            Vec3 *f,*m,*l;
 
-            f = (vec3_t*)dl_list_get(vec_list, firstIdx);
-            m = (vec3_t*)dl_list_get(vec_list, middleIdx);
-            l = (vec3_t*)dl_list_get(vec_list, lastIdx);
+            f = (Vec3*)dl_list_get(vec_list, firstIdx);
+            m = (Vec3*)dl_list_get(vec_list, middleIdx);
+            l = (Vec3*)dl_list_get(vec_list, lastIdx);
 
             float place = place_of_vec3(f, l, m);
             
@@ -504,9 +504,9 @@ geometry_triangulate(const vec3_t *vecs, size_t cnt_vecs)
                 printf("last triangle!!\n");
                 #endif
                 /* here we are saving the last triangle */
-                f = (vec3_t*)dl_list_get(vec_list, 0);
-                m = (vec3_t*)dl_list_get(vec_list, 1);
-                l = (vec3_t*)dl_list_get(vec_list, 2);
+                f = (Vec3*)dl_list_get(vec_list, 0);
+                m = (Vec3*)dl_list_get(vec_list, 1);
+                l = (Vec3*)dl_list_get(vec_list, 2);
                 
                 dl_list_append(triangulated, &*f);
                 dl_list_append(triangulated, &*m);
@@ -532,17 +532,17 @@ geometry_triangulate(const vec3_t *vecs, size_t cnt_vecs)
 
 /* START BEZIER */
 
-void geometry_bezier1(vec2_t *start, vec2_t *cp, vec2_t *end, uint32_t *steps, RASTER_BEZIER_FUNC_2D rFunc, void *data) 
+void geometry_bezier1(Vec2 *start, Vec2 *cp, Vec2 *end, uint32_t *steps, RASTER_BEZIER_FUNC_2D rFunc, void *data) 
 {
     
-    vec2_t middle;
-    vec2_t middle_before;
-    vec2_t middle_unit;
-    vec2_t s_cp_unit;
-    vec2_t s_cp;
-    vec2_t cp_e_unit;
-    vec2_t cp_e;
-    vec2_t temp;
+    Vec2 middle;
+    Vec2 middle_before;
+    Vec2 middle_unit;
+    Vec2 s_cp_unit;
+    Vec2 s_cp;
+    Vec2 cp_e_unit;
+    Vec2 cp_e;
+    Vec2 temp;
 
     float s_cp_len;
     float s_cp_step;
@@ -589,7 +589,7 @@ void geometry_bezier1(vec2_t *start, vec2_t *cp, vec2_t *end, uint32_t *steps, R
         vec2_mul_dest(&temp, &middle_unit, curStep * middle_step);
         vec2_add_dest(&middle, &s_cp, &temp);
 
-        rFunc((vec2_t const * const)&middle_before, (vec2_t const * const)&middle, data);
+        rFunc((Vec2 const * const)&middle_before, (Vec2 const * const)&middle, data);
 
         vec2_copy_dest(&middle_before, &middle);
     }
@@ -597,18 +597,18 @@ void geometry_bezier1(vec2_t *start, vec2_t *cp, vec2_t *end, uint32_t *steps, R
 
 }
 
-void geometry_bezier2(vec2_t *start, vec2_t *cp1, vec2_t *cp2, vec2_t *end, uint32_t *steps, RASTER_BEZIER_FUNC_2D rFunc, void *data)
+void geometry_bezier2(Vec2 *start, Vec2 *cp1, Vec2 *cp2, Vec2 *end, uint32_t *steps, RASTER_BEZIER_FUNC_2D rFunc, void *data)
 {
-    vec2_t middle;
-    vec2_t middle_before;
-    vec2_t middle_unit;
-    vec2_t s_cp1_unit;
-    vec2_t s_cp1;
-    vec2_t cp1_cp2_unit;
-    vec2_t cp1_cp2;
-    vec2_t cp2_e_unit;
-    vec2_t cp2_e;
-    vec2_t temp;
+    Vec2 middle;
+    Vec2 middle_before;
+    Vec2 middle_unit;
+    Vec2 s_cp1_unit;
+    Vec2 s_cp1;
+    Vec2 cp1_cp2_unit;
+    Vec2 cp1_cp2;
+    Vec2 cp2_e_unit;
+    Vec2 cp2_e;
+    Vec2 temp;
 
     float s_cp1_len;
     float s_cp1_step;
@@ -658,8 +658,8 @@ void geometry_bezier2(vec2_t *start, vec2_t *cp1, vec2_t *cp2, vec2_t *end, uint
 
 
         /* compute needed values from ctrl point 1 to ctrl point 2 */
-        vec2_t side1;
-        vec2_t side1_unit;
+        Vec2 side1;
+        Vec2 side1_unit;
         float side1_len;
         float side1_step;
 
@@ -673,8 +673,8 @@ void geometry_bezier2(vec2_t *start, vec2_t *cp1, vec2_t *cp2, vec2_t *end, uint
         vec2_add_dest(&side1, &s_cp1, &temp);
 
         /* compute needed values from ctrl point 1 to ctrl point 2 */
-        vec2_t side2;
-        vec2_t side2_unit;
+        Vec2 side2;
+        Vec2 side2_unit;
         float side2_len;
         float side2_step;
 
@@ -697,7 +697,7 @@ void geometry_bezier2(vec2_t *start, vec2_t *cp1, vec2_t *cp2, vec2_t *end, uint
         vec2_mul_dest(&temp, &middle_unit, curStep * middle_step);
         vec2_add_dest(&middle, &side1, &temp);
 
-        rFunc((vec2_t const * const)&middle_before, (vec2_t const * const)&middle, data);
+        rFunc((Vec2 const * const)&middle_before, (Vec2 const * const)&middle, data);
 
         vec2_copy_dest(&middle_before, &middle);
     }

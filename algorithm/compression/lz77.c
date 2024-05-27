@@ -653,7 +653,7 @@ void __lz77_decode(lz77CtxPtr _ctx)
 
 /***** PUBLIC INTERFACE *****/
 
-lz77_result_t en_lz77_u8(lz77BufPtr srcBuf, lz77BufPtr dstBuf, lz77ParamPtr param)
+LZ77Result en_lz77_u8(lz77BufPtr srcBuf, lz77BufPtr dstBuf, lz77ParamPtr param)
 {
     lz77_ctx_t ctx;
 
@@ -664,13 +664,13 @@ lz77_result_t en_lz77_u8(lz77BufPtr srcBuf, lz77BufPtr dstBuf, lz77ParamPtr para
     return LZ77_OK;
 }
 
-lz77_result_t de_lz77_u8(lz77BufPtr srcBuf, lz77BufPtr dstBuf)
+LZ77Result de_lz77_u8(lz77BufPtr srcBuf, lz77BufPtr dstBuf)
 {
     lz77_ctx_t ctx;
 
     __lz77_init_ctx(&ctx, srcBuf, dstBuf, NULL);
 
-    lz77_result_t result = LZ77_OK; 
+    LZ77Result result = LZ77_OK; 
 
     if ( __lz77_cnt_triplets_valid(ctx.srcBuf) )
     {
