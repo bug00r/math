@@ -46,10 +46,8 @@ CRYPT_MODULES=base64
 OBJS=$(patsubst %, $(BUILDPATH)%.o, $(CRYPT_MODULES))
 #OBJS=$(BUILDPATH)$(NAME).o
 
-override CFLAGS+=-I/c/dev/include
+override CFLAGS+=-I. -I/c/dev/include
 LIBSDIR?=-L/c/dev/lib$(BIT_SUFFIX)
-
-override CFLAGS+=-I.
 
 TESTBIN=$(BUILDPATH)test_$(NAME).exe
 TESTLIB= -l$(NAME)

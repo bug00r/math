@@ -43,7 +43,7 @@ LIBNAME=lib$(NAME).a
 LIB=$(BUILDPATH)$(LIBNAME)
 OBJS=$(BUILDPATH)$(NAME).o
 
-override CFLAGS+=-I/c/dev/include -I.
+override CFLAGS+=-I. -I/c/dev/include 
 
 LIBSDIR?=-L/c/dev/lib$(BIT_SUFFIX)
 

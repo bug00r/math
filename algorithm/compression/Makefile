@@ -46,10 +46,8 @@ COMPRESSION_MODULES=deflate checksum lz77
 OBJS=$(patsubst %, $(BUILDPATH)%.o, $(COMPRESSION_MODULES))
 #OBJS=$(BUILDPATH)$(NAME).o
 
-override CFLAGS+=-I/c/dev/include
+override CFLAGS+=-I. -I/c/dev/include
 LIBSDIR?=-L/c/dev/lib$(BIT_SUFFIX)
-
-override CFLAGS+=-I.
 
 TESTBIN=$(BUILDPATH)test_$(NAME).exe
 TESTLIB= -l$(NAME)
