@@ -52,6 +52,16 @@ TESTLIBDIR=-L$(BUILDDIR) $(LIBSDIR)
 
 override LDFLAGS+=$(TESTLIBDIR) $(TESTLIB)
 
+UNAME_S := $(shell uname -s)
+
+ifeq ($(OS), Windows_NT)
+	#nothing yet
+endif
+
+ifeq ($(UNAME_S), Linux) 
+	override LDFLAGS+=-lm
+endif
+
 all: mkbuilddir $(LIB)
 
 $(LIB): $(OBJS)
